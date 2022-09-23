@@ -11,12 +11,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/factory"
-	profctx "github.com/omec-project/gnbsim/profile/context"
-	"github.com/omec-project/gnbsim/profile/util"
-	"github.com/omec-project/gnbsim/simue"
-	simuectx "github.com/omec-project/gnbsim/simue/context"
+	"gnbsim/common"
+	"gnbsim/factory"
+	profctx "gnbsim/profile/context"
+	"gnbsim/profile/util"
+	"gnbsim/simue"
+	simuectx "gnbsim/simue/context"
 )
 
 //profile names

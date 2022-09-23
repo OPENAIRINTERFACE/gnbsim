@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/omec-project/gnbsim/common"
-	realuectx "github.com/omec-project/gnbsim/realue/context"
+	"gnbsim/common"
+	realuectx "gnbsim/realue/context"
 )
 
 func Init(pduSess *realuectx.PduSession, wg *sync.WaitGroup) {

@@ -14,8 +14,8 @@ import (
 	"fmt"
 	"os"
 
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	profctx "github.com/omec-project/gnbsim/profile/context"
+	gnbctx "gnbsim/gnodeb/context"
+	profctx "gnbsim/profile/context"
 )
 
 const (

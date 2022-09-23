@@ -7,11 +7,11 @@ package context
 import (
 	"sync"
 
-	"github.com/omec-project/gnbsim/common"
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	"github.com/omec-project/gnbsim/logger"
-	profctx "github.com/omec-project/gnbsim/profile/context"
-	realuectx "github.com/omec-project/gnbsim/realue/context"
+	"gnbsim/common"
+	gnbctx "gnbsim/gnodeb/context"
+	"gnbsim/logger"
+	profctx "gnbsim/profile/context"
+	realuectx "gnbsim/realue/context"
 
 	"github.com/omec-project/nas/security"
 	"github.com/sirupsen/logrus"

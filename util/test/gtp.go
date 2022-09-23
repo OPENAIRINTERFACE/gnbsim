@@ -9,7 +9,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/logger"
 )
 
 const (

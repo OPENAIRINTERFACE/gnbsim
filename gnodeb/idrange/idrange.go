@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/logger"
 )
 
 /*

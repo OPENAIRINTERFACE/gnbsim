@@ -11,8 +11,8 @@ import (
 	"regexp"
 	"sync"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/common"
+	"gnbsim/logger"
 
 	"github.com/omec-project/UeauCommon"
 	"github.com/omec-project/milenage"

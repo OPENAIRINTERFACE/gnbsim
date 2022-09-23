@@ -7,8 +7,8 @@ package context
 import (
 	"net"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/common"
+	"gnbsim/logger"
 
 	"github.com/omec-project/openapi/models"
 	"github.com/sirupsen/logrus"

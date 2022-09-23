@@ -4,7 +4,7 @@
 
 package common
 
-import "github.com/omec-project/gnbsim/logger"
+import "gnbsim/logger"
 
 type EventType uint32
 

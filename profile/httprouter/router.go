@@ -11,7 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/logger"
 	"github.com/omec-project/logger_util"
 )
 

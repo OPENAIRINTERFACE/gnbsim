@@ -5,9 +5,9 @@
 package realue
 
 import (
-	"github.com/omec-project/gnbsim/common"
-	realuectx "github.com/omec-project/gnbsim/realue/context"
-	"github.com/omec-project/gnbsim/util/test"
+	"gnbsim/common"
+	realuectx "gnbsim/realue/context"
+	"gnbsim/util/test"
 )
 
 func Init(ue *realuectx.RealUe) {

@@ -7,8 +7,8 @@ package gnbamfworker
 import (
 	"fmt"
 
-	"github.com/omec-project/gnbsim/common"
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
+	"gnbsim/common"
+	gnbctx "gnbsim/gnodeb/context"
 
 	"github.com/omec-project/ngap"
 	"github.com/omec-project/ngap/ngapType"

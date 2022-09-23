@@ -9,9 +9,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/omec-project/gnbsim/logger"
-	profile "github.com/omec-project/gnbsim/profile"
-	profCtx "github.com/omec-project/gnbsim/profile/context"
+	"gnbsim/logger"
+	profile "gnbsim/profile"
+	profCtx "gnbsim/profile/context"
 	"github.com/omec-project/openapi"
 	"github.com/omec-project/openapi/models"
 )

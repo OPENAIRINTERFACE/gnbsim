@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/omec-project/gnbsim/common"
-	simuectx "github.com/omec-project/gnbsim/simue/context"
+	"gnbsim/common"
+	simuectx "gnbsim/simue/context"
 )
 
 func HandleProfileStartEvent(ue *simuectx.SimUe,

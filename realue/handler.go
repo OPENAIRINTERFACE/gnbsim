@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/omec-project/gnbsim/common"
-	realuectx "github.com/omec-project/gnbsim/realue/context"
-	"github.com/omec-project/gnbsim/realue/util"
-	"github.com/omec-project/gnbsim/realue/worker/pdusessworker"
+	"gnbsim/common"
+	realuectx "gnbsim/realue/context"
+	"gnbsim/realue/util"
+	"gnbsim/realue/worker/pdusessworker"
 
-	realue_nas "github.com/omec-project/gnbsim/realue/nas"
+	realue_nas "gnbsim/realue/nas"
 
 	"github.com/omec-project/nas"
 	"github.com/omec-project/nas/nasConvert"

@@ -15,13 +15,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/factory"
-	"github.com/omec-project/gnbsim/gnodeb"
-	"github.com/omec-project/gnbsim/httpserver"
-	"github.com/omec-project/gnbsim/logger"
-	prof "github.com/omec-project/gnbsim/profile"
-	profctx "github.com/omec-project/gnbsim/profile/context"
+	"gnbsim/common"
+	"gnbsim/factory"
+	"gnbsim/gnodeb"
+	"gnbsim/httpserver"
+	"gnbsim/logger"
+	prof "gnbsim/profile"
+	profctx "gnbsim/profile/context"
 
 	"github.com/urfave/cli"
 )

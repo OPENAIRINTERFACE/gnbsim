@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
-	"github.com/omec-project/gnbsim/factory"
-	"github.com/omec-project/gnbsim/logger"
-	profilerouter "github.com/omec-project/gnbsim/profile/httprouter"
+	"gnbsim/factory"
+	"gnbsim/logger"
+	profilerouter "gnbsim/profile/httprouter"
 	"github.com/omec-project/http2_util"
 	"github.com/omec-project/logger_util"
 	"golang.org/x/net/context"

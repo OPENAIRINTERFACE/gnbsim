@@ -5,7 +5,7 @@
 package context
 
 import (
-	transport "github.com/omec-project/gnbsim/transportcommon"
+	transport "gnbsim/transportcommon"
 
 	"github.com/omec-project/idgenerator"
 	"github.com/omec-project/openapi/models"

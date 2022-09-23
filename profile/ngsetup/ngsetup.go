@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/omec-project/gnbsim/factory"
-	"github.com/omec-project/gnbsim/gnodeb"
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	profctx "github.com/omec-project/gnbsim/profile/context"
+	"gnbsim/factory"
+	"gnbsim/gnodeb"
+	gnbctx "gnbsim/gnodeb/context"
+	profctx "gnbsim/profile/context"
 )
 
 func NgSetup_test(profile *profctx.Profile) {

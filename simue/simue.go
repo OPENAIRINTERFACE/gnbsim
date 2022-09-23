@@ -7,10 +7,10 @@ package simue
 import (
 	"fmt"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/gnodeb"
-	"github.com/omec-project/gnbsim/realue"
-	simuectx "github.com/omec-project/gnbsim/simue/context"
+	"gnbsim/common"
+	"gnbsim/gnodeb"
+	"gnbsim/realue"
+	simuectx "gnbsim/simue/context"
 )
 
 func Init(simUe *simuectx.SimUe) {

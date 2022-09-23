@@ -8,8 +8,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	"github.com/omec-project/gnbsim/util/ngapTestpacket"
+	gnbctx "gnbsim/gnodeb/context"
+	"gnbsim/util/ngapTestpacket"
 
 	"github.com/omec-project/ngap"
 	"github.com/omec-project/ngap/ngapConvert"

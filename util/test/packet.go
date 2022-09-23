@@ -5,7 +5,7 @@
 package test
 
 import (
-	"github.com/omec-project/gnbsim/util/ngapTestpacket"
+	"gnbsim/util/ngapTestpacket"
 	"github.com/omec-project/ngap"
 )
 

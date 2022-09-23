@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"reflect"
 
-	realuectx "github.com/omec-project/gnbsim/realue/context"
+	realuectx "gnbsim/realue/context"
 
 	"github.com/omec-project/nas"
 	"github.com/omec-project/nas/nasMessage"

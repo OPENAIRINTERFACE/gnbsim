@@ -9,6 +9,8 @@
 
 package factory
 
+// Raphael DEFOSSEUX: again touching it.
+
 import (
 	"fmt"
 	"io/ioutil"

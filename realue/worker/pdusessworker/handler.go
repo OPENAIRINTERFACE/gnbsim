@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/omec-project/gnbsim/common"
-	realuectx "github.com/omec-project/gnbsim/realue/context"
-	"github.com/omec-project/gnbsim/util/test"
+	"gnbsim/common"
+	realuectx "gnbsim/realue/context"
+	"gnbsim/util/test"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"

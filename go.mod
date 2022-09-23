@@ -1,6 +1,12 @@
-module github.com/omec-project/gnbsim
+module github.com/openairinterface/gnbsim
 
 go 1.15
+
+replace (
+	github.com/omec-project/nas => ../nas
+	github.com/omec-project/ngap => ../ngap
+	gnbsim => ../gnbsim
+)
 
 require (
 	git.cs.nctu.edu.tw/calee/sctp v1.1.0
@@ -25,6 +31,7 @@ require (
 	github.com/ugorji/go v1.2.3 // indirect
 	github.com/urfave/cli v1.22.4
 	github.com/yerden/go-util v1.1.4
+	gnbsim v0.0.0-00010101000000-000000000000 // indirect
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da

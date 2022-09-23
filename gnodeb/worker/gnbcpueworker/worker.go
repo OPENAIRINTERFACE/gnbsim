@@ -5,8 +5,8 @@
 package gnbcpueworker
 
 import (
-	"github.com/omec-project/gnbsim/common"
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
+	"gnbsim/common"
+	gnbctx "gnbsim/gnodeb/context"
 )
 
 func Init(gnbue *gnbctx.GnbCpUe) {

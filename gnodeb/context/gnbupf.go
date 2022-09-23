@@ -8,8 +8,8 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/omec-project/gnbsim/common"
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/common"
+	"gnbsim/logger"
 
 	"github.com/sirupsen/logrus"
 )

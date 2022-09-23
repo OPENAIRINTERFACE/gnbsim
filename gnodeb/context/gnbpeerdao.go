@@ -7,7 +7,7 @@ package context
 import (
 	"sync"
 
-	"github.com/omec-project/gnbsim/logger"
+	"gnbsim/logger"
 
 	"github.com/sirupsen/logrus"
 )

@@ -9,10 +9,10 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/omec-project/gnbsim/common"
-	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	"github.com/omec-project/gnbsim/logger"
-	"github.com/omec-project/gnbsim/transportcommon"
+	"gnbsim/common"
+	gnbctx "gnbsim/gnodeb/context"
+	"gnbsim/logger"
+	"gnbsim/transportcommon"
 
 	"github.com/sirupsen/logrus"
 )
