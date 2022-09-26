@@ -12,7 +12,7 @@ WORKDIR $GOPATH/src/gnbsim
 COPY . $GOPATH/src/gnbsim 
 
 RUN cd $GOPATH/src/gnbsim && \
-    go build -mod=vendor && \
+    go build -buildvcs=false -mod=vendor && \
     ldd gnbsim
 
 FROM debian:bullseye-slim AS gnbsim
@@ -25,4 +25,4 @@ WORKDIR /gnbsim/bin
 
 COPY --from=sim $GOPATH/src/gnbsim/gnbsim /gnbsim/bin/
 RUN ldconfig && \
-    ldd /gnbsim/bin/
+    ldd /gnbsim/bin/gnbsim
