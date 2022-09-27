@@ -108,11 +108,11 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 			Mu.Unlock()
 		}(simUe)
 
-		if profile.ExecInParallel == false {
+		if !profile.ExecInParallel {
 			wg.Wait()
 		}
 	}
-	if profile.ExecInParallel == true {
+	if profile.ExecInParallel {
 		wg.Wait()
 	}
 }

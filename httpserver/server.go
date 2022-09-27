@@ -62,7 +62,7 @@ func StartHttpServer() (err error) {
 	serverScheme := "http"
 	if serverScheme == "http" {
 		err = server.ListenAndServe()
-	} else if serverScheme == "https" {
+	    //} else if serverScheme == "https" {
 		//To Do
 	}
 

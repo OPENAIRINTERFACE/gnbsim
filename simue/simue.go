@@ -115,10 +115,16 @@ func HandleEvents(ue *simuectx.SimUe) {
 		case common.DEREG_ACCEPT_UE_TERM_EVENT:
 			err = HandleNwDeregAcceptEvent(ue, msg)
 		case common.ERROR_EVENT:
-			HandleErrorEvent(ue, msg)
+			err = HandleErrorEvent(ue, msg)
+			if err != nil {
+				ue.Log.Errorln("HandleErrorEvent failed")
+			}
 			return
 		case common.QUIT_EVENT:
-			HandleQuitEvent(ue, msg)
+			err = HandleQuitEvent(ue, msg)
+			if err != nil {
+				ue.Log.Errorln("HandleQuitEvent failed")
+			}
 			return
 		default:
 			ue.Log.Warnln("Event:", event, "is not supported")
@@ -128,14 +134,14 @@ func HandleEvents(ue *simuectx.SimUe) {
 			ue.Log.Errorln("Failed to handle event:", event, "Error:", err)
 			msg := &common.UeMessage{}
 			msg.Error = err
-			err = nil
 			msg.Event = common.ERROR_EVENT
-			HandleErrorEvent(ue, msg)
-			return
+			err = HandleErrorEvent(ue, msg)
+			// for linter
+			if err != nil {
+				ue.Log.Errorln("HandleErrorEvent never fails")
+			}
 		}
 	}
-
-	return
 }
 
 func SendToRealUe(ue *simuectx.SimUe, msg common.InterfaceMessage) {

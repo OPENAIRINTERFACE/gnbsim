@@ -156,17 +156,20 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 				cpTprt.Log.Warnln("SCTP read timeout")
 				continue
 			case syscall.EINTR:
-				cpTprt.Log.Warnln("SCTPRead: %+v\n", err)
+				cpTprt.Log.Warnln("SCTPRead: %+u\n", err)
 				continue
 			default:
-				cpTprt.Log.Errorln("Handle connection[addr: %+v] error: %+v\n", amf.Conn.RemoteAddr(), err)
+				cpTprt.Log.Errorln("Handle connection[addr: %+u] error: %+u\n", conn.RemoteAddr().String(), err)
 				return
 			}
 		}
 
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
 		//TODO Post to gnbamfworker channel
-		gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
+		var msg_err error = gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
+		if msg_err != nil {
+			cpTprt.Log.Errorln("gnbamfworker.HandleMessage failed")
+		}
 	}
 }
 

@@ -111,7 +111,10 @@ func HandleIcmpMessage(pduSess *realuectx.PduSession,
 
 		pduSess.RxDataPktCount++
 		if pduSess.TxDataPktCount < pduSess.ReqDataPktCount {
-			SendIcmpEchoRequest(pduSess)
+			err = SendIcmpEchoRequest(pduSess)
+			if err != nil {
+				return fmt.Errorf("failed to send icmp echo req:%v", err)
+			}
 		} else {
 			msg := &common.UuMessage{}
 			msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
@@ -197,7 +200,7 @@ func HandleQuitEvent(pduSess *realuectx.PduSession,
 	// Drain all the messages until END MARKER is received.
 	// This ensures that the transmitting go routine is not blocked while
 	// sending data on this channel
-	if pduSess.LastDataPktRecvd != true {
+	if !pduSess.LastDataPktRecvd {
 		for pkt := range pduSess.ReadDlChan {
 			if pkt.GetEventType() == common.LAST_DATA_PKT_EVENT {
 				pduSess.Log.Debugln("Received last downlink data packet")

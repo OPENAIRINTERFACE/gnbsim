@@ -394,7 +394,11 @@ func HandleErrorEvent(ue *simuectx.SimUe,
 
 	msg := &common.UuMessage{}
 	msg.Event = common.QUIT_EVENT
-	HandleQuitEvent(ue, msg)
+	err = HandleQuitEvent(ue, msg)
+	if err != nil {
+		ue.Log.Errorln("HandleQuitEvent returned:", err)
+		return err
+	}
 	return nil
 }
 
