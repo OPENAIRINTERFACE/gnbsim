@@ -15,6 +15,8 @@ import (
 	"github.com/omec-project/ngap/ngapConvert"
 	"github.com/omec-project/ngap/ngapType"
 	"github.com/omec-project/openapi/models"
+
+	"fmt"
 )
 
 // HandleNGSetupResponse processes the NG Setup Response and updates GnbAmf
@@ -27,7 +29,8 @@ func HandleNgSetupResponse(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 	// TODO Process optional IEs
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing NG Setup Response")
@@ -162,7 +165,8 @@ func HandleNgSetupFailure(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 	var cause *ngapType.Cause
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing NG Setup Failure")
@@ -208,7 +212,8 @@ func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing Downlink Nas Transport")
@@ -260,7 +265,8 @@ func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing Initial Context Setup Request")
@@ -311,7 +317,8 @@ func HandlePduSessResourceSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing Pdu Session Resource Setup Request")
@@ -360,7 +367,8 @@ func HandlePduSessResourceReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing Pdu Session Resource Release Command")
@@ -408,7 +416,8 @@ func HandleUeCtxReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	pdu *ngapType.NGAPPDU) {
 
 	if amf == nil {
-		amf.Log.Errorln("ran is nil")
+		err := fmt.Errorf("amf pointer is nil")
+		fmt.Println(err)
 		return
 	}
 	amf.Log.Traceln("Processing Ue Context Release Command")
