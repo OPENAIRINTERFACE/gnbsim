@@ -108,12 +108,12 @@ func action(c *cli.Context) error {
 			prof.ExecuteProfile(profileCtx, profctx.SummaryChan)
 		}(profile)
 
-		if config.Configuration.ExecInParallel == false {
+		if !config.Configuration.ExecInParallel {
 			profileWaitGrp.Wait()
 		}
 	}
 
-	if config.Configuration.ExecInParallel == true {
+	if config.Configuration.ExecInParallel {
 		profileWaitGrp.Wait()
 	}
 

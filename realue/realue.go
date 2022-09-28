@@ -14,7 +14,10 @@ func Init(ue *realuectx.RealUe) {
 
 	ue.AuthenticationSubs = test.GetAuthSubscription(ue.Key, ue.Opc, "", ue.SeqNum)
 
-	HandleEvents(ue)
+	var err error = HandleEvents(ue)
+	if err != nil {
+		ue.Log.Errorln("HandleEvents failed")
+	}
 }
 
 func HandleEvents(ue *realuectx.RealUe) (err error) {
@@ -57,9 +60,16 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 		case common.DEREG_ACCEPT_UE_TERM_EVENT:
 			err = HandleNwDeregAcceptEvent(ue, msg)
 		case common.ERROR_EVENT:
-			HandleErrorEvent(ue, msg)
+			err = HandleErrorEvent(ue, msg)
+			if err != nil {
+				ue.Log.Errorln("real ue failed:", event, ":", err)
+			}
+			return nil
 		case common.QUIT_EVENT:
-			HandleQuitEvent(ue, msg)
+			err = HandleQuitEvent(ue, msg)
+			if err != nil {
+				ue.Log.Errorln("real ue failed:", event, ":", err)
+			}
 			return nil
 		default:
 			ue.Log.Warnln("Event", event, "is not supported")
@@ -70,8 +80,11 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 			msg := &common.UeMessage{}
 			msg.Error = err
 			msg.Event = common.ERROR_EVENT
-			err = nil
-			HandleErrorEvent(ue, msg)
+			err = HandleErrorEvent(ue, msg)
+			// Should never happen. Here for linter
+			if err != nil {
+				ue.Log.Infoln("HandleErrorEvent failed")
+			}
 		}
 	}
 

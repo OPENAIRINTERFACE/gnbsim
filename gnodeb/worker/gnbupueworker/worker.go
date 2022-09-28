@@ -37,7 +37,11 @@ func HandleEvents(gnbue *gnbctx.GnbUpUe) {
 			gnbue.Log.Infoln("Handling:", evt)
 			switch evt {
 			case common.QUIT_EVENT:
-				HandleQuitEvent(gnbue, msg)
+				err = HandleQuitEvent(gnbue, msg)
+				// Mainly for the linter since HandleQuitEvent always returns nil
+				if err != nil {
+					gnbue.Log.Errorln("HandleQuitEvent() returned:", err)
+				}
 				return
 			}
 		}

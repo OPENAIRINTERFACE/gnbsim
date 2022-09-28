@@ -1,0 +1,31 @@
+name: golangci-lint
+
+on:
+  push:
+    branches:
+      - ngap-tester
+  pull_request:
+    branches:
+      - ngap-tester
+    types: [ opened, reopened, synchronize ]
+
+jobs:
+
+  golangci:
+    if: github.repository_owner == 'openairinterface'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Clone the nas/ngap modules
+      run: |
+        mkdir -p ../nas ../ngap
+        cd ../nas
+        git clone https://github.com/OPENAIRINTERFACE/nas.git .
+        git checkout ngap-tester
+        cd ../ngap
+        git clone https://github.com/OPENAIRINTERFACE/ngap.git .
+        cd ../gnbsim
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.49

@@ -20,7 +20,7 @@ import (
 
 const (
 	GNBSIM_EXPECTED_CONFIG_VERSION string = "1.0.0"
-	GNBSIM_DEFAULT_CONFIG_PATH            = "/gnbsim/config/gnb.conf"
+	GNBSIM_DEFAULT_CONFIG_PATH     string = "/gnbsim/config/gnb.conf"
 )
 
 type Config struct {
@@ -77,7 +77,7 @@ func (c *Config) Validate() (err error) {
 		c.Configuration.Server.IpAddr = os.Getenv("POD_IP")
 	}
 
-	if c.Configuration.SingleInterface == true {
+	if c.Configuration.SingleInterface {
 		for _, gnb := range c.Configuration.Gnbs {
 			if gnb.GnbN3Ip == "POD_IP" {
 				gnb.GnbN3Ip = os.Getenv("POD_IP")

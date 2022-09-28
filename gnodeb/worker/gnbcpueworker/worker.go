@@ -10,7 +10,10 @@ import (
 )
 
 func Init(gnbue *gnbctx.GnbCpUe) {
-	HandleEvents(gnbue)
+	var err error = HandleEvents(gnbue)
+	if err != nil {
+		gnbue.Log.Errorln("HandleEvents failed")
+	}
 }
 
 func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
@@ -42,7 +45,7 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 			HandleRanConnectionRelease(gnbue, msg)
 		case common.QUIT_EVENT:
 			HandleQuitEvent(gnbue, msg)
-			return
+			return nil
 		default:
 			gnbue.Log.Infoln("Event", evt, "is not supported")
 		}
