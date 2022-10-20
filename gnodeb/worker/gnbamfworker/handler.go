@@ -208,7 +208,6 @@ func HandleNgSetupFailure(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 
 func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	pdu *ngapType.NGAPPDU) {
-
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
@@ -261,7 +260,6 @@ func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 
 func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	pdu *ngapType.NGAPPDU) {
-
 	var gnbUeNgapId *ngapType.RANUENGAPID
 
 	if amf == nil {
@@ -414,7 +412,6 @@ func HandlePduSessResourceReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 
 func HandleUeCtxReleaseCommand(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 	pdu *ngapType.NGAPPDU) {
-
 	if amf == nil {
 		err := fmt.Errorf("amf pointer is nil")
 		fmt.Println(err)

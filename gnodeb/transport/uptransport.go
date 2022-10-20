@@ -66,7 +66,6 @@ func (upTprt *GnbUpTransport) Init() error {
 // SendToPeer sends a GTP-U encoded packet to the specified UPF over the socket
 func (upTprt *GnbUpTransport) SendToPeer(peer transportcommon.TransportPeer,
 	pkt []byte) (err error) {
-
 	err = upTprt.CheckTransportParam(peer, pkt)
 	if err != nil {
 		return err
@@ -115,7 +114,6 @@ func (upTprt *GnbUpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 func (upTprt *GnbUpTransport) CheckTransportParam(peer transportcommon.TransportPeer,
 	pkt []byte) error {
-
 	upf := peer.(*gnbctx.GnbUpf)
 
 	if upf == nil {

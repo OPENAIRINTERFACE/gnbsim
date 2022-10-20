@@ -59,7 +59,6 @@ type RealUe struct {
 func NewRealUe(supi string, cipheringAlg, integrityAlg uint8,
 	simuechan chan common.InterfaceMessage, plmnid *models.PlmnId,
 	key string, opc string, seqNum string, Dnn string, SNssai *models.Snssai) *RealUe {
-
 	ue := RealUe{}
 	ue.Supi = supi
 	ue.CipheringAlg = cipheringAlg
@@ -112,9 +111,7 @@ func (ue *RealUe) GetUESecurityCapability() (UESecurityCapability *nasType.UESec
 
 func (ue *RealUe) DeriveRESstarAndSetKey(
 	autn, rand []byte, snName string) []byte {
-
 	authSubs := ue.AuthenticationSubs
-
 	// Run milenage
 	macA, macS := make([]byte, 8), make([]byte, 8)
 	ck, ik := make([]byte, 16), make([]byte, 16)
@@ -155,7 +152,7 @@ func (ue *RealUe) DeriveRESstarAndSetKey(
 
 	rcvSQN := make([]byte, 6)
 
-	// Todo : check what to do with the seperation bit of the AMF field
+	// Todo : check what to do with the separation bit of the AMF field
 	rcvAMF := autn[6:8]
 
 	for i := 0; i < 6; i++ {
@@ -186,11 +183,9 @@ func (ue *RealUe) DeriveRESstarAndSetKey(
 	kdfVal_for_resStar :=
 		UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1), P2, UeauCommon.KDFLen(P2))
 	return kdfVal_for_resStar[len(kdfVal_for_resStar)/2:]
-
 }
 
 func (ue *RealUe) DerivateKamf(key []byte, snName string, SQN, AK []byte) {
-
 	FC := UeauCommon.FC_FOR_KAUSF_DERIVATION
 	P0 := []byte(snName)
 	SQNxorAK := make([]byte, 6)

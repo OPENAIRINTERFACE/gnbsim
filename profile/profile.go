@@ -19,7 +19,7 @@ import (
 	simuectx "github.com/omec-project/gnbsim/simue/context"
 )
 
-//profile names
+// profile names
 const (
 	REGISTER                string = "register"
 	PDU_SESS_EST            string = "pdusessest"
@@ -118,7 +118,6 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 }
 
 func ExecuteSimUe(profile *profctx.Profile, simUe *simuectx.SimUe, imsiStr string) error {
-
 	var err error
 
 	util.SendToSimUe(simUe, common.PROFILE_START_EVENT)
@@ -137,7 +136,7 @@ func ExecuteSimUe(profile *profctx.Profile, simUe *simuectx.SimUe, imsiStr strin
 		case common.PROFILE_PASS_EVENT:
 			profile.Log.Infoln("Result: PASS, imsi:", msg.Supi)
 		case common.PROFILE_FAIL_EVENT:
-			err := fmt.Errorf("imsi:%v, procedure:%v, error:%v", msg.Supi, msg.Proc, msg.Error)
+			err = fmt.Errorf("imsi:%v, procedure:%v, error:%v", msg.Supi, msg.Proc, msg.Error)
 			profile.Log.Infoln("Result: FAIL,", err)
 		}
 	}

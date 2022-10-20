@@ -17,7 +17,6 @@ func Init(gnbue *gnbctx.GnbCpUe) {
 }
 
 func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
-
 	for msg := range gnbue.ReadChan {
 		evt := msg.GetEventType()
 		gnbue.Log.Infoln("Handling event:", evt)

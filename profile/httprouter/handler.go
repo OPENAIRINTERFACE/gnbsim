@@ -17,7 +17,6 @@ import (
 )
 
 func HTTPExecuteProfile(c *gin.Context) {
-
 	logger.HttpLog.Infoln("EcecuteProfile API called")
 	var prof profCtx.Profile
 

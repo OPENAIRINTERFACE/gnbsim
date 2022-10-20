@@ -42,18 +42,16 @@ func GetInitialContextSetupResponse(amfUeNgapID int64, ranUeNgapID int64) ([]byt
 	return ngap.Encoder(message)
 }
 
-func GetInitialContextSetupResponseForServiceRequest(
-	pduSessions []*ngapTestpacket.PduSession, amfUeNgapID int64,
+func GetInitialContextSetupResponseForServiceRequest(pduSessions []*ngapTestpacket.PduSession, amfUeNgapID int64,
 	ranUeNgapID int64, ipv4 string) ([]byte, error) {
-
 	message := ngapTestpacket.BuildInitialContextSetupResponse(pduSessions, amfUeNgapID, ranUeNgapID, ipv4, nil)
 	return ngap.Encoder(message)
 }
 
 func GetPDUSessionResourceSetupResponse(pduSessions []*ngapTestpacket.PduSession,
 	amfUeNgapID int64, ranUeNgapID int64, ipv4 string) ([]byte, error) {
-
-	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessions, amfUeNgapID, ranUeNgapID, ipv4)
+	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessions, amfUeNgapID,
+		ranUeNgapID, ipv4)
 	return ngap.Encoder(message)
 }
 
@@ -96,7 +94,6 @@ func GetHandoverNotify(amfUeNgapID int64, ranUeNgapID int64) ([]byte, error) {
 
 func GetPDUSessionResourceSetupResponseForPaging(pduSessions []*ngapTestpacket.PduSession,
 	amfUeNgapID int64, ranUeNgapID int64, ipv4 string) ([]byte, error) {
-
 	message := ngapTestpacket.BuildPDUSessionResourceSetupResponseForPaging(
 		pduSessions, amfUeNgapID, ranUeNgapID, ipv4)
 	return ngap.Encoder(message)

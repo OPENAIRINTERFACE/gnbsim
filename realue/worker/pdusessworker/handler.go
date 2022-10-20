@@ -35,10 +35,10 @@ func HandleInitEvent(pduSess *realuectx.PduSession,
 }
 
 func SendIcmpEchoRequest(pduSess *realuectx.PduSession) (err error) {
-
 	pduSess.Log.Traceln("Sending UL ICMP ping message")
 
-	icmpPayload, err := hex.DecodeString("8c870d0000000000101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637")
+	icmpPayload, err :=
+		hex.DecodeString("8c870d0000000000101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637")
 	if err != nil {
 		pduSess.Log.Errorln("Failed to decode icmp hexString ")
 		return
@@ -130,7 +130,6 @@ func HandleIcmpMessage(pduSess *realuectx.PduSession,
 
 func HandleDlMessage(pduSess *realuectx.PduSession,
 	msg common.InterfaceMessage) (err error) {
-
 	pduSess.Log.Traceln("Handling DL user data packet from gNb")
 
 	if msg.GetEventType() == common.LAST_DATA_PKT_EVENT {
@@ -178,7 +177,6 @@ func HandleDataPktGenRequestEvent(pduSess *realuectx.PduSession,
 
 func HandleConnectionReleaseRequestEvent(pduSess *realuectx.PduSession,
 	intfcMsg common.InterfaceMessage) (err error) {
-
 	userDataMsg := &common.UserDataMessage{}
 	userDataMsg.Event = common.LAST_DATA_PKT_EVENT
 	pduSess.WriteGnbChan <- userDataMsg
@@ -189,7 +187,6 @@ func HandleConnectionReleaseRequestEvent(pduSess *realuectx.PduSession,
 
 func HandleQuitEvent(pduSess *realuectx.PduSession,
 	intfcMsg common.InterfaceMessage) (err error) {
-
 	if pduSess.WriteGnbChan != nil {
 		userDataMsg := &common.UserDataMessage{}
 		userDataMsg.Event = common.LAST_DATA_PKT_EVENT

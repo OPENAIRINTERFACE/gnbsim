@@ -18,10 +18,10 @@ const (
 )
 
 func BuildUlPduSessInformation(qfi uint8) []uint8 {
-
 	pdu := make([]uint8, 2)
 	pdu[0] = UL_PDU_SESS_INFO_PDU_TYPE << 4
 	pdu[1] = qfi
+
 	return pdu
 }
 

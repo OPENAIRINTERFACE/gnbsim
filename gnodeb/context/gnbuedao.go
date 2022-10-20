@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//TODO: Need to seperate out the DAOs
+//TODO: Need to separate out the DAOs
 
 // GnbUeDao acts as a Data Access Object that stores and provides access to all
 // the GNodeB instances
@@ -60,7 +60,7 @@ func (dao *GnbUeDao) GetGnbUpUe(teid uint32, downlink bool) *GnbUpUe {
 	var ok bool
 	if downlink {
 		val, ok = dao.dlTeidGnbUpUeMap.Load(teid)
-	    // } else {
+		// } else {
 		// TODO
 		//val, ok = dao.ulTeidGnbUpUeMap.Load(teid)
 	}
@@ -78,7 +78,7 @@ func (dao *GnbUeDao) AddGnbUpUe(teid uint32, downlink bool, gnbue *GnbUpUe) {
 	dao.Log.Infoln("Adding new GnbUpUe for TEID:", teid, "Downlink:", downlink)
 	if downlink {
 		dao.dlTeidGnbUpUeMap.Store(teid, gnbue)
-	    // } else {
+		// } else {
 		//  TODO
 	}
 }
@@ -88,7 +88,7 @@ func (dao *GnbUeDao) RemoveGnbUpUe(teid uint32, downlink bool) {
 	dao.Log.Infoln("Removing GnbUpUe for TEID:", teid, "Downlink:", downlink)
 	if downlink {
 		dao.dlTeidGnbUpUeMap.Delete(teid)
-	    // } else {
+		// } else {
 		//  TODO
 	}
 }

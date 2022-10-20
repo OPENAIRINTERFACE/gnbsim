@@ -12,25 +12,19 @@ import (
 	simuectx "github.com/omec-project/gnbsim/simue/context"
 )
 
-func HandleProfileStartEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleProfileStartEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	ue.Procedure = ue.ProfileCtx.GetFirstProcedure()
 	ue.Log.Infoln("Updated procedure to", ue.Procedure)
 	HandleProcedure(ue)
 	return nil
 }
 
-func HandleRegRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleRegRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	SendToGnbUe(ue, intfcMsg)
 	return nil
 }
 
-func HandleRegRejectEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleRegRejectEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	err = ue.ProfileCtx.CheckCurrentEvent(common.REG_REQUEST_EVENT,
 		intfcMsg.GetEventType())
 	if err != nil {
@@ -41,9 +35,7 @@ func HandleRegRejectEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleAuthRequestEvent(ue *simuectx.SimUe,
-	intfMsg common.InterfaceMessage) (err error) {
-
+func HandleAuthRequestEvent(ue *simuectx.SimUe, intfMsg common.InterfaceMessage) (err error) {
 	msg := intfMsg.(*common.UeMessage)
 	// checking as per profile if Authentication Request Message is expected
 	// from 5G Core against Registration Request message sent by RealUE
@@ -63,9 +55,7 @@ func HandleAuthRequestEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleAuthResponseEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleAuthResponseEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	// Checking if RealUe has sent expected message as per profile against
 	// Authentication Request message recevied from 5G Core
@@ -81,11 +71,8 @@ func HandleAuthResponseEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleSecModCommandEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleSecModCommandEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	// TODO: Should check if SecModCommandEvent event is expected
-
 	msg := intfcMsg.(*common.UeMessage)
 	nextEvent, err := ue.ProfileCtx.GetNextEvent(msg.Event)
 	if err != nil {
@@ -97,9 +84,7 @@ func HandleSecModCommandEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleSecModCompleteEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleSecModCompleteEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	ue.Log.Traceln("Handling Security Mode Complete Event")
 
 	msg := intfcMsg.(*common.UuMessage)
@@ -116,9 +101,7 @@ func HandleSecModCompleteEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleRegAcceptEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleRegAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UeMessage)
 	// TODO: Should check if Registration Accept event is expected
 	nextEvent, err := ue.ProfileCtx.GetNextEvent(msg.Event)
@@ -131,9 +114,7 @@ func HandleRegAcceptEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleRegCompleteEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleRegCompleteEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	err = ue.ProfileCtx.CheckCurrentEvent(common.REG_ACCEPT_EVENT, msg.Event)
 	if err != nil {
@@ -149,9 +130,7 @@ func HandleRegCompleteEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleDeregRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleDeregRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
@@ -160,24 +139,18 @@ func HandleDeregRequestEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleDeregAcceptEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleDeregAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	return nil
 }
 
-func HandlePduSessEstRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessEstRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
 	return nil
 }
 
-func HandlePduSessEstAcceptEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessEstAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UeMessage)
 	err = ue.ProfileCtx.CheckCurrentEvent(common.PDU_SESS_EST_REQUEST_EVENT, msg.Event)
 	if err != nil {
@@ -195,9 +168,7 @@ func HandlePduSessEstAcceptEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandlePduSessEstRejectEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessEstRejectEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	err = ue.ProfileCtx.CheckCurrentEvent(common.PDU_SESS_EST_REQUEST_EVENT,
 		intfcMsg.GetEventType())
 	if err != nil {
@@ -208,18 +179,14 @@ func HandlePduSessEstRejectEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandlePduSessReleaseRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessReleaseRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
 	return nil
 }
 
-func HandlePduSessReleaseCommandEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessReleaseCommandEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UeMessage)
 	if ue.Procedure == common.UE_REQUESTED_PDU_SESSION_RELEASE_PROCEDURE {
 		err = ue.ProfileCtx.CheckCurrentEvent(common.PDU_SESS_REL_REQUEST_EVENT, msg.Event)
@@ -239,40 +206,30 @@ func HandlePduSessReleaseCommandEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandlePduSessReleaseCompleteEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandlePduSessReleaseCompleteEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
 	return nil
 }
 
-func HandleDlInfoTransferEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
-
+func HandleDlInfoTransferEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	SendToRealUe(ue, msg)
 	return nil
 }
 
-func HandleDataBearerSetupRequestEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
-
+func HandleDataBearerSetupRequestEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	SendToRealUe(ue, msg)
 	return nil
 }
 
-func HandleDataBearerSetupResponseEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
-
+func HandleDataBearerSetupResponseEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	SendToGnbUe(ue, msg)
-
 	ChangeProcedure(ue)
 	return nil
 }
 
-func HandleDataBearerReleaseRequestEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
+func HandleDataBearerReleaseRequestEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	// This event is sent by gNB component after it has sent
 	// PDU Session Resource Release Complete over N2, However the PDU Sesson
 	// routines in the RealUE will be terminated while processing PDU Session
@@ -282,23 +239,17 @@ func HandleDataBearerReleaseRequestEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleDataPktGenSuccessEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleDataPktGenSuccessEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	ChangeProcedure(ue)
 	return nil
 }
 
-func HandleDataPktGenFailureEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
-
+func HandleDataPktGenFailureEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	SendToProfile(ue, common.PROFILE_FAIL_EVENT, msg.GetErrorMsg())
 	return nil
 }
 
-func HandleServiceRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleServiceRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	err = ConnectToGnb(ue)
 	if err != nil {
 		return fmt.Errorf("failed to connect gnb %v:", err)
@@ -310,9 +261,7 @@ func HandleServiceRequestEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleServiceAcceptEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleServiceAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	err = ue.ProfileCtx.CheckCurrentEvent(common.SERVICE_REQUEST_EVENT,
 		intfcMsg.GetEventType())
 	if err != nil {
@@ -323,8 +272,7 @@ func HandleServiceAcceptEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleConnectionReleaseRequestEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
+func HandleConnectionReleaseRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	msg := intfcMsg.(*common.UuMessage)
 
 	if ue.Procedure == common.AN_RELEASE_PROCEDURE {
@@ -354,7 +302,6 @@ func HandleConnectionReleaseRequestEvent(ue *simuectx.SimUe,
 }
 
 func HandleNwDeregRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
-
 	msg := intfcMsg.(*common.UeMessage)
 
 	nextEvent, err := ue.ProfileCtx.GetNextEvent(msg.Event)
@@ -370,7 +317,6 @@ func HandleNwDeregRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMess
 }
 
 func HandleNwDeregAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
-
 	ue.Log.Traceln("Handling Dereg Accept Event")
 
 	msg := intfcMsg.(*common.UuMessage)
@@ -387,9 +333,7 @@ func HandleNwDeregAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessa
 	return nil
 }
 
-func HandleErrorEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
+func HandleErrorEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 	SendToProfile(ue, common.PROFILE_FAIL_EVENT, intfcMsg.GetErrorMsg())
 
 	msg := &common.UuMessage{}
@@ -402,8 +346,7 @@ func HandleErrorEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleQuitEvent(ue *simuectx.SimUe,
-	msg common.InterfaceMessage) (err error) {
+func HandleQuitEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error) {
 	if ue.WriteGnbUeChan != nil {
 		SendToGnbUe(ue, msg)
 	}
@@ -463,7 +406,7 @@ func HandleProcedure(ue *simuectx.SimUe) {
 		msg.Event = common.DATA_PKT_GEN_REQUEST_EVENT
 
 		/* TODO: Solve timing issue. Currently UE may start sending user data
-		 * before gnb has successfuly sent PDU Session Resource Setup Response
+		 * before gnb has successfully sent PDU Session Resource Setup Response
 		 * or before 5g core has processed it
 		 */
 		ue.Log.Infoln("Please wait, initiating uplink user data in 3 seconds ...")
