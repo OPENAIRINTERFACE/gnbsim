@@ -19,10 +19,6 @@ FROM alpine:3.16 AS gnbsim
 ENV GOPATH=/go
 RUN apk update && apk add -U gcompat strace net-tools curl netcat-openbsd bind-tools bash tcpdump
 
-RUN mkdir -p /gnbsim/bin
-
 # Copy executable
 WORKDIR /gnbsim/bin
 COPY --from=sim $GOPATH/src/gnbsim/gnbsim /gnbsim/bin/
-RUN ldconfig && \
-    ldd /gnbsim/bin/gnbsim
