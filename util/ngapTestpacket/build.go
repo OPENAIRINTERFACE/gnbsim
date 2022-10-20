@@ -35,7 +35,6 @@ func init() {
 }
 
 func BuildNGSetupRequest() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -132,7 +131,6 @@ func BuildNGSetupRequest() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildNGReset(partOfNGInterface *ngapType.UEAssociatedLogicalNGConnectionList) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -184,7 +182,6 @@ func BuildNGReset(partOfNGInterface *ngapType.UEAssociatedLogicalNGConnectionLis
 }
 
 func BuildNGResetAcknowledge() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -226,7 +223,6 @@ func BuildNGResetAcknowledge() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -349,7 +345,6 @@ func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) 
 }
 
 func BuildErrorIndication() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -425,7 +420,6 @@ func BuildErrorIndication() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildUEContextReleaseRequest(amfUeNgapID, ranUeNgapID int64, pduSessionIDList []int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -500,7 +494,6 @@ func BuildUEContextReleaseRequest(amfUeNgapID, ranUeNgapID int64, pduSessionIDLi
 }
 
 func BuildUEContextReleaseComplete(amfUeNgapID, ranUeNgapID int64, pduSessionIDList []int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -587,7 +580,6 @@ func BuildUEContextReleaseComplete(amfUeNgapID, ranUeNgapID int64, pduSessionIDL
 }
 
 func BuildUEContextModificationResponse(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -667,7 +659,6 @@ func BuildUEContextModificationResponse(amfUeNgapID, ranUeNgapID int64) (pdu nga
 }
 
 func BuildUplinkNasTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -746,7 +737,6 @@ func BuildUplinkNasTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte) (pdu
 
 func BuildInitialContextSetupResponse(pduSessions []*PduSession, amfUeNgapID, ranUeNgapID int64, ipv4 string,
 	pduSessionFailedList *ngapType.PDUSessionResourceFailedToSetupListCxtRes) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -820,7 +810,6 @@ func BuildInitialContextSetupResponse(pduSessions []*PduSession, amfUeNgapID, ra
 }
 
 func BuildInitialContextSetupFailure(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentUnsuccessfulOutcome
 	pdu.UnsuccessfulOutcome = new(ngapType.UnsuccessfulOutcome)
 
@@ -896,7 +885,6 @@ func BuildInitialContextSetupFailure(amfUeNgapID, ranUeNgapID int64) (pdu ngapTy
 }
 
 func BuildPathSwitchRequest(sourceAmfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -1027,7 +1015,6 @@ func BuildPathSwitchRequest(sourceAmfUeNgapID, ranUeNgapID int64) (pdu ngapType.
 }
 
 func BuildHandoverRequestAcknowledge(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1120,7 +1107,6 @@ func BuildHandoverRequestAcknowledge(amfUeNgapID, ranUeNgapID int64) (pdu ngapTy
 }
 
 func BuildHandoverFailure(amfUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentUnsuccessfulOutcome
 	pdu.UnsuccessfulOutcome = new(ngapType.UnsuccessfulOutcome)
 
@@ -1165,7 +1151,6 @@ func BuildHandoverFailure(amfUeNgapID int64) (pdu ngapType.NGAPPDU) {
 }
 
 func BuildPDUSessionResourceReleaseResponse() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1250,7 +1235,6 @@ func BuildPDUSessionResourceReleaseResponse() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildAMFConfigurationUpdateFailure() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentUnsuccessfulOutcome
 	pdu.UnsuccessfulOutcome = new(ngapType.UnsuccessfulOutcome)
 
@@ -1283,11 +1267,9 @@ func BuildAMFConfigurationUpdateFailure() (pdu ngapType.NGAPPDU) {
 	//	TODO: Criticality Diagnostics (optional)
 
 	return pdu
-
 }
 
 func BuildUERadioCapabilityCheckRequest(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -1339,11 +1321,9 @@ func BuildUERadioCapabilityCheckRequest(amfUeNgapID, ranUeNgapID int64) (pdu nga
 	}
 
 	return pdu
-
 }
 
 func BuildUERadioCapabilityCheckResponse() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1399,7 +1379,6 @@ func BuildUERadioCapabilityCheckResponse() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildHandoverCancel() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -1508,8 +1487,8 @@ func BuildLocationReportingFailureIndication() (pdu ngapType.NGAPPDU) {
 	return pdu
 }
 
-func BuildPDUSessionResourceSetupResponse(pduSessions []*PduSession, amfUeNgapID, ranUeNgapID int64, ipv4 string) (pdu ngapType.NGAPPDU) {
-
+func BuildPDUSessionResourceSetupResponse(pduSessions []*PduSession, amfUeNgapID, ranUeNgapID int64,
+	ipv4 string) (pdu ngapType.NGAPPDU) {
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1564,7 +1543,8 @@ func BuildPDUSessionResourceSetupResponse(pduSessions []*PduSession, amfUeNgapID
 		pDUSessionResourceSetupItemSURes.PDUSessionResourceSetupResponseTransfer =
 			GetPDUSessionResourceSetupResponseTransfer(pduSess, ipv4)
 
-		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List, pDUSessionResourceSetupItemSURes)
+		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List,
+			pDUSessionResourceSetupItemSURes)
 	}
 	pDUSessionResourceSetupResponseIEs.List = append(pDUSessionResourceSetupResponseIEs.List, ie)
 
@@ -1591,8 +1571,8 @@ func BuildPDUSessionResourceSetupResponse(pduSessions []*PduSession, amfUeNgapID
 	return pdu
 }
 
-func BuildPDUSessionResourceSetupResponseForPaging(pduSessions []*PduSession, amfUeNgapID, ranUeNgapID int64, ipv4 string) (pdu ngapType.NGAPPDU) {
-
+func BuildPDUSessionResourceSetupResponseForPaging(pduSessions []*PduSession, amfUeNgapID, ranUeNgapID int64,
+	ipv4 string) (pdu ngapType.NGAPPDU) {
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1647,7 +1627,8 @@ func BuildPDUSessionResourceSetupResponseForPaging(pduSessions []*PduSession, am
 		pDUSessionResourceSetupItemSURes.PDUSessionResourceSetupResponseTransfer =
 			GetPDUSessionResourceSetupResponseTransfer(pduSess, ipv4)
 
-		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List, pDUSessionResourceSetupItemSURes)
+		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List,
+			pDUSessionResourceSetupItemSURes)
 	}
 
 	pDUSessionResourceSetupResponseIEs.List = append(pDUSessionResourceSetupResponseIEs.List, ie)
@@ -1664,7 +1645,6 @@ func BuildPDUSessionResourceSetupResponseForPaging(pduSessions []*PduSession, am
 }
 
 func BuildPDUSessionResourceModifyResponse(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -1873,7 +1853,6 @@ func BuildPDUSessionResourceNotify() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildPDUSessionResourceModifyIndication(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -1935,7 +1914,6 @@ func BuildPDUSessionResourceModifyIndication(amfUeNgapID, ranUeNgapID int64) (pd
 }
 
 func BuildUEContextModificationFailure(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentUnsuccessfulOutcome
 	pdu.UnsuccessfulOutcome = new(ngapType.UnsuccessfulOutcome)
 
@@ -2091,7 +2069,6 @@ func BuildRRCInactiveTransitionReport() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildHandoverNotify(amfUeNgapID int64, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2156,7 +2133,6 @@ func BuildHandoverNotify(amfUeNgapID int64, ranUeNgapID int64) (pdu ngapType.NGA
 }
 
 func BuildUplinkRanStatusTransfer(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2229,7 +2205,6 @@ func BuildUplinkRanStatusTransfer(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.
 }
 
 func BuildNasNonDeliveryIndication(amfUeNgapID, ranUeNgapID int64, naspdu aper.OctetString) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2296,7 +2271,6 @@ func BuildNasNonDeliveryIndication(amfUeNgapID, ranUeNgapID int64, naspdu aper.O
 }
 
 func BuildRanConfigurationUpdate() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2366,7 +2340,6 @@ func BuildRanConfigurationUpdate() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildRanConfigurationUpdateAck(diagnostics *ngapType.CriticalityDiagnostics) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -2396,10 +2369,8 @@ func BuildRanConfigurationUpdateAck(diagnostics *ngapType.CriticalityDiagnostics
 	return pdu
 }
 
-func BuildRanConfigurationUpdateFailure(
-	time *ngapType.TimeToWait,
+func BuildRanConfigurationUpdateFailure(time *ngapType.TimeToWait,
 	diagnostics *ngapType.CriticalityDiagnostics) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentUnsuccessfulOutcome
 	pdu.UnsuccessfulOutcome = new(ngapType.UnsuccessfulOutcome)
 
@@ -2463,7 +2434,6 @@ func BuildAMFStatusIndication() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildUplinkRanConfigurationTransfer() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2544,7 +2514,6 @@ func BuildUplinkRanConfigurationTransfer() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildUplinkUEAssociatedNRPPATransport() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2610,7 +2579,6 @@ func BuildUplinkUEAssociatedNRPPATransport() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildUplinkNonUEAssociatedNRPPATransport() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2649,7 +2617,6 @@ func BuildUplinkNonUEAssociatedNRPPATransport() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildLocationReport() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2797,7 +2764,6 @@ func BuildUETNLABindingReleaseRequest() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildUERadioCapabilityInfoIndication() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -2852,7 +2818,6 @@ func BuildUERadioCapabilityInfoIndication() (pdu ngapType.NGAPPDU) {
 }
 
 func BuildAMFConfigurationUpdateAcknowledge() (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -2922,7 +2887,7 @@ func BuildAMFConfigurationUpdate(amfName string, guamiList []ngapType.ServedGUAM
 	plmnList []ngapType.PLMNSupportItem, amfRelativeCapacity int64,
 	addList *ngapType.AMFTNLAssociationToAddList, removeList *ngapType.AMFTNLAssociationToRemoveList,
 	updateList *ngapType.AMFTNLAssociationToUpdateList) (pdu ngapType.NGAPPDU) {
-
+	// InitiatingMessage
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -3030,9 +2995,8 @@ func BuildAMFConfigurationUpdate(amfName string, guamiList []ngapType.ServedGUAM
 	return pdu
 }
 
-func BuildHandoverRequired(
-	amfUeNgapID, ranUeNgapID int64, targetGNBID []byte, targetCellID []byte) (pdu ngapType.NGAPPDU) {
-
+func BuildHandoverRequired(amfUeNgapID, ranUeNgapID int64, targetGNBID []byte,
+	targetCellID []byte) (pdu ngapType.NGAPPDU) {
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -3165,7 +3129,6 @@ func BuildHandoverRequired(
 }
 
 func BuildCellTrafficTrace(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -3251,7 +3214,6 @@ func BuildCellTrafficTrace(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU
 
 func buildPDUSessionResourceSetupResponseTransfer(pduSession *PduSession,
 	ipv4 string) (data ngapType.PDUSessionResourceSetupResponseTransfer) {
-
 	// QoS Flow per TNL Information
 	qosFlowPerTNLInformation := &data.DLQosFlowPerTNLInformation
 	qosFlowPerTNLInformation.UPTransportLayerInformation.Present = ngapType.UPTransportLayerInformationPresentGTPTunnel
@@ -3277,7 +3239,6 @@ func buildPDUSessionResourceSetupResponseTransfer(pduSession *PduSession,
 }
 
 func buildPDUSessionResourceModifyResponseTransfer() (data ngapType.PDUSessionResourceModifyResponseTransfer) {
-
 	// Qos Flow Add or Modify Response List
 	data.QosFlowAddOrModifyResponseList = new(ngapType.QosFlowAddOrModifyResponseList)
 	qosFlowAddOrModifyResponseList := data.QosFlowAddOrModifyResponseList
@@ -3294,7 +3255,6 @@ func buildPDUSessionResourceModifyResponseTransfer() (data ngapType.PDUSessionRe
 }
 
 func buildPDUSessionResourceSetupUnsucessfulTransfer() (data ngapType.PDUSessionResourceSetupUnsuccessfulTransfer) {
-
 	// Cause
 	data.Cause.Present = ngapType.CausePresentRadioNetwork
 	data.Cause.RadioNetwork = new(ngapType.CauseRadioNetwork)
@@ -3304,7 +3264,6 @@ func buildPDUSessionResourceSetupUnsucessfulTransfer() (data ngapType.PDUSession
 }
 
 func buildPDUSessionResourceModifyUnsuccessfulTransfer() (data ngapType.PDUSessionResourceModifyUnsuccessfulTransfer) {
-
 	// Cause
 	data.Cause = ngapType.Cause{
 		Present: ngapType.CausePresentRadioNetwork,
@@ -3322,9 +3281,9 @@ func buildPDUSessionResourceReleaseResponseTransfer() (data ngapType.PDUSessionR
 	return data
 }
 
-func buildPDUSessionResourceNotifyTransfer(
-	qfis []int64, notiCause []uint64, relQfis []int64) (data ngapType.PDUSessionResourceNotifyTransfer) {
-
+func buildPDUSessionResourceNotifyTransfer(qfis []int64, notiCause []uint64,
+	relQfis []int64) (data ngapType.PDUSessionResourceNotifyTransfer) {
+	// qfis
 	if len(qfis) > 0 {
 		data.QosFlowNotifyList = new(ngapType.QosFlowNotifyList)
 	}
@@ -3371,7 +3330,6 @@ func buildPDUSessionResourceNotifyReleasedTransfer() (data ngapType.PDUSessionRe
 }
 
 func buildPathSwitchRequestTransfer() (data ngapType.PathSwitchRequestTransfer) {
-
 	// DL NG-U UP TNL information
 	upTransportLayerInformation := &data.DLNGUUPTNLInformation
 	upTransportLayerInformation.Present = ngapType.UPTransportLayerInformationPresentGTPTunnel
@@ -3393,7 +3351,6 @@ func buildPathSwitchRequestTransfer() (data ngapType.PathSwitchRequestTransfer) 
 
 func buildPDUSessionResourceModifyIndicationTransfer() (
 	data ngapType.PDUSessionResourceModifyIndicationTransfer) {
-
 	// DL UP TNL Information
 	data.DLQosFlowPerTNLInformation = ngapType.QosFlowPerTNLInformation{
 		UPTransportLayerInformation: ngapType.UPTransportLayerInformation{
@@ -3447,7 +3404,6 @@ func buildPDUSessionResourceReleaseCommandTransferr() (
 }
 
 func buildPathSwitchRequestSetupFailedTransfer() (data ngapType.PathSwitchRequestSetupFailedTransfer) {
-
 	// Cause
 	data.Cause = ngapType.Cause{
 		Present: ngapType.CausePresentTransport,
@@ -3460,7 +3416,6 @@ func buildPathSwitchRequestSetupFailedTransfer() (data ngapType.PathSwitchReques
 }
 
 func buildHandoverRequestAcknowledgeTransfer() (data ngapType.HandoverRequestAcknowledgeTransfer) {
-
 	// DL NG-U UP TNL information
 	upTransportLayerInformation := &data.DLNGUUPTNLInformation
 	upTransportLayerInformation.Present = ngapType.UPTransportLayerInformationPresentGTPTunnel
@@ -3482,7 +3437,6 @@ func buildHandoverRequestAcknowledgeTransfer() (data ngapType.HandoverRequestAck
 
 func buildHandoverResourceAllocationUnsuccessfulTransfer() (
 	data ngapType.HandoverResourceAllocationUnsuccessfulTransfer) {
-
 	data.Cause = ngapType.Cause{
 		Present: ngapType.CausePresentRadioNetwork,
 		RadioNetwork: &ngapType.CauseRadioNetwork{
@@ -3501,7 +3455,6 @@ func buildHandoverRequiredTransfer() (data ngapType.HandoverRequiredTransfer) {
 
 func buildSourceToTargetTransparentTransfer(
 	targetGNBID []byte, targetCellID []byte) (data ngapType.SourceNGRANNodeToTargetNGRANNodeTransparentContainer) {
-
 	// RRC Container
 	data.RRCContainer.Value = aper.OctetString("\x00\x00\x11")
 
@@ -3697,7 +3650,7 @@ func GetSourceToTargetTransparentTransfer(targetGNBID []byte, targetCellID []byt
 }
 
 func BuildInitialContextSetupResponseForRegistraionTest(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
+	// SuccessfulOutcome
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -3740,7 +3693,7 @@ func BuildInitialContextSetupResponseForRegistraionTest(amfUeNgapID, ranUeNgapID
 
 func BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessions []*PduSession,
 	amfUeNgapID, ranUeNgapID int64, ipv4 string) (pdu ngapType.NGAPPDU) {
-
+	// SuccessfulOutcome
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -3795,7 +3748,8 @@ func BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessions []*PduS
 		pDUSessionResourceSetupItemSURes.PDUSessionResourceSetupResponseTransfer =
 			GetPDUSessionResourceSetupResponseTransfer(pduSess, ipv4)
 
-		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List, pDUSessionResourceSetupItemSURes)
+		pDUSessionResourceSetupListSURes.List = append(pDUSessionResourceSetupListSURes.List,
+			pDUSessionResourceSetupItemSURes)
 	}
 
 	pDUSessionResourceSetupResponseIEs.List = append(pDUSessionResourceSetupResponseIEs.List, ie)
@@ -3824,7 +3778,7 @@ func BuildPDUSessionResourceSetupResponseForRegistrationTest(pduSessions []*PduS
 }
 
 func BuildPDUSessionResourceReleaseResponseForReleaseTest(amfUeNgapID, ranUeNgapID int64) (pdu ngapType.NGAPPDU) {
-
+	// SuccessfulOutcome
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -3889,7 +3843,7 @@ func BuildPDUSessionResourceReleaseResponseForReleaseTest(amfUeNgapID, ranUeNgap
 
 func BuildNGSetupResponse(amfName string, guamiList []ngapType.ServedGUAMIItem,
 	plmnList []ngapType.PLMNSupportItem, amfRelativeCapacity int64) (pdu ngapType.NGAPPDU) {
-
+	// SuccessfulOutcome
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -3952,13 +3906,11 @@ func BuildNGSetupResponse(amfName string, guamiList []ngapType.ServedGUAMIItem,
 	return pdu
 }
 
-func BuildPDUSessionResourceModifyConfirm(
-	amfUeNgapId int64,
-	ranUeNgapId int64,
+func BuildPDUSessionResourceModifyConfirm(amfUeNgapId int64, ranUeNgapId int64,
 	pduSessionResourceModifyConfirmList ngapType.PDUSessionResourceModifyListModCfm,
 	pduSessionResourceFailedToModifyList ngapType.PDUSessionResourceFailedToModifyListModCfm,
 	criticalityDiagnostics *ngapType.CriticalityDiagnostics) (pdu ngapType.NGAPPDU) {
-
+	// SuccessfulOutcome
 	pdu.Present = ngapType.NGAPPDUPresentSuccessfulOutcome
 	pdu.SuccessfulOutcome = new(ngapType.SuccessfulOutcome)
 
@@ -4027,13 +3979,10 @@ func BuildPDUSessionResourceModifyConfirm(
 	return pdu
 }
 
-func BuildPDUSessionResourceReleaseCommand(
-	amfUeNgapId int64,
-	ranUeNgapId int64,
-	pagingPriority *ngapType.RANPagingPriority,
-	nasPdu []byte,
+func BuildPDUSessionResourceReleaseCommand(amfUeNgapId int64, ranUeNgapId int64,
+	pagingPriority *ngapType.RANPagingPriority, nasPdu []byte,
 	pduSessionResourceReleasedList ngapType.PDUSessionResourceToReleaseListRelCmd) (pdu ngapType.NGAPPDU) {
-
+	// InitiatingMessage
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 
@@ -4106,11 +4055,9 @@ func BuildPDUSessionResourceReleaseCommand(
 	return pdu
 }
 
-func BuildOverloadStart(
-	action *ngapType.OverloadAction,
-	ind *int64,
+func BuildOverloadStart(action *ngapType.OverloadAction, ind *int64,
 	list []ngapType.OverloadStartNSSAIItem) (pdu ngapType.NGAPPDU) {
-
+	// InitiatingMessage
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
 

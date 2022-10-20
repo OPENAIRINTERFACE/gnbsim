@@ -62,8 +62,8 @@ func (amf *GnbAmf) SetAMFName(name string) {
 	amf.AmfName = name
 }
 
-func (amf *GnbAmf) SetRelativeAMFCapacity(cap int64) {
-	amf.RelCap = cap
+func (amf *GnbAmf) SetRelativeAMFCapacity(capValue int64) {
+	amf.RelCap = capValue
 }
 
 func (amf *GnbAmf) SetNgSetupStatus(successfulOutcome bool) {

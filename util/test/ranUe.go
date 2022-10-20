@@ -100,9 +100,8 @@ func NewRanUeContext(supi string, ranUeNgapId int64, cipheringAlg, integrityAlg 
 	return &ue
 }
 
-func (ue *RanUeContext) DeriveRESstarAndSetKey(
-	authSubs models.AuthenticationSubscription, rand []byte, snName string) []byte {
-
+func (ue *RanUeContext) DeriveRESstarAndSetKey(authSubs models.AuthenticationSubscription, rand []byte,
+	snName string) []byte {
 	sqn, err := hex.DecodeString(authSubs.SequenceNumber)
 	if err != nil {
 		fatal.Fatalf("DecodeString error: %+v", err)
@@ -169,11 +168,9 @@ func (ue *RanUeContext) DeriveRESstarAndSetKey(
 	kdfVal_for_resStar :=
 		UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1), P2, UeauCommon.KDFLen(P2))
 	return kdfVal_for_resStar[len(kdfVal_for_resStar)/2:]
-
 }
 
 func (ue *RanUeContext) DerivateKamf(key []byte, snName string, SQN, AK []byte) {
-
 	FC := UeauCommon.FC_FOR_KAUSF_DERIVATION
 	P0 := []byte(snName)
 	SQNxorAK := make([]byte, 6)

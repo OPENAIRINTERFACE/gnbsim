@@ -53,16 +53,15 @@ func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) 
 		if amf.AmfHostName == "" {
 			return fmt.Errorf("amf ip or host name not configured")
 		}
-		addrs, err := net.LookupHost(amf.AmfHostName)
-		if err != nil {
+		addrs, err2 := net.LookupHost(amf.AmfHostName)
+		if err2 != nil {
 			return fmt.Errorf("failed to resolve amf host name: %v, err: %v",
-				amf.AmfHostName, err)
+				amf.AmfHostName, err2)
 		}
 		amf.AmfIp = addrs[0]
 	}
 
-	amf.Conn, err = test.ConnectToAmf(amf.AmfIp, gnb.GnbN2Ip, int(amf.AmfPort),
-		int(gnb.GnbN2Port))
+	amf.Conn, err = test.ConnectToAmf(amf.AmfIp, gnb.GnbN2Ip, amf.AmfPort, gnb.GnbN2Port)
 	if err != nil {
 		return fmt.Errorf("failed to connect amf, ip: %v, port: %v, err: %v",
 			amf.AmfIp, amf.AmfPort, err)
@@ -78,7 +77,6 @@ func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) 
 // connection and waits for the response
 func (cpTprt *GnbCpTransport) SendToPeerBlock(peer transportcommon.TransportPeer,
 	pkt []byte) ([]byte, error) {
-
 	err := cpTprt.SendToPeer(peer, pkt)
 	if err != nil {
 		cpTprt.Log.Errorln("SendToPeer returned err:", err)
@@ -104,7 +102,6 @@ func (cpTprt *GnbCpTransport) SendToPeerBlock(peer transportcommon.TransportPeer
 // connection
 func (cpTprt *GnbCpTransport) SendToPeer(peer transportcommon.TransportPeer,
 	pkt []byte) (err error) {
-
 	err = cpTprt.CheckTransportParam(peer, pkt)
 	if err != nil {
 		return err
@@ -139,9 +136,7 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 		if err := amf.Conn.Close(); err != nil && err != syscall.EBADF {
 			cpTprt.Log.Errorln("Close returned:", err)
 		}
-
 	}()
-
 	conn := amf.Conn.(*sctp.SCTPConn)
 	for {
 		recvMsg := make([]byte, MAX_SCTP_PKT_LEN)

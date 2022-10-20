@@ -14,7 +14,6 @@ import (
 )
 
 func Init(simUe *simuectx.SimUe) {
-
 	err := ConnectToGnb(simUe)
 	if err != nil {
 		err = fmt.Errorf("failed to connect to gnodeb: %v", err)

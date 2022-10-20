@@ -68,7 +68,6 @@ func GetNasPduSetupRequest(ue *realuectx.RealUe, msg *ngapType.PDUSessionResourc
 
 func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable bool) (
 	payload []byte, err error) {
-
 	if ue == nil {
 		err = fmt.Errorf("amfUe is nil")
 		return
@@ -118,10 +117,10 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 		// add sequence number
 		payload = append([]byte{ue.ULCount.SQN()}, payload[:]...)
 
-		mac32, err := security.NASMacCalculate(ue.IntegrityAlg, ue.KnasInt, ue.ULCount.Get(),
+		mac32, err2 := security.NASMacCalculate(ue.IntegrityAlg, ue.KnasInt, ue.ULCount.Get(),
 			security.Bearer3GPP, security.DirectionUplink, payload)
-		if err != nil {
-			return nil, fmt.Errorf("nas mac calcuate failed: %+v", err)
+		if err2 != nil {
+			return nil, fmt.Errorf("nas mac calcuate failed: %+v", err2)
 		}
 
 		// Add mac value
@@ -147,7 +146,7 @@ func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (
 	}
 
 	msg = new(nas.Message)
-	msg.SecurityHeaderType = uint8(nas.GetSecurityHeaderType(payload) & 0x0f)
+	msg.SecurityHeaderType = nas.GetSecurityHeaderType(payload) & 0x0f
 	if securityHeaderType == nas.SecurityHeaderTypePlainNas {
 		err = msg.PlainNasDecode(&payload)
 		return
