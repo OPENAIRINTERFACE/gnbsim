@@ -186,7 +186,7 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 		}(pCtx)
 
 		if !profile.ExecInParallel {
-			profile.Log.Infoln("ExecuteProfile ExecInParallel false. Waiting for UEs to finish procesessing")
+			profile.Log.Infoln("ExecuteProfile ExecInParallel false. Waiting for UEs to finish processing")
 			wg.Wait()
 		}
 	}
