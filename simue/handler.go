@@ -371,7 +371,6 @@ func HandleQuitEvent(ue *simuectx.SimUe, msg common.InterfaceMessage) (err error
 func SendProcedureResult(ue *simuectx.SimUe) {
 	ue.Log.Traceln("Sending Procedure Result to Profile : PASS")
 	SendToProfile(ue, common.PROC_PASS_EVENT, nil)
-	return
 }
 
 func HandleProcedure(ue *simuectx.SimUe) {

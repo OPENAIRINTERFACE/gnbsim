@@ -16,7 +16,8 @@ import (
 	"time"
 )
 
-func InitUE(imsiStr string, gnb *gnbctx.GNodeB, profile *profctx.Profile, result chan *common.ProfileMessage) chan common.InterfaceMessage {
+func InitUE(imsiStr string, gnb *gnbctx.GNodeB, profile *profctx.Profile,
+	result chan *common.ProfileMessage) chan common.InterfaceMessage {
 	simUe := simuectx.NewSimUe(imsiStr, gnb, profile, result)
 	Init(simUe) // Initialize simUE, realUE & wait for events
 	return simUe.ReadChan
@@ -180,7 +181,8 @@ func RunProcedure(simUe *simuectx.SimUe, procedure common.ProcedureType) {
 	util.SendToSimUe(simUe, common.PROC_START_EVENT, procedure)
 }
 
-func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, imsiStr string, summaryChan chan common.InterfaceMessage) error {
+func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, imsiStr string,
+	summaryChan chan common.InterfaceMessage) error {
 	var no_more_proc bool
 	var proc_fail bool
 	var err error
@@ -220,14 +222,14 @@ func ImsiStateMachine(profile *profctx.Profile, pCtx *profctx.ProfileUeContext, 
 			}
 		}
 		ticker.Stop()
-		if no_more_proc == true {
+		if no_more_proc {
 			pCtx.Log.Infoln("imsiStateMachine no more proc to execute")
 			break
-		} else if proc_fail == true {
+		} else if proc_fail {
 			break
 		}
 		//should we wait for pulse to move to next step?
-		if profile.StepTrigger == true {
+		if profile.StepTrigger {
 			pCtx.Log.Infoln("imsiStateMachine waiting for user trigger")
 			select {
 			case msg := <-pCtx.TrigEventsChan:

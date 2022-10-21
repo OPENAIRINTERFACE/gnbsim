@@ -39,7 +39,6 @@ func InitializeAllProfiles() {
 }
 
 func InitProfile(profile *profctx.Profile, summaryChan chan common.InterfaceMessage) {
-
 	summary := &common.SummaryMessage{
 		ProfileType: profile.ProfileType,
 		ProfileName: profile.Name,
@@ -110,7 +109,6 @@ func initImsi(profile *profctx.Profile, gnb *gnbctx.GNodeB, imsiStr string) {
 //    - We should be able to pass events to profile
 
 func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceMessage) {
-
 	profile.Log.Infoln("ExecuteProfile started ")
 	var wg sync.WaitGroup
 	var Mu sync.Mutex
@@ -277,7 +275,6 @@ func initProcedureEventMap() {
 		common.PROFILE_PASS_EVENT: common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.USER_DATA_PKT_GENERATION_PROCEDURE] = &proc9
-
 }
 
 func initProcedureList(profile *profctx.Profile) error {

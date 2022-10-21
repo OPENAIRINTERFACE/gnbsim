@@ -81,7 +81,7 @@ func (c *Config) Validate() (err error) {
 	if len(c.Configuration.Gnbs) == 0 {
 		return fmt.Errorf("no gnbs configured")
 	}
-	if c.Configuration.GoProfile.Enable == true {
+	if c.Configuration.GoProfile.Enable {
 		if c.Configuration.GoProfile.Port == 0 {
 			c.Configuration.GoProfile.Port = 5000
 		}
@@ -119,36 +119,64 @@ func (c *Config) Validate() (err error) {
 					x := strings.Fields(v1.First)
 					PIter.ProcMap[1] = common.GetProcId(x[0])
 					PIter.WaitMap[1], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[1]")
+						return err
+					}
 				}
 				if len(v1.Second) > 0 {
 					x := strings.Fields(v1.Second)
 					PIter.ProcMap[2] = common.GetProcId(x[0])
 					PIter.WaitMap[2], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[2]")
+						return err
+					}
 				}
 				if len(v1.Third) > 0 {
 					x := strings.Fields(v1.Third)
 					PIter.ProcMap[3] = common.GetProcId(x[0])
 					PIter.WaitMap[3], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[3]")
+						return err
+					}
 				}
 				if len(v1.Fourth) > 0 {
 					x := strings.Fields(v1.Fourth)
 					PIter.ProcMap[4] = common.GetProcId(x[0])
 					PIter.WaitMap[4], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[4]")
+						return err
+					}
 				}
 				if len(v1.Fifth) > 0 {
 					x := strings.Fields(v1.Fifth)
 					PIter.ProcMap[5] = common.GetProcId(x[0])
 					PIter.WaitMap[5], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[5]")
+						return err
+					}
 				}
 				if len(v1.Sixth) > 0 {
 					x := strings.Fields(v1.Sixth)
 					PIter.ProcMap[6] = common.GetProcId(x[0])
 					PIter.WaitMap[6], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[6]")
+						return err
+					}
 				}
 				if len(v1.Seventh) > 0 {
 					x := strings.Fields(v1.Seventh)
 					PIter.ProcMap[7] = common.GetProcId(x[0])
 					PIter.WaitMap[7], err = strconv.Atoi(x[1])
+					if err != nil {
+						err = fmt.Errorf("Could not convert x[1] for WaitMap[7]")
+						return err
+					}
 				}
 				v.PIterations[v1.Name] = PIter // add iterations in the custom profile
 			}

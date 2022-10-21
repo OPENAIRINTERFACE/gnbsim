@@ -64,6 +64,10 @@ output:
   uniq-by-line: true
 # all available settings of specific linters
 linters-settings:
+  gosimple:
+    checks:
+      - all
+      - '-S1000'
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
     # default is false: such cases aren't reported by default.

@@ -118,12 +118,12 @@ func (profile *Profile) Init() {
 // enable step trigger only if execParallel is enabled in profile
 func SendStepEventProfile(name string) error {
 	profile, found := ProfileMap[name]
-	if found == false {
-		err := fmt.Errorf("unknown profile:%s", profile)
+	if !found {
+		err := fmt.Errorf("unknown profile:%v", profile)
 		log.Println(err)
 		return err
 	}
-	if profile.ExecInParallel == false {
+	if !profile.ExecInParallel {
 		err := fmt.Errorf("ExecInParallel should be true if step profile needs to be executed")
 		log.Println(err)
 		return err
@@ -142,8 +142,8 @@ func SendStepEventProfile(name string) error {
 
 func SendAddNewCallsEventProfile(name string, number int32) error {
 	profile, found := ProfileMap[name]
-	if found == false {
-		err := fmt.Errorf("unknown profile:%s", profile)
+	if !found {
+		err := fmt.Errorf("unknown profile:%v", profile)
 		return err
 	}
 	msg := &common.ProfileMessage{}
@@ -157,7 +157,8 @@ func SendAddNewCallsEventProfile(name string, number int32) error {
 	return nil
 }
 
-func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent common.EventType) (common.EventType, error) {
+func (p *Profile) GetNextEvent(Procedure common.ProcedureType,
+	currentEvent common.EventType) (common.EventType, error) {
 	var err error
 	proc := ProceduresMap[Procedure]
 
@@ -168,7 +169,8 @@ func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent comm
 	return nextEvent, err
 }
 
-func (p *Profile) CheckCurrentEvent(Procedure common.ProcedureType, triggerEvent, recvEvent common.EventType) (err error) {
+func (p *Profile) CheckCurrentEvent(Procedure common.ProcedureType, triggerEvent,
+	recvEvent common.EventType) (err error) {
 	proc := ProceduresMap[Procedure]
 	expected, ok := proc.Events[triggerEvent]
 	if !ok {
@@ -231,16 +233,19 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 
 	// check if custom Profile
 	if len(p.Iterations) > 0 {
+		var found bool
 		pCtx.Log.Infoln("Current UE iteration ", pCtx.CurrentItr)
 		pCtx.Log.Infoln("Current UE procedure index  ", pCtx.CurrentProcIndex)
-		itp, found := p.PIterations[pCtx.CurrentItr]
-		pCtx.Log.Infoln("Current Iteration map - ", itp)
+		itp, found2 := p.PIterations[pCtx.CurrentItr]
+		if found2 {
+			pCtx.Log.Infoln("Current Iteration map - ", itp)
+		}
 		if itp.WaitMap[pCtx.CurrentProcIndex] != 0 {
 			time.Sleep(time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
 		}
 		nextProcIndex := pCtx.CurrentProcIndex + 1
-		nextProcedure, found := itp.ProcMap[nextProcIndex]
-		if found == true {
+		nextProcedure, found = itp.ProcMap[nextProcIndex]
+		if found {
 			pCtx.Log.Infof("Next Procedure Index %v and next Procedure = %v ", nextProcIndex, nextProcedure)
 			pCtx.Procedure = nextProcedure
 			pCtx.CurrentProcIndex = nextProcIndex
@@ -251,7 +256,7 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 			pCtx.Repeat = pCtx.Repeat - 1
 			pCtx.Log.Infoln("Repeat current iteration : ", itp.Name, ", Repeat Count ", pCtx.Repeat)
 			pCtx.CurrentProcIndex = 1
-			nextProcedure := itp.ProcMap[1]
+			nextProcedure = itp.ProcMap[1]
 			pCtx.Procedure = nextProcedure
 			return nextProcedure
 		}
@@ -263,7 +268,7 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 			pCtx.CurrentItr = nItr.Name
 			pCtx.CurrentProcIndex = 1
 			pCtx.Repeat = nItr.Repeat
-			nextProcedure := nItr.ProcMap[1]
+			nextProcedure = nItr.ProcMap[1]
 			pCtx.Procedure = nextProcedure
 			return nextProcedure
 		}

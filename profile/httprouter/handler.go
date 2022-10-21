@@ -21,7 +21,7 @@ import (
 func HTTPStepProfile(c *gin.Context) {
 	logger.HttpLog.Infoln("HTTPStepProfile!")
 	profName, exists := c.Params.Get("profile-name")
-	if exists == false {
+	if !exists {
 		logger.HttpLog.Printf("Received HTTPStepProfile, but profile-name not found ")
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
@@ -38,17 +38,20 @@ func HTTPStepProfile(c *gin.Context) {
 func HTTPAddNewCallsProfile(c *gin.Context) {
 	logger.HttpLog.Infoln("HTTPAddNewCallsProfile!")
 	profName, exists := c.Params.Get("profile-name")
-	if exists == false {
+	if !exists {
 		logger.HttpLog.Printf("Received HTTPAddNewCallsProfile, but profile-name not found ")
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
 	}
 	var number int32
 	n, ok := c.GetQuery("number")
-	if ok == false {
+	if !ok {
 		number = 1
 	} else {
-		n, _ := strconv.Atoi(n)
+		n, errConv := strconv.Atoi(n)
+		if errConv != nil {
+			log.Println(errConv)
+		}
 		number = int32(n)
 	}
 

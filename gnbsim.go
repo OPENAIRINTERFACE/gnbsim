@@ -59,7 +59,7 @@ func action(c *cli.Context) error {
 	config := factory.AppConfig
 
 	//Initiating a server for profiling
-	if config.Configuration.GoProfile.Enable == true {
+	if config.Configuration.GoProfile.Enable {
 		go func() {
 			endpt := fmt.Sprintf(":%v", config.Configuration.GoProfile.Port)
 			fmt.Println("endpoint for profile server ", endpt)
