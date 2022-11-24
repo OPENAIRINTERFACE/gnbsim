@@ -391,20 +391,27 @@ func HandleProcedure(ue *simuectx.SimUe) {
 		msg.Event = common.PDU_SESS_REL_REQUEST_EVENT
 		SendToRealUe(ue, msg)
 	case common.USER_DATA_PKT_GENERATION_PROCEDURE:
-		ue.Log.Infoln("Initiating User Data Packet Generation Procedure")
-		msg := &common.UeMessage{}
-		msg.UserDataPktCount = ue.ProfileCtx.DataPktCount
-		msg.DefaultAs = ue.ProfileCtx.DefaultAs
-		msg.Event = common.DATA_PKT_GEN_REQUEST_EVENT
+		if ue.ProfileCtx.DefaultAs == "0.0.0.0" {
+			ue.Log.Infoln("Bypassing User Data Packet Generation Procedure")
+			msg := &common.UeMessage{}
+			msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
+			SendToRealUe(ue, msg)
+		} else {
+			ue.Log.Infoln("Initiating User Data Packet Generation Procedure")
+			msg := &common.UeMessage{}
+			msg.UserDataPktCount = ue.ProfileCtx.DataPktCount
+			msg.DefaultAs = ue.ProfileCtx.DefaultAs
+			msg.Event = common.DATA_PKT_GEN_REQUEST_EVENT
 
-		/* TODO: Solve timing issue. Currently UE may start sending user data
-		 * before gnb has successfully sent PDU Session Resource Setup Response
-		 * or before 5g core has processed it
-		 */
-		ue.Log.Infoln("Please wait, initiating uplink user data in 3 seconds ...")
-		time.Sleep(3 * time.Second)
+			/* TODO: Solve timing issue. Currently UE may start sending user data
+			 * before gnb has successfully sent PDU Session Resource Setup Response
+			 * or before 5g core has processed it
+			 */
+			ue.Log.Infoln("Please wait, initiating uplink user data in 3 seconds ...")
+			time.Sleep(3 * time.Second)
 
-		SendToRealUe(ue, msg)
+			SendToRealUe(ue, msg)
+		}
 	case common.UE_INITIATED_DEREGISTRATION_PROCEDURE:
 		ue.Log.Infoln("Initiating UE Initiated Deregistration Procedure")
 		msg := &common.UeMessage{}
