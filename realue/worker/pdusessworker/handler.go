@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/omec-project/gnbsim/common"
 	realuectx "github.com/omec-project/gnbsim/realue/context"
@@ -110,16 +111,18 @@ func HandleIcmpMessage(pduSess *realuectx.PduSession,
 			echpReply.ID, echpReply.Seq)
 
 		pduSess.RxDataPktCount++
-		if pduSess.TxDataPktCount < pduSess.ReqDataPktCount {
-			err = SendIcmpEchoRequest(pduSess)
-			if err != nil {
-				return fmt.Errorf("failed to send icmp echo req:%v", err)
+		if pduSess.ReqDataPktInt == 0 {
+			if pduSess.TxDataPktCount < pduSess.ReqDataPktCount {
+				err = SendIcmpEchoRequest(pduSess)
+				if err != nil {
+					return fmt.Errorf("failed to send icmp echo req:%v", err)
+				}
+			} else {
+				msg := &common.UuMessage{}
+				msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
+				pduSess.WriteUeChan <- msg
+				pduSess.Log.Traceln("Sent Data Packet Generation Success Event")
 			}
-		} else {
-			msg := &common.UuMessage{}
-			msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
-			pduSess.WriteUeChan <- msg
-			pduSess.Log.Traceln("Sent Data Packet Generation Success Event")
 		}
 	default:
 		return fmt.Errorf("unsupported icmp message type:%v", icmpMsg.Type)
@@ -167,10 +170,27 @@ func HandleDataPktGenRequestEvent(pduSess *realuectx.PduSession,
 	intfcMsg common.InterfaceMessage) (err error) {
 	cmd := intfcMsg.(*common.UeMessage)
 	pduSess.ReqDataPktCount = cmd.UserDataPktCount
+	pduSess.ReqDataPktInt = cmd.UserDataPktInterval
 	pduSess.DefaultAs = cmd.DefaultAs
-	err = SendIcmpEchoRequest(pduSess)
-	if err != nil {
-		return fmt.Errorf("failed to send icmp echo req:%v", err)
+	if pduSess.ReqDataPktInt == 0 {
+		err = SendIcmpEchoRequest(pduSess)
+		if err != nil {
+			return fmt.Errorf("failed to send icmp echo req:%v", err)
+		}
+	} else {
+		go func(pduSess *realuectx.PduSession) {
+			for pduSess.TxDataPktCount < pduSess.ReqDataPktCount {
+				err = SendIcmpEchoRequest(pduSess)
+				if err != nil {
+					pduSess.Log.Errorln("failed to send icmp echo req")
+				}
+				time.Sleep(time.Duration(pduSess.ReqDataPktInt) * time.Second)
+			}
+			msg := &common.UuMessage{}
+			msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
+			pduSess.WriteUeChan <- msg
+			pduSess.Log.Traceln("Sent Data Packet Generation Success Event")
+		}(pduSess)
 	}
 	return nil
 }
