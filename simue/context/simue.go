@@ -31,7 +31,7 @@ type SimUe struct {
 	WaitGrp   sync.WaitGroup
 
 	// SimUe writes messages to Scenario routine on this channel
-	WriteScenarioChan chan *common.ProfileMessage
+	WriteScenarioChan chan *common.InterfaceMessage
 
 	// SimUe writes messages to RealUE on this channel
 	WriteRealUeChan chan common.InterfaceMessage
@@ -49,7 +49,7 @@ type SimUe struct {
 
 var SimUeTable map[string]*SimUe
 
-func NewSimUe(supi string, ueModel string, gnb *gnbctx.GNodeB, result chan *common.ProfileMessage) *SimUe {
+func NewSimUe(supi string, ueModel string, gnb *gnbctx.GNodeB, result chan *common.InterfaceMessage) *SimUe {
 	ueProfile, err := factory.AppConfig.Configuration.GetUeProfile(ueModel)
 	if err != nil {
 		return nil

@@ -17,7 +17,7 @@ import (
 	simuectx "github.com/omec-project/gnbsim/simue/context"
 )
 
-func InitUE(imsiStr string, ueModel string, gnb *gnbctx.GNodeB, string, result chan *common.ProfileMessage) *simuectx.SimUe {
+func InitUE(imsiStr string, ueModel string, gnb *gnbctx.GNodeB, result chan *common.InterfaceMessage) *simuectx.SimUe {
 	simUe := simuectx.NewSimUe(imsiStr, ueModel, gnb, result)
 	Init(simUe) // Initialize simUE, realUE & wait for events
 	return simUe
@@ -73,75 +73,75 @@ func HandleEvents(ue *simuectx.SimUe) {
 		ue.Log.Infoln("Handling event:", event)
 
 		switch event {
-		case common.NAS_5GMM_REGISTRATION_REQUEST_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST:
 			err = HandleRegRequestEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST:
 			err = HandleRegRequestEncodedEvent(ue, msg)
-		case common.NAS_5GMM_REGISTRATION_ACCEPT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_REGISTRATION_ACCEPT:
 			SendToScenario(ue, msg)
-		case common.NAS_5GMM_REGISTRATION_REJECT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_REGISTRATION_REJECT:
 			SendToScenario(ue, msg)
-		case common.NAS_5GMM_REGISTRATION_COMPLETE_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE:
 			err = HandleRegCompleteEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE:
 			err = HandleRegCompleteEncodedEvent(ue, msg)
 
-		case common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG:
 			err = HandleDeregRequestEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG:
 			err = HandleDeregRequestEncodedEvent(ue, msg)
-		case common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_ORIG_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_ORIG:
 			SendToScenario(ue, msg)
 
-		case common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_TERM_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_TERM:
 			SendToScenario(ue, msg)
-		case common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM:
 			err = HandleNwDeregAcceptEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM:
 			err = HandleNwDeregAcceptDecodedEvent(ue, msg)
 
-		case common.NAS_5GMM_SERVICE_REQUEST_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
 			err = HandleServiceRequestEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
 			err = HandleServiceRequestEncodedEvent(ue, msg)
-		case common.NAS_5GMM_SERVICE_REJECT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_SERVICE_REJECT:
 			SendToScenario(ue, msg)
-		case common.NAS_5GMM_SERVICE_ACCEPT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_SERVICE_ACCEPT:
 			SendToScenario(ue, msg)
 
-		case common.NAS_5GMM_AUTHENTICATION_REQUEST_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_AUTHENTICATION_REQUEST:
 			err = HandleAuthRequestEvent(ue, msg)
-		case common.NAS_5GMM_AUTHENTICATION_RESPONSE_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
 			err = HandleAuthResponseEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
 			err = HandleAuthResponseEncodedEvent(ue, msg)
 
-		case common.NAS_5GMM_SECURITY_MODE_COMMAND_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GMM_SECURITY_MODE_COMMAND:
 			err = HandleSecModCommandEvent(ue, msg)
-		case common.NAS_5GMM_SECURITY_MODE_COMPLETE_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
 			err = HandleSecModCompleteEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
 			err = HandleSecModCompleteEncodedEvent(ue, msg)
-		case common.NAS_5GMM_SECURITY_MODE_REJECT_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SECURITY_MODE_REJECT:
 			err = HandleSecModRejectEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SECURITY_MODE_REJECT:
 			err = HandleSecModRejectEncodedEvent(ue, msg)
 
-		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST:
 			err = HandlePduSessEstRequestEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST:
 			err = HandlePduSessEstRequestEncodedEvent(ue, msg)
-		case common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST:
 			err = HandlePduSessReleaseRequestEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST:
 			err = HandlePduSessReleaseRequestEncodedEvent(ue, msg)
-		case common.NAS_5GSM_PDU_SESSION_RELEASE_COMMAND_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMMAND:
 			err = HandlePduSessReleaseCommandEvent(ue, msg)
-		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_ACCEPT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_ACCEPT:
 			err = HandlePduSessEstAcceptEvent(ue, msg)
-		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REJECT_RECV_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REJECT:
 			err = HandlePduSessEstRejectEvent(ue, msg)
-		case common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE_SEND_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE:
 			err = HandlePduSessReleaseCompleteEvent(ue, msg)
 		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE:
 			err = HandlePduSessReleaseCompleteEncodedEvent(ue, msg)
@@ -198,7 +198,7 @@ func SendToGnbUe(ue *simuectx.SimUe, msg common.InterfaceMessage) {
 
 func SendToScenario(ue *simuectx.SimUe, msg common.InterfaceMessage) {
 	ue.Log.Traceln("Sending", msg.GetEventType(), "to Scenario")
-	ue.WriteScenarioChan <- msg
+	ue.WriteScenarioChan <- &msg
 }
 
 func RunProcedure(simUe *simuectx.SimUe, procedure common.ProcedureType) {
