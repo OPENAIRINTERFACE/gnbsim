@@ -6,38 +6,45 @@ package simue
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/omec-project/gnbsim/common"
 	simuectx "github.com/omec-project/gnbsim/simue/context"
 )
 
-func HandleProcedureEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-	msg := intfcMsg.(*common.ProfileMessage)
-	ue.Procedure = msg.Proc
-	ue.Log.Infoln("Start new procedure ", ue.Procedure)
-	HandleProcedure(ue)
-	return nil
-}
-
 func HandleRegRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	SendToGnbUe(ue, intfcMsg)
+	ue.Log.Infoln("Initiating Registration Procedure")
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST
+	SendToRealUe(ue, msg)
 	return nil
 }
 
-func HandleRegRejectEvent(ue *simuectx.SimUe,
+func HandleRegRequestEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.REG_REQUEST_EVENT,
-		intfcMsg.GetEventType())
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
+	msg := intfcMsg.(*common.UuMessage)
+	SendToGnbUe(ue, msg)
+	return nil
+}
 
+func HandleRegCompleteEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandleRegCompleteEncodedEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	msg := intfcMsg.(*common.UuMessage)
+	msg.Event = common.UL_INFO_TRANSFER_EVENT
+	SendToGnbUe(ue, msg)
+	ue.Log.Traceln("Sent Registration Complete to the network")
 	return nil
 }
 
@@ -45,55 +52,34 @@ func HandleAuthRequestEvent(ue *simuectx.SimUe,
 	intfMsg common.InterfaceMessage) (err error) {
 
 	msg := intfMsg.(*common.UeMessage)
-	// checking as per profile if Authentication Request Message is expected
-	// from 5G Core against Registration Request message sent by RealUE
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.REG_REQUEST_EVENT, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	ue.Log.Infoln("Next Event:", nextEvent)
-	msg.Event = nextEvent
-	SendToRealUe(ue, msg)
+	SendToScenario(ue, msg)
 	return nil
 }
 
 func HandleAuthResponseEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
+	intfMsg common.InterfaceMessage) (err error) {
 
-	msg := intfcMsg.(*common.UuMessage)
-	// Checking if RealUe has sent expected message as per profile against
-	// Authentication Request message recevied from 5G Core
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.AUTH_REQUEST_EVENT, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE
+	SendToRealUe(ue, msg)
+	return nil
+}
 
+func HandleAuthResponseEncodedEvent(ue *simuectx.SimUe,
+	intfMsg common.InterfaceMessage) (err error) {
+
+	msg := intfMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
-	ue.Log.Traceln("Sending Authentication Response to the network")
+	ue.Log.Traceln("Sent Registration Complete to the network")
 	return nil
 }
 
 func HandleSecModCommandEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
+	intfMsg common.InterfaceMessage) (err error) {
 
-	// TODO: Should check if SecModCommandEvent event is expected
-
-	msg := intfcMsg.(*common.UeMessage)
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	msg.Event = nextEvent
-	SendToRealUe(ue, msg)
+	msg := intfMsg.(*common.UeMessage)
+	SendToScenario(ue, msg)
 	return nil
 }
 
@@ -101,63 +87,62 @@ func HandleSecModCompleteEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	ue.Log.Traceln("Handling Security Mode Complete Event")
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE
+	SendToRealUe(ue, msg)
+	return nil
+}
 
+func HandleSecModCompleteEncodedEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	ue.Log.Traceln("Handling Security Mode Complete Event")
 	msg := intfcMsg.(*common.UuMessage)
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.SEC_MOD_COMMAND_EVENT,
-		msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
-
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
 	ue.Log.Traceln("Sent Security Mode Complete to the network")
 	return nil
 }
 
-func HandleRegAcceptEvent(ue *simuectx.SimUe,
+func HandleSecModRejectEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	msg := intfcMsg.(*common.UeMessage)
-	// TODO: Should check if Registration Accept event is expected
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	msg.Event = nextEvent
+	ue.Log.Traceln("Handling Security Mode Reject Event")
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_SECURITY_MODE_REJECT
 	SendToRealUe(ue, msg)
 	return nil
 }
 
-func HandleRegCompleteEvent(ue *simuectx.SimUe,
+func HandleSecModRejectEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
+	ue.Log.Traceln("Handling Security Mode Reject Event")
+
 	msg := intfcMsg.(*common.UuMessage)
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.REG_ACCEPT_EVENT, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
 
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
-	ue.Log.Traceln("Sent Registration Complete to the network")
-
-	//Current Procedure is complete. Move to next one
-	SendProcedureResult(ue)
+	ue.Log.Traceln("Sent Security Mode Reject to the network")
 	return nil
 }
 
 func HandleDeregRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
+	msg := intfcMsg.(*common.UeMessage)
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandleDeregRequestEncodedEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
 	ue.Log.Traceln("Sent Deregistration Request to the network")
-
 	return nil
 }
 
@@ -170,6 +155,15 @@ func HandleDeregAcceptEvent(ue *simuectx.SimUe,
 func HandlePduSessEstRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
+	msg := intfcMsg.(*common.UeMessage)
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandlePduSessEstRequestEncodedEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
 	msg := intfcMsg.(*common.UuMessage)
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
@@ -180,36 +174,28 @@ func HandlePduSessEstAcceptEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	msg := intfcMsg.(*common.UeMessage)
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.PDU_SESS_EST_REQUEST_EVENT, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	ue.Log.Infoln("Next Event:", nextEvent)
-	msg.Event = nextEvent
-	SendToRealUe(ue, msg)
+	SendToScenario(ue, msg)
 	return nil
 }
 
 func HandlePduSessEstRejectEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.PDU_SESS_EST_REQUEST_EVENT,
-		intfcMsg.GetEventType())
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
-
+	msg := intfcMsg.(*common.UeMessage)
+	SendToScenario(ue, msg)
 	return nil
 }
 
 func HandlePduSessReleaseRequestEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	msg := intfcMsg.(*common.UeMessage)
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandlePduSessReleaseRequestEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	msg := intfcMsg.(*common.UuMessage)
@@ -222,25 +208,20 @@ func HandlePduSessReleaseCommandEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	msg := intfcMsg.(*common.UeMessage)
-	if ue.Procedure == common.UE_REQUESTED_PDU_SESSION_RELEASE_PROCEDURE {
-		err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.PDU_SESS_REL_REQUEST_EVENT, msg.Event)
-		if err != nil {
-			ue.Log.Errorln("CheckCurrentEvent returned:", err)
-			return err
-		}
-	}
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	ue.Log.Infoln("Next Event:", nextEvent)
-	msg.Event = nextEvent
-	SendToRealUe(ue, msg)
+	SendToScenario(ue, msg)
 	return nil
 }
 
 func HandlePduSessReleaseCompleteEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	msg := intfcMsg.(*common.UeMessage)
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandlePduSessReleaseCompleteEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	msg := intfcMsg.(*common.UuMessage)
@@ -267,9 +248,6 @@ func HandleDataBearerSetupResponseEvent(ue *simuectx.SimUe,
 	msg common.InterfaceMessage) (err error) {
 
 	SendToGnbUe(ue, msg)
-
-	//Current Procedure is complete. Move to next one
-	SendProcedureResult(ue)
 	return nil
 }
 
@@ -281,7 +259,6 @@ func HandleDataBearerReleaseRequestEvent(ue *simuectx.SimUe,
 	// Release Complete which will also release the communication links
 	// (go channels) with the gNB
 	//Current Procedure is complete. Move to next one
-	SendProcedureResult(ue)
 	return nil
 }
 
@@ -289,7 +266,6 @@ func HandleDataPktGenSuccessEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	//Current Procedure is complete. Move to next one
-	SendProcedureResult(ue)
 	return nil
 }
 
@@ -297,11 +273,20 @@ func HandleDataPktGenFailureEvent(ue *simuectx.SimUe,
 	msg common.InterfaceMessage) (err error) {
 
 	ue.Log.Traceln("HandleDataPktGenFailureEvent")
-	SendToProfile(ue, common.PROC_FAIL_EVENT, msg.GetErrorMsg())
+	SendToScenario(ue, msg)
 	return nil
 }
 
 func HandleServiceRequestEvent(ue *simuectx.SimUe,
+	intfcMsg common.InterfaceMessage) (err error) {
+
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_SERVICE_REQUEST
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandleServiceRequestEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	err = ConnectToGnb(ue)
@@ -315,78 +300,38 @@ func HandleServiceRequestEvent(ue *simuectx.SimUe,
 	return nil
 }
 
-func HandleServiceAcceptEvent(ue *simuectx.SimUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.SERVICE_REQUEST_EVENT,
-		intfcMsg.GetEventType())
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
-
-	return nil
-}
-
 func HandleConnectionReleaseRequestEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
+
+	ue.Log.Errorln("TODO HandleConnectionReleaseRequestEvent")
+
 	msg := intfcMsg.(*common.UuMessage)
-
-	if ue.Procedure == common.AN_RELEASE_PROCEDURE {
-		err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.TRIGGER_AN_RELEASE_EVENT,
-			common.CONNECTION_RELEASE_REQUEST_EVENT)
-		if err != nil {
-			return err
-		}
-	}
-
 	ue.WriteGnbUeChan = nil
-
-	if msg.TriggeringEvent == common.DEREG_REQUEST_UE_ORIG_EVENT {
-		/*
-			msg := &common.UeMessage{}
-			msg.Event = common.QUIT_EVENT
-			ue.ReadChan <- msg
-		*/
-		// Nothing else to execute. Tell profile we are done.
-		ue.Log.Traceln("debug2")
-		SendToProfile(ue, common.PROC_PASS_EVENT, nil)
-		return nil
-	}
 	SendToRealUe(ue, msg)
-	//Current Procedure is complete. Move to next one
-	SendProcedureResult(ue)
-
 	return nil
 }
 
 func HandleNwDeregRequestEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 
-	msg := intfcMsg.(*common.UeMessage)
-
-	nextEvent, err := ue.ProfileCtx.GetNextEvent(ue.Procedure, msg.Event)
-	if err != nil {
-		ue.Log.Errorln("GetNextEvent returned:", err)
-		return err
-	}
-	ue.Log.Infoln("Next Event:", nextEvent)
-	msg.Event = nextEvent
-	SendToRealUe(ue, msg)
-
+	//msg := intfcMsg.(*common.UeMessage)
+	ue.Log.Errorln("TODO HandleNwDeregRequestEvent")
 	return nil
 }
 
 func HandleNwDeregAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
 
 	ue.Log.Traceln("Handling Dereg Accept Event")
+	msg := &common.UeMessage{}
+	msg.Event = common.N1_ENCODE_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM
+	SendToRealUe(ue, msg)
+	return nil
+}
+
+func HandleNwDeregAcceptDecodedEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessage) (err error) {
+
+	ue.Log.Traceln("Handling Dereg Accept Event")
 
 	msg := intfcMsg.(*common.UuMessage)
-	err = ue.ProfileCtx.CheckCurrentEvent(ue.Procedure, common.DEREG_REQUEST_UE_TERM_EVENT,
-		msg.Event)
-	if err != nil {
-		ue.Log.Errorln("CheckCurrentEvent returned:", err)
-		return err
-	}
 
 	msg.Event = common.UL_INFO_TRANSFER_EVENT
 	SendToGnbUe(ue, msg)
@@ -397,8 +342,9 @@ func HandleNwDeregAcceptEvent(ue *simuectx.SimUe, intfcMsg common.InterfaceMessa
 func HandleErrorEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	ue.Log.Traceln("debug3")
-	SendToProfile(ue, common.PROC_FAIL_EVENT, intfcMsg.GetErrorMsg())
+	ue.Log.Errorln("TODO HandleErrorEvent")
+	//ue.Log.Traceln("debug3")
+	//SendToScenario(ue, common.PROC_FAIL_EVENT, intfcMsg.GetErrorMsg())
 
 	msg := &common.UuMessage{}
 	msg.Event = common.QUIT_EVENT
@@ -416,65 +362,4 @@ func HandleQuitEvent(ue *simuectx.SimUe,
 	ue.WaitGrp.Wait()
 	ue.Log.Infoln("Sim UE terminated")
 	return nil
-}
-
-// TODO : accept result, 1. pass or 2. Fail (with error)
-func SendProcedureResult(ue *simuectx.SimUe) {
-	ue.Log.Traceln("Sending Procedure Result to Profile : PASS")
-	SendToProfile(ue, common.PROC_PASS_EVENT, nil)
-	return
-}
-
-func HandleProcedure(ue *simuectx.SimUe) {
-	switch ue.Procedure {
-	case common.REGISTRATION_PROCEDURE:
-		ue.Log.Infoln("Initiating Registration Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.REG_REQUEST_EVENT
-		SendToRealUe(ue, msg)
-	case common.PDU_SESSION_ESTABLISHMENT_PROCEDURE:
-		ue.Log.Infoln("Initiating UE Requested PDU Session Establishment Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.PDU_SESS_EST_REQUEST_EVENT
-		SendToRealUe(ue, msg)
-	case common.UE_REQUESTED_PDU_SESSION_RELEASE_PROCEDURE:
-		ue.Log.Infoln("Initiating UE Requested PDU Session Release Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.PDU_SESS_REL_REQUEST_EVENT
-		SendToRealUe(ue, msg)
-	case common.USER_DATA_PKT_GENERATION_PROCEDURE:
-		ue.Log.Infoln("Initiating User Data Packet Generation Procedure")
-		msg := &common.UeMessage{}
-		msg.UserDataPktCount = ue.ProfileCtx.DataPktCount
-		msg.DefaultAs = ue.ProfileCtx.DefaultAs
-		msg.Event = common.DATA_PKT_GEN_REQUEST_EVENT
-
-		/* TODO: Solve timing issue. Currently UE may start sending user data
-		 * before gnb has successfuly sent PDU Session Resource Setup Response
-		 * or before 5g core has processed it
-		 */
-		ue.Log.Infoln("Please wait, initiating uplink user data in 3 seconds ...")
-		time.Sleep(3 * time.Second)
-
-		SendToRealUe(ue, msg)
-	case common.UE_INITIATED_DEREGISTRATION_PROCEDURE:
-		ue.Log.Infoln("Initiating UE Initiated Deregistration Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.DEREG_REQUEST_UE_ORIG_EVENT
-		SendToRealUe(ue, msg)
-	case common.AN_RELEASE_PROCEDURE:
-		ue.Log.Infoln("Initiating AN Release Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.TRIGGER_AN_RELEASE_EVENT
-		SendToGnbUe(ue, msg)
-	case common.UE_TRIGGERED_SERVICE_REQUEST_PROCEDURE:
-		ue.Log.Infoln("Initiating UE Triggered Service Request Procedure")
-		msg := &common.UeMessage{}
-		msg.Event = common.SERVICE_REQUEST_EVENT
-		SendToRealUe(ue, msg)
-	case common.NW_TRIGGERED_UE_DEREGISTRATION_PROCEDURE:
-		ue.Log.Infoln("Waiting for N/W Triggered De-registration Procedure")
-	case common.NW_REQUESTED_PDU_SESSION_RELEASE_PROCEDURE:
-		ue.Log.Infoln("Waiting for N/W Requested PDU Session Release Procedure")
-	}
 }

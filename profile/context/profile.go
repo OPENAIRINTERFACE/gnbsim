@@ -7,7 +7,6 @@ package context
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/omec-project/gnbsim/common"
@@ -113,48 +112,6 @@ func (profile *Profile) Init() {
 	}
 	ProfileMap[profile.Name] = profile
 	profile.Log.Traceln("profile initialized ", profile.Name, ", Enable ", profile.Enable)
-}
-
-// enable step trigger only if execParallel is enabled in profile
-func SendStepEventProfile(name string) error {
-	profile, found := ProfileMap[name]
-	if found == false {
-		err := fmt.Errorf("unknown profile:%s", profile)
-		log.Println(err)
-		return err
-	}
-	if profile.ExecInParallel == false {
-		err := fmt.Errorf("ExecInParallel should be true if step profile needs to be executed")
-		log.Println(err)
-		return err
-	}
-	msg := &common.ProfileMessage{}
-	// msg.Supi =
-	// msg.ProcedureType =
-	msg.Event = common.PROFILE_STEP_EVENT
-	for _, ctx := range profile.PSimUe {
-		profile.Log.Traceln("profile ", profile, ", writing on trig channel - start")
-		ctx.TrigEventsChan <- msg
-		profile.Log.Traceln("profile ", profile, ", writing on trig channel - end")
-	}
-	return nil
-}
-
-func SendAddNewCallsEventProfile(name string, number int32) error {
-	profile, found := ProfileMap[name]
-	if found == false {
-		err := fmt.Errorf("unknown profile:%s", profile)
-		return err
-	}
-	msg := &common.ProfileMessage{}
-	msg.Event = common.PROFILE_ADDCALLS_EVENT
-	var i int32
-	for i = 0; i < number; i++ {
-		profile.Log.Traceln("profile ", profile, ", writing on trig channel - start")
-		profile.ReadChan <- msg
-		profile.Log.Traceln("profile ", profile, ", writing on trig channel - end")
-	}
-	return nil
 }
 
 func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent common.EventType) (common.EventType, error) {

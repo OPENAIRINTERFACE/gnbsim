@@ -22,7 +22,7 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 		switch msg.GetEventType() {
 		case common.CONNECTION_REQUEST_EVENT:
 			HandleConnectRequest(gnbue, msg)
-		case common.REG_REQUEST_EVENT, common.SERVICE_REQUEST_EVENT:
+		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST, common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
 			HandleInitialUEMessage(gnbue, msg)
 		case common.UL_INFO_TRANSFER_EVENT:
 			HandleUlInfoTransfer(gnbue, msg)

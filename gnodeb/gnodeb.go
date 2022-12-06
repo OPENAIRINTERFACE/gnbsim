@@ -53,26 +53,27 @@ func Init(gnb *gnbctx.GNodeB) error {
 	gnb.RanUeNGAPIDGenerator = idgenerator.NewGenerator(int64(start), int64(end))
 	gnb.DlTeidGenerator = idgenerator.NewGenerator(int64(start), int64(end))
 
-	if gnb.DefaultAmf == nil {
+	if gnb.Amf == nil {
 		gnb.Log.Infoln("Default AMF not configured, continuing ...")
+		gnb.Log.Tracef("GNodeB Initialized %v without connecting to Amf", gnb)
 		return nil
 	}
 
-	gnb.DefaultAmf.Init()
+	gnb.Amf.Init()
 
-	err = gnb.CpTransport.ConnectToPeer(gnb.DefaultAmf)
+	err = gnb.CpTransport.ConnectToPeer(gnb.Amf)
 	if err != nil {
 		gnb.Log.Errorln("ConnectToPeer returned:", err)
 		return fmt.Errorf("failed to connect to amf")
 	}
 
-	successfulOutcome, err := PerformNgSetup(gnb, gnb.DefaultAmf)
+	successfulOutcome, err := PerformNgSetup(gnb, gnb.Amf)
 	if !successfulOutcome || err != nil {
 		gnb.Log.Errorln("PerformNgSetup returned:", err)
 		return fmt.Errorf("failed to perform ng setup procedure")
 	}
 
-	go gnb.CpTransport.ReceiveFromPeer(gnb.DefaultAmf)
+	go gnb.CpTransport.ReceiveFromPeer(gnb.Amf)
 
 	gnb.Log.Tracef("GNodeB Initialized %v ", gnb)
 	return nil
@@ -124,7 +125,7 @@ func RequestConnection(gnb *gnbctx.GNodeB, uemsg *common.UuMessage) (chan common
 		return nil, fmt.Errorf("failed to allocate ran ue ngap id")
 	}
 
-	gnbUe := gnbctx.NewGnbCpUe(ranUeNgapID, gnb, gnb.DefaultAmf)
+	gnbUe := gnbctx.NewGnbCpUe(ranUeNgapID, gnb, gnb.Amf)
 	gnb.GnbUes.AddGnbCpUe(ranUeNgapID, gnbUe)
 
 	// TODO: Launching a GO Routine for gNB and handling the waitgroup

@@ -6,6 +6,8 @@ package simue
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/omec-project/gnbsim/common"
 	"github.com/omec-project/gnbsim/gnodeb"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
@@ -13,13 +15,12 @@ import (
 	"github.com/omec-project/gnbsim/profile/util"
 	"github.com/omec-project/gnbsim/realue"
 	simuectx "github.com/omec-project/gnbsim/simue/context"
-	"time"
 )
 
-func InitUE(imsiStr string, gnb *gnbctx.GNodeB, profile *profctx.Profile, result chan *common.ProfileMessage) chan common.InterfaceMessage {
-	simUe := simuectx.NewSimUe(imsiStr, gnb, profile, result)
+func InitUE(imsiStr string, ueModel string, gnb *gnbctx.GNodeB, string, result chan *common.ProfileMessage) *simuectx.SimUe {
+	simUe := simuectx.NewSimUe(imsiStr, ueModel, gnb, result)
 	Init(simUe) // Initialize simUE, realUE & wait for events
-	return simUe.ReadChan
+	return simUe
 }
 
 func Init(simUe *simuectx.SimUe) {
@@ -28,7 +29,10 @@ func Init(simUe *simuectx.SimUe) {
 	if err != nil {
 		err = fmt.Errorf("failed to connect to gnodeb: %v", err)
 		simUe.Log.Infoln("Sent Profile Fail Event to Profile routine****: ", err)
-		SendToProfile(simUe, common.PROC_FAIL_EVENT, err)
+		msg := &common.DefaultMessage{}
+		msg.Event = common.PROC_FAIL_EVENT
+		msg.Error = err
+		SendToScenario(simUe, msg)
 		return
 	}
 
@@ -69,40 +73,78 @@ func HandleEvents(ue *simuectx.SimUe) {
 		ue.Log.Infoln("Handling event:", event)
 
 		switch event {
-		case common.PROC_START_EVENT:
-			err = HandleProcedureEvent(ue, msg)
-		case common.REG_REQUEST_EVENT:
+		case common.NAS_5GMM_REGISTRATION_REQUEST_SEND_EVENT:
 			err = HandleRegRequestEvent(ue, msg)
-		case common.REG_REJECT_EVENT:
-			err = HandleRegRejectEvent(ue, msg)
-		case common.AUTH_REQUEST_EVENT:
-			err = HandleAuthRequestEvent(ue, msg)
-		case common.AUTH_RESPONSE_EVENT:
-			err = HandleAuthResponseEvent(ue, msg)
-		case common.SEC_MOD_COMMAND_EVENT:
-			err = HandleSecModCommandEvent(ue, msg)
-		case common.SEC_MOD_COMPLETE_EVENT:
-			err = HandleSecModCompleteEvent(ue, msg)
-		case common.REG_ACCEPT_EVENT:
-			err = HandleRegAcceptEvent(ue, msg)
-		case common.REG_COMPLETE_EVENT:
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST:
+			err = HandleRegRequestEncodedEvent(ue, msg)
+		case common.NAS_5GMM_REGISTRATION_ACCEPT_RECV_EVENT:
+			SendToScenario(ue, msg)
+		case common.NAS_5GMM_REGISTRATION_REJECT_RECV_EVENT:
+			SendToScenario(ue, msg)
+		case common.NAS_5GMM_REGISTRATION_COMPLETE_SEND_EVENT:
 			err = HandleRegCompleteEvent(ue, msg)
-		case common.DEREG_REQUEST_UE_ORIG_EVENT:
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE:
+			err = HandleRegCompleteEncodedEvent(ue, msg)
+
+		case common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG_SEND_EVENT:
 			err = HandleDeregRequestEvent(ue, msg)
-		case common.DEREG_ACCEPT_UE_ORIG_EVENT:
-			err = HandleDeregAcceptEvent(ue, msg)
-		case common.PDU_SESS_EST_REQUEST_EVENT:
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG:
+			err = HandleDeregRequestEncodedEvent(ue, msg)
+		case common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_ORIG_RECV_EVENT:
+			SendToScenario(ue, msg)
+
+		case common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_TERM_RECV_EVENT:
+			SendToScenario(ue, msg)
+		case common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM_SEND_EVENT:
+			err = HandleNwDeregAcceptEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM:
+			err = HandleNwDeregAcceptDecodedEvent(ue, msg)
+
+		case common.NAS_5GMM_SERVICE_REQUEST_SEND_EVENT:
+			err = HandleServiceRequestEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
+			err = HandleServiceRequestEncodedEvent(ue, msg)
+		case common.NAS_5GMM_SERVICE_REJECT_RECV_EVENT:
+			SendToScenario(ue, msg)
+		case common.NAS_5GMM_SERVICE_ACCEPT_RECV_EVENT:
+			SendToScenario(ue, msg)
+
+		case common.NAS_5GMM_AUTHENTICATION_REQUEST_RECV_EVENT:
+			err = HandleAuthRequestEvent(ue, msg)
+		case common.NAS_5GMM_AUTHENTICATION_RESPONSE_SEND_EVENT:
+			err = HandleAuthResponseEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
+			err = HandleAuthResponseEncodedEvent(ue, msg)
+
+		case common.NAS_5GMM_SECURITY_MODE_COMMAND_RECV_EVENT:
+			err = HandleSecModCommandEvent(ue, msg)
+		case common.NAS_5GMM_SECURITY_MODE_COMPLETE_SEND_EVENT:
+			err = HandleSecModCompleteEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
+			err = HandleSecModCompleteEncodedEvent(ue, msg)
+		case common.NAS_5GMM_SECURITY_MODE_REJECT_SEND_EVENT:
+			err = HandleSecModRejectEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GMM_SECURITY_MODE_REJECT:
+			err = HandleSecModRejectEncodedEvent(ue, msg)
+
+		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST_SEND_EVENT:
 			err = HandlePduSessEstRequestEvent(ue, msg)
-		case common.PDU_SESS_REL_REQUEST_EVENT:
+		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST:
+			err = HandlePduSessEstRequestEncodedEvent(ue, msg)
+		case common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST_SEND_EVENT:
 			err = HandlePduSessReleaseRequestEvent(ue, msg)
-		case common.PDU_SESS_REL_COMMAND_EVENT:
+		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST:
+			err = HandlePduSessReleaseRequestEncodedEvent(ue, msg)
+		case common.NAS_5GSM_PDU_SESSION_RELEASE_COMMAND_RECV_EVENT:
 			err = HandlePduSessReleaseCommandEvent(ue, msg)
-		case common.PDU_SESS_EST_ACCEPT_EVENT:
+		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_ACCEPT_RECV_EVENT:
 			err = HandlePduSessEstAcceptEvent(ue, msg)
-		case common.PDU_SESS_EST_REJECT_EVENT:
+		case common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REJECT_RECV_EVENT:
 			err = HandlePduSessEstRejectEvent(ue, msg)
-		case common.PDU_SESS_REL_COMPLETE_EVENT:
+		case common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE_SEND_EVENT:
 			err = HandlePduSessReleaseCompleteEvent(ue, msg)
+		case common.N1_ENCODED_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE:
+			err = HandlePduSessReleaseCompleteEncodedEvent(ue, msg)
 		case common.DL_INFO_TRANSFER_EVENT:
 			err = HandleDlInfoTransferEvent(ue, msg)
 		case common.DATA_BEARER_SETUP_REQUEST_EVENT:
@@ -115,16 +157,10 @@ func HandleEvents(ue *simuectx.SimUe) {
 			err = HandleDataPktGenSuccessEvent(ue, msg)
 		case common.DATA_PKT_GEN_FAILURE_EVENT:
 			err = HandleDataPktGenFailureEvent(ue, msg)
-		case common.SERVICE_REQUEST_EVENT:
-			err = HandleServiceRequestEvent(ue, msg)
-		case common.SERVICE_ACCEPT_EVENT:
-			err = HandleServiceAcceptEvent(ue, msg)
+
 		case common.CONNECTION_RELEASE_REQUEST_EVENT:
 			err = HandleConnectionReleaseRequestEvent(ue, msg)
-		case common.DEREG_REQUEST_UE_TERM_EVENT:
-			err = HandleNwDeregRequestEvent(ue, msg)
-		case common.DEREG_ACCEPT_UE_TERM_EVENT:
-			err = HandleNwDeregAcceptEvent(ue, msg)
+
 		case common.ERROR_EVENT:
 			ue.Log.Warnln("Event:", event, " received error")
 			HandleErrorEvent(ue, msg)
@@ -160,15 +196,9 @@ func SendToGnbUe(ue *simuectx.SimUe, msg common.InterfaceMessage) {
 	ue.WriteGnbUeChan <- msg
 }
 
-func SendToProfile(ue *simuectx.SimUe, event common.EventType, errMsg error) {
-	ue.Log.Traceln("Sending", event, "to Profile routine")
-	msg := &common.ProfileMessage{}
-	msg.Event = event
-	msg.Supi = ue.Supi
-	msg.Proc = ue.Procedure
-	msg.Error = errMsg
-	ue.WriteProfileChan <- msg
-	ue.Log.Traceln("Sent ", event, "to Profile routine")
+func SendToScenario(ue *simuectx.SimUe, msg common.InterfaceMessage) {
+	ue.Log.Traceln("Sending", msg.GetEventType(), "to Scenario")
+	ue.WriteScenarioChan <- msg
 }
 
 func RunProcedure(simUe *simuectx.SimUe, procedure common.ProcedureType) {

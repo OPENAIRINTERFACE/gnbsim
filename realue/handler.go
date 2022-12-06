@@ -23,7 +23,7 @@ import (
 	"github.com/omec-project/openapi/models"
 )
 
-//TODO Remove the hardcoding
+// TODO Remove the hardcoding
 const (
 	SN_NAME                        string = "5G:mnc093.mcc208.3gppnetwork.org"
 	SWITCH_OFF                     uint8  = 0
@@ -48,7 +48,7 @@ func HandleRegRequestEvent(ue *realuectx.RealUe,
 	nasPdu := nasTestpacket.GetRegistrationRequest(nasMessage.RegistrationType5GSInitialRegistration,
 		mobileId5GS, nil, ueSecurityCapability, nil, nil, nil)
 
-	m := formUuMessage(common.REG_REQUEST_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_REGISTRATION_REQUEST, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Registration Request Message to SimUe")
 	return nil
@@ -74,7 +74,7 @@ func HandleAuthResponseEvent(ue *realuectx.RealUe,
 	ue.Log.Traceln("Generating Authentication Reponse Message")
 	nasPdu := nasTestpacket.GetAuthenticationResponse(resStat, "")
 
-	m := formUuMessage(common.AUTH_RESPONSE_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_AUTHENTICATION_RESPONSE, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Authentication Reponse Message to SimUe")
 	return nil
@@ -104,7 +104,7 @@ func HandleSecModCompleteEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encrypt security mode complete message")
 	}
 
-	m := formUuMessage(common.SEC_MOD_COMPLETE_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SECURITY_MODE_COMPLETE, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Security Mode Complete Message to SimUe")
 	return nil
@@ -132,7 +132,7 @@ func HandleRegCompleteEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encrypt registration complete message")
 	}
 
-	m := formUuMessage(common.REG_COMPLETE_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_REGISTRATION_COMPLETE, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Registration Complete Message to SimUe")
 	return nil
@@ -160,7 +160,7 @@ func HandleDeregRequestEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encrypt deregistration request message")
 	}
 
-	m := formUuMessage(common.DEREG_REQUEST_UE_ORIG_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent UE Initiated Deregistration Request message to SimUe")
 	return nil
@@ -183,7 +183,7 @@ func HandlePduSessEstRequestEvent(ue *realuectx.RealUe,
 		return
 	}
 
-	m := formUuMessage(common.PDU_SESS_EST_REQUEST_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST, nasPdu)
 	SendToSimUe(ue, m)
 	return nil
 }
@@ -231,7 +231,7 @@ func HandlePduSessReleaseRequestEvent(ue *realuectx.RealUe,
 		return
 	}
 
-	m := formUuMessage(common.PDU_SESS_REL_REQUEST_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST, nasPdu)
 	SendToSimUe(ue, m)
 	return nil
 }
@@ -268,7 +268,7 @@ func HandlePduSessReleaseCompleteEvent(ue *realuectx.RealUe,
 		return
 	}
 
-	m := formUuMessage(common.PDU_SESS_REL_COMPLETE_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE, nasPdu)
 	SendToSimUe(ue, m)
 	return nil
 }
@@ -397,7 +397,7 @@ func HandleDlInfoTransferEvent(ue *realuectx.RealUe,
 
 		// The MSB out of the 32 bytes represents event type, which in this case
 		// is N1_EVENT
-		m.Event = common.EventType(msgType) | common.N1_EVENT
+		m.Event = common.EventType(msgType) | common.N1_DECODED_EVENT
 		m.NasMsg = nasMsg
 
 		// Simply notify SimUe about the received nas message. Later SimUe will
@@ -423,7 +423,7 @@ func HandleServiceRequestEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encode with security: %v", err)
 	}
 
-	m := formUuMessage(common.SERVICE_REQUEST_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SERVICE_REQUEST, nasPdu)
 	SendToSimUe(ue, m)
 	return nil
 }
@@ -440,7 +440,7 @@ func HandleNwDeregAcceptEvent(ue *realuectx.RealUe, msg common.InterfaceMessage)
 		return fmt.Errorf("failed to encrypt security mode complete message")
 	}
 
-	m := formUuMessage(common.DEREG_ACCEPT_UE_TERM_EVENT, nasPdu)
+	m := formUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM, nasPdu)
 	SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Dereg Accept UE Terminated Message to SimUe")
 	return nil

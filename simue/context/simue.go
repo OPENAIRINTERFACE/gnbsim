@@ -8,9 +8,9 @@ import (
 	"sync"
 
 	"github.com/omec-project/gnbsim/common"
+	"github.com/omec-project/gnbsim/factory"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
 	"github.com/omec-project/gnbsim/logger"
-	profctx "github.com/omec-project/gnbsim/profile/context"
 	realuectx "github.com/omec-project/gnbsim/realue/context"
 
 	"github.com/omec-project/nas/security"
@@ -24,15 +24,14 @@ func init() {
 // SimUe controls the flow of messages between RealUe and GnbUe as per the test
 // profile. It is the central entry point for all events
 type SimUe struct {
-	Supi       string
-	GnB        *gnbctx.GNodeB
-	RealUe     *realuectx.RealUe
-	ProfileCtx *profctx.Profile
-	Procedure  common.ProcedureType
-	WaitGrp    sync.WaitGroup
+	Supi      string
+	GnB       *gnbctx.GNodeB
+	RealUe    *realuectx.RealUe
+	Procedure common.ProcedureType
+	WaitGrp   sync.WaitGroup
 
-	// SimUe writes messages to Profile routine on this channel
-	WriteProfileChan chan *common.ProfileMessage
+	// SimUe writes messages to Scenario routine on this channel
+	WriteScenarioChan chan *common.ProfileMessage
 
 	// SimUe writes messages to RealUE on this channel
 	WriteRealUeChan chan common.InterfaceMessage
@@ -50,18 +49,22 @@ type SimUe struct {
 
 var SimUeTable map[string]*SimUe
 
-func NewSimUe(supi string, gnb *gnbctx.GNodeB, profile *profctx.Profile, result chan *common.ProfileMessage) *SimUe {
+func NewSimUe(supi string, ueModel string, gnb *gnbctx.GNodeB, result chan *common.ProfileMessage) *SimUe {
+	ueProfile, err := factory.AppConfig.Configuration.GetUeProfile(ueModel)
+	if err != nil {
+		return nil
+	}
 	simue := SimUe{}
 	simue.GnB = gnb
 	simue.Supi = supi
-	simue.ProfileCtx = profile
 	simue.ReadChan = make(chan common.InterfaceMessage, 5)
+	// TODO select prefered security algorithms
 	simue.RealUe = realuectx.NewRealUe(supi,
 		security.AlgCiphering128NEA0, security.AlgIntegrity128NIA2,
-		simue.ReadChan, profile.Plmn, profile.Key, profile.Opc, profile.SeqNum,
-		profile.Dnn, profile.SNssai)
+		simue.ReadChan, ueProfile.Plmn, ueProfile.Key, ueProfile.Opc, ueProfile.Nas.SeqNum,
+		ueProfile.Nas.Dnn, ueProfile.Nas.SNssai)
 	simue.WriteRealUeChan = simue.RealUe.ReadChan
-	simue.WriteProfileChan = result
+	simue.WriteScenarioChan = result
 
 	simue.Log = logger.SimUeLog.WithField(logger.FieldSupi, supi)
 

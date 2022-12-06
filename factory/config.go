@@ -13,17 +13,14 @@ package factory
 import (
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 
-	"github.com/omec-project/gnbsim/common"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
-	profctx "github.com/omec-project/gnbsim/profile/context"
+	"github.com/omec-project/openapi/models"
 )
 
 const (
 	GNBSIM_EXPECTED_CONFIG_VERSION string = "1.0.0"
-	GNBSIM_DEFAULT_CONFIG_PATH            = "/gnbsim/config/gnb.conf"
+	GNBSIM_DEFAULT_CONFIG_PATH            = "./testscenario/config-default.yaml"
 )
 
 type Config struct {
@@ -37,14 +34,72 @@ type Info struct {
 	Description string `yaml:"description"`
 }
 
+type SecurityCapabilities struct {
+	FgIa0 bool `yaml:"fgIa0" json:"fgIa0"`
+	FgIa1 bool `yaml:"fgIa1" json:"fgIa1"`
+	FgIa2 bool `yaml:"fgIa2" json:"fgIa2"`
+	FgIa3 bool `yaml:"fgIa3" json:"fgIa3"`
+	FgIa4 bool `yaml:"fgIa4" json:"fgIa4"`
+	FgIa5 bool `yaml:"fgIa5" json:"fgIa5"`
+	FgIa6 bool `yaml:"fgIa6" json:"fgIa6"`
+	FgIa7 bool `yaml:"fgIa7" json:"fgIa7"`
+	FgEa0 bool `yaml:"fgEa0" json:"fgEa0"`
+	FgEa1 bool `yaml:"fgEa1" json:"fgEa1"`
+	FgEa2 bool `yaml:"fgEa2" json:"fgEa2"`
+	FgEa3 bool `yaml:"fgEa3" json:"fgEa3"`
+	FgEa4 bool `yaml:"fgEa4" json:"fgEa4"`
+	FgEa5 bool `yaml:"fgEa5" json:"fgEa5"`
+	FgEa6 bool `yaml:"fgEa6" json:"fgEa6"`
+	FgEa7 bool `yaml:"fgEa7" json:"fgEa7"`
+	Eia0  bool `yaml:"eia0" json:"Eia0"`
+	Eia1  bool `yaml:"eia1" json:"Eia1"`
+	Eia2  bool `yaml:"eia2" json:"Eia2"`
+	Eia3  bool `yaml:"eia3" json:"Eia3"`
+	Eia4  bool `yaml:"eia4" json:"Eia4"`
+	Eia5  bool `yaml:"eia5" json:"Eia5"`
+	Eia6  bool `yaml:"eia6" json:"Eia6"`
+	Eia7  bool `yaml:"eia7" json:"Eia7"`
+	Eea0  bool `yaml:"eea0" json:"Eea0"`
+	Eea1  bool `yaml:"eea1" json:"Eea1"`
+	Eea2  bool `yaml:"eea2" json:"Eea2"`
+	Eea3  bool `yaml:"eea3" json:"Eea3"`
+	Eea4  bool `yaml:"eea4" json:"Eea4"`
+	Eea5  bool `yaml:"eea5" json:"Eea5"`
+	Eea6  bool `yaml:"eea6" json:"Eea6"`
+	Eea7  bool `yaml:"eea7" json:"Eea7"`
+}
+
+type Nas struct {
+	SecurityCapabilities SecurityCapabilities `yaml:"securityCapabilities" json:"securityCapabilities"`
+	SeqNum               string               `yaml:"sequenceNumber" json:"sequenceNumber"`
+	Dnn                  string               `yaml:"dnn" json:"dnn"`
+	SNssai               *models.Snssai       `yaml:"sNssai" json:"sNssai"`
+}
+
+type UeProfile struct {
+	Model     string         `yaml:"model" json:"model"`
+	StartImsi string         `yaml:"startImsi" json:"startImsi"`
+	Opc       string         `yaml:"opc" json:"opc"`
+	Key       string         `yaml:"key" json:"key"`
+	Nas       Nas            `yaml:"nas" json:"nas"`
+	Plmn      *models.PlmnId `yaml:"plmnId" json:"plmnId"`
+}
+
+type Amf struct {
+	HostName string `yaml:"hostName"`
+	IpAddr   string `yaml:"ipAddr"`
+	Port     string `yaml:"port"`
+}
+
 type Configuration struct {
-	Gnbs            map[string]*gnbctx.GNodeB   `yaml:"gnbs"`
-	CustomProfiles  map[string]*profctx.Profile `yaml:"customProfiles"`
-	Profiles        []*profctx.Profile          `yaml:"profiles"`
-	SingleInterface bool                        `yaml:"singleInterface"`
-	ExecInParallel  bool                        `yaml:"execInParallel"`
-	Server          HttpServer                  `yaml:"httpServer"`
-	GoProfile       ProfileServer               `yaml:"goProfile"`
+	Amfs                    map[string]*gnbctx.GnbAmf `yaml:"amfs"`
+	Gnbs                    map[string]*gnbctx.GNodeB `yaml:"gnbs"`
+	UeProfiles              map[string]*UeProfile     `yaml:"ueProfiles"`
+	SingleInterface         bool                      `yaml:"singleInterface"`
+	ExecScenariosInParallel bool                      `yaml:"execScenariosInParallel"`
+	ExecUesInParallel       bool                      `yaml:"execUesInParallel"`
+	Server                  HttpServer                `yaml:"httpServer"`
+	GoProfile               ProfileServer             `yaml:"goProfile"`
 }
 
 type ProfileServer struct {
@@ -80,8 +135,17 @@ func (c *Config) Validate() (err error) {
 	}
 
 	if len(c.Configuration.Gnbs) == 0 {
-		return fmt.Errorf("no gnbs configured")
+		return fmt.Errorf("no gNB(s) configured")
 	}
+
+	if len(c.Configuration.Amfs) == 0 {
+		return fmt.Errorf("no AMF(s) configured")
+	}
+
+	if len(c.Configuration.UeProfiles) == 0 {
+		return fmt.Errorf("no UE profile(s) configured")
+	}
+
 	if c.Configuration.GoProfile.Enable == true {
 		if c.Configuration.GoProfile.Port == 0 {
 			c.Configuration.GoProfile.Port = 5000
@@ -100,67 +164,16 @@ func (c *Config) Validate() (err error) {
 		}
 	}
 
-	if len(c.Configuration.Profiles) == 0 {
-		return fmt.Errorf("no profile information available")
-	}
-
-	if len(c.Configuration.CustomProfiles) != 0 {
-		for _, v := range c.Configuration.CustomProfiles {
-			it := v.Iterations
-			v.PIterations = make(map[string]*profctx.PIterations)
-			for _, v1 := range it {
-				if len(v1.Next) == 0 {
-					v1.Next = "quit" // default value
-				}
-				PIter := &profctx.PIterations{Name: v1.Name, NextItr: v1.Next, Repeat: v1.Repeat}
-				PIter.ProcMap = make(map[int]common.ProcedureType)
-				PIter.WaitMap = make(map[int]int)
-				PIter.WaitMap[0] = 0
-				if len(v1.First) > 0 {
-					x := strings.Fields(v1.First)
-					PIter.ProcMap[1] = common.GetProcId(x[0])
-					PIter.WaitMap[1], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Second) > 0 {
-					x := strings.Fields(v1.Second)
-					PIter.ProcMap[2] = common.GetProcId(x[0])
-					PIter.WaitMap[2], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Third) > 0 {
-					x := strings.Fields(v1.Third)
-					PIter.ProcMap[3] = common.GetProcId(x[0])
-					PIter.WaitMap[3], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Fourth) > 0 {
-					x := strings.Fields(v1.Fourth)
-					PIter.ProcMap[4] = common.GetProcId(x[0])
-					PIter.WaitMap[4], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Fifth) > 0 {
-					x := strings.Fields(v1.Fifth)
-					PIter.ProcMap[5] = common.GetProcId(x[0])
-					PIter.WaitMap[5], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Sixth) > 0 {
-					x := strings.Fields(v1.Sixth)
-					PIter.ProcMap[6] = common.GetProcId(x[0])
-					PIter.WaitMap[6], err = strconv.Atoi(x[1])
-				}
-				if len(v1.Seventh) > 0 {
-					x := strings.Fields(v1.Seventh)
-					PIter.ProcMap[7] = common.GetProcId(x[0])
-					PIter.WaitMap[7], err = strconv.Atoi(x[1])
-				}
-				v.PIterations[v1.Name] = PIter // add iterations in the custom profile
-			}
-		}
-
-		for _, v := range c.Configuration.CustomProfiles {
-			c.Configuration.Profiles = append(c.Configuration.Profiles, v)
-		}
-	}
-
 	return nil
+}
+
+func (c *Configuration) GetAmf(name string) (*gnbctx.GnbAmf, error) {
+	var err error
+	amf, ok := c.Amfs[name]
+	if !ok {
+		err = fmt.Errorf("no corresponding Amf found for:%v", name)
+	}
+	return amf, err
 }
 
 func (c *Configuration) GetGNodeB(name string) (*gnbctx.GNodeB, error) {
@@ -170,4 +183,13 @@ func (c *Configuration) GetGNodeB(name string) (*gnbctx.GNodeB, error) {
 		err = fmt.Errorf("no corresponding gNodeB found for:%v", name)
 	}
 	return gnb, err
+}
+
+func (c *Configuration) GetUeProfile(model string) (*UeProfile, error) {
+	var err error
+	ue, ok := c.UeProfiles[model]
+	if !ok {
+		err = fmt.Errorf("no corresponding Ue model found for:%v", model)
+	}
+	return ue, err
 }

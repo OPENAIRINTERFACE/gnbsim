@@ -24,25 +24,25 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 		ue.Log.Infoln("Handling:", event)
 
 		switch event {
-		case common.REG_REQUEST_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST:
 			err = HandleRegRequestEvent(ue, msg)
-		case common.AUTH_RESPONSE_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
 			err = HandleAuthResponseEvent(ue, msg)
-		case common.SEC_MOD_COMPLETE_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
 			err = HandleSecModCompleteEvent(ue, msg)
-		case common.REG_COMPLETE_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE:
 			err = HandleRegCompleteEvent(ue, msg)
-		case common.DEREG_REQUEST_UE_ORIG_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG:
 			err = HandleDeregRequestEvent(ue, msg)
 		case common.DL_INFO_TRANSFER_EVENT:
 			err = HandleDlInfoTransferEvent(ue, msg)
-		case common.PDU_SESS_EST_REQUEST_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST:
 			err = HandlePduSessEstRequestEvent(ue, msg)
-		case common.PDU_SESS_REL_REQUEST_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST:
 			err = HandlePduSessReleaseRequestEvent(ue, msg)
-		case common.PDU_SESS_REL_COMPLETE_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE:
 			err = HandlePduSessReleaseCompleteEvent(ue, msg)
-		case common.PDU_SESS_EST_ACCEPT_EVENT:
+		case common.N1_RECV_SDU_EVENT + common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_ACCEPT:
 			err = HandlePduSessEstAcceptEvent(ue, msg)
 		case common.DATA_BEARER_SETUP_REQUEST_EVENT:
 			err = HandleDataBearerSetupRequestEvent(ue, msg)
@@ -50,11 +50,11 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 			err = HandleDataPktGenRequestEvent(ue, msg)
 		case common.DATA_PKT_GEN_SUCCESS_EVENT:
 			err = HandleDataPktGenSuccessEvent(ue, msg)
-		case common.SERVICE_REQUEST_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
 			err = HandleServiceRequestEvent(ue, msg)
 		case common.CONNECTION_RELEASE_REQUEST_EVENT:
 			err = HandleConnectionReleaseRequestEvent(ue, msg)
-		case common.DEREG_ACCEPT_UE_TERM_EVENT:
+		case common.N1_ENCODE_EVENT + common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM:
 			err = HandleNwDeregAcceptEvent(ue, msg)
 		case common.ERROR_EVENT:
 			HandleErrorEvent(ue, msg)

@@ -23,6 +23,7 @@ var (
 	RealUeLog     *logrus.Entry
 	SimUeLog      *logrus.Entry
 	ProfileLog    *logrus.Entry
+	ScenarioLog   *logrus.Entry
 	GNodeBLog     *logrus.Entry
 	CfgLog        *logrus.Entry
 	UtilLog       *logrus.Entry
@@ -31,11 +32,13 @@ var (
 	PsuppLog      *logrus.Entry
 	GinLog        *logrus.Entry
 	HttpLog       *logrus.Entry
+	ScnrUeCtxLog  *logrus.Entry
 	ProfUeCtxLog  *logrus.Entry
 )
 
 const (
 	FieldSupi        string = "supi"
+	FieldScenario    string = "scenario"
 	FieldProfile     string = "profile"
 	FieldGnb         string = "gnb"
 	FieldGnbUeNgapId string = "ranuengapid"
@@ -84,6 +87,8 @@ func init() {
 	RealUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "RealUe"})
 	SimUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "SimUe"})
 	ProfUeCtxLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "ProfUeCtx"})
+	ScnrUeCtxLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "ScnrUeCtx"})
+	ScenarioLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Scenario"})
 	ProfileLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Profile"})
 	GNodeBLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "GNodeB"})
 	GinLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Gin"})

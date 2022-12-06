@@ -18,7 +18,7 @@ import (
 	"github.com/omec-project/gnbsim/simue"
 )
 
-//profile names
+// profile names
 const (
 	REGISTER                string = "register"
 	PDU_SESS_EST            string = "pdusessest"
@@ -205,11 +205,11 @@ func initProcedureEventMap() {
 
 	//common.REGISTRATION_PROCEDURE:
 	proc1.Events = map[common.EventType]common.EventType{
-		common.REG_REQUEST_EVENT:     common.AUTH_REQUEST_EVENT,
-		common.AUTH_REQUEST_EVENT:    common.AUTH_RESPONSE_EVENT,
-		common.SEC_MOD_COMMAND_EVENT: common.SEC_MOD_COMPLETE_EVENT,
-		common.REG_ACCEPT_EVENT:      common.REG_COMPLETE_EVENT,
-		common.PROFILE_PASS_EVENT:    common.QUIT_EVENT,
+		common.NAS_5GMM_REGISTRATION_REQUEST_EVENT:   common.NAS_5GMM_AUTHENTICATION_REQUEST_EVENT,
+		common.NAS_5GMM_AUTHENTICATION_REQUEST_EVENT: common.NAS_5GMM_AUTHENTICATION_RESPONSE_EVENT,
+		common.NAS_5GMM_SECURITY_MODE_COMMAND_EVENT:  common.NAS_5GMM_SECURITY_MODE_COMPLETE_EVENT,
+		common.NAS_5GMM_REGISTRATION_ACCEPT_EVENT:    common.NAS_5GMM_REGISTRATION_COMPLETE_EVENT,
+		common.PROFILE_PASS_EVENT:                    common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.REGISTRATION_PROCEDURE] = &proc1
 
@@ -234,8 +234,8 @@ func initProcedureEventMap() {
 	// common.UE_INITIATED_DEREGISTRATION_PROCEDURE:
 	proc4 := profctx.ProcedureEventsDetails{}
 	proc4.Events = map[common.EventType]common.EventType{
-		common.DEREG_REQUEST_UE_ORIG_EVENT: common.DEREG_ACCEPT_UE_ORIG_EVENT,
-		common.PROFILE_PASS_EVENT:          common.QUIT_EVENT,
+		common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG_EVENT: common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_ORIG_EVENT,
+		common.PROFILE_PASS_EVENT:                            common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.UE_INITIATED_DEREGISTRATION_PROCEDURE] = &proc4
 
@@ -250,16 +250,16 @@ func initProcedureEventMap() {
 	// common.UE_TRIGGERED_SERVICE_REQUEST_PROCEDURE:
 	proc6 := profctx.ProcedureEventsDetails{}
 	proc6.Events = map[common.EventType]common.EventType{
-		common.SERVICE_REQUEST_EVENT: common.SERVICE_ACCEPT_EVENT,
-		common.PROFILE_PASS_EVENT:    common.QUIT_EVENT,
+		common.NAS_5GMM_SERVICE_REQUEST_EVENT: common.NAS_5GMM_SERVICE_ACCEPT_EVENT,
+		common.PROFILE_PASS_EVENT:             common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.UE_TRIGGERED_SERVICE_REQUEST_PROCEDURE] = &proc6
 
 	// common.NW_TRIGGERED_UE_DEREGISTRATION_PROCEDURE:
 	proc7 := profctx.ProcedureEventsDetails{}
 	proc7.Events = map[common.EventType]common.EventType{
-		common.DEREG_REQUEST_UE_TERM_EVENT: common.DEREG_ACCEPT_UE_TERM_EVENT,
-		common.PROFILE_PASS_EVENT:          common.QUIT_EVENT,
+		common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_TERM_EVENT: common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM_EVENT,
+		common.PROFILE_PASS_EVENT:                            common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.NW_TRIGGERED_UE_DEREGISTRATION_PROCEDURE] = &proc7
 

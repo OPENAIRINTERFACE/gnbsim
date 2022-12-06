@@ -135,7 +135,7 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 				gnbue.Log.Errorln("AMFUENGAPID is nil")
 				return
 			}
-	        gnbue.AmfUeNgapId = amfUeNgapId.Value
+			gnbue.AmfUeNgapId = amfUeNgapId.Value
 		case ngapType.ProtocolIEIDNASPDU:
 			nasPdu = ie.Value.NASPDU
 			if nasPdu == nil {
@@ -442,7 +442,7 @@ func HandleUeCtxReleaseCommand(gnbue *gnbctx.GnbCpUe,
 	req := &common.UuMessage{}
 	req.Event = common.CONNECTION_RELEASE_REQUEST_EVENT
 	if causeNum == ngapType.CauseNasPresentDeregister {
-		req.TriggeringEvent = common.DEREG_REQUEST_UE_ORIG_EVENT
+		req.TriggeringEvent = common.N1_SEND_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG
 	} else {
 		req.TriggeringEvent = common.TRIGGER_AN_RELEASE_EVENT
 	}
