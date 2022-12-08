@@ -18,22 +18,14 @@ import (
 
 func GetNGSetupRequest(gnb *gnbctx.GNodeB) ([]byte, error) {
 
-	message := ngapTestpacket.BuildNGSetupRequest()
-
-	// GlobalRANNodeID
-	ie := message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[0]
-	*(ie.Value.GlobalRANNodeID) = ngapConvert.RanIDToNgap(gnb.RanId)
-
-	// RANNodeName
-	ie = message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[1]
-	ie.Value.RANNodeName.Value = gnb.GnbName
-
-	// TAC
-	ie = message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[2]
-
-	supportedTaList := ie.Value.SupportedTAList
-	// Clearing default entries.
-	supportedTaList.List = nil
+	// Mandatory SupportedTAList TS 138 413 V16.8.0
+	// Build NGAP IE to avoid circular import else need to restructure TAI list
+	ieSupportedTaList := ngapType.NGSetupRequestIEs{}
+	ieSupportedTaList.Id.Value = ngapType.ProtocolIEIDSupportedTAList
+	ieSupportedTaList.Criticality.Value = ngapType.CriticalityPresentReject
+	ieSupportedTaList.Value.Present = ngapType.NGSetupRequestIEsPresentSupportedTAList
+	ieSupportedTaList.Value.SupportedTAList = new(ngapType.SupportedTAList)
+	supportedTaList := ieSupportedTaList.Value.SupportedTAList
 
 	for _, ta := range gnb.SupportedTaList {
 		tac, err := hex.DecodeString(ta.Tac)
@@ -41,10 +33,11 @@ func GetNGSetupRequest(gnb *gnbctx.GNodeB) ([]byte, error) {
 			gnb.Log.Errorln("DecodeString returned:", err)
 			return nil, fmt.Errorf("invalid TAC")
 		}
-		supportedTaItem := ngapType.SupportedTAItem{}
-		supportedTaItem.TAC.Value = tac
+		// SupportedTAItem in SupportedTAList
+		supportedTAItem := ngapType.SupportedTAItem{}
+		supportedTAItem.TAC.Value = tac
 
-		broadcastPLMNList := &supportedTaItem.BroadcastPLMNList
+		broadcastPLMNList := &supportedTAItem.BroadcastPLMNList
 		for _, plmnItem := range ta.BroadcastPLMNList {
 			// BroadcastPLMNItem in BroadcastPLMNList
 			broadcastPLMNItem := ngapType.BroadcastPLMNItem{}
@@ -59,9 +52,10 @@ func GetNGSetupRequest(gnb *gnbctx.GNodeB) ([]byte, error) {
 			}
 			broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
 		}
-		supportedTaList.List = append(supportedTaList.List, supportedTaItem)
+		supportedTaList.List = append(supportedTaList.List, supportedTAItem)
 	}
 
+	message := ngapTestpacket.BuildNGSetupRequest(gnb.RanId, &gnb.GnbName, ieSupportedTaList)
 	return ngap.Encoder(message)
 }
 

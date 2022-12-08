@@ -14,6 +14,7 @@ import (
 	"github.com/omec-project/aper"
 	"github.com/omec-project/ngap/ngapConvert"
 	"github.com/omec-project/ngap/ngapType"
+	"github.com/omec-project/openapi/models"
 )
 
 // TODO: check test data
@@ -34,7 +35,8 @@ func init() {
 	TestPlmn.Value = aper.OctetString("\x02\xf8\x39")
 }
 
-func BuildNGSetupRequest() (pdu ngapType.NGAPPDU) {
+func BuildNGSetupRequest(globalGnbId models.GlobalRanNodeId,
+	ranNodeName *string, supportedTaList ngapType.NGSetupRequestIEs) (pdu ngapType.NGAPPDU) {
 
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
@@ -49,75 +51,33 @@ func BuildNGSetupRequest() (pdu ngapType.NGAPPDU) {
 	nGSetupRequest := initiatingMessage.Value.NGSetupRequest
 	nGSetupRequestIEs := &nGSetupRequest.ProtocolIEs
 
-	// GlobalRANNodeID
+	// Mandatory GlobalRANNodeID TS 138 413 V16.8.0 §9.3.1.5
 	ie := ngapType.NGSetupRequestIEs{}
 	ie.Id.Value = ngapType.ProtocolIEIDGlobalRANNodeID
 	ie.Criticality.Value = ngapType.CriticalityPresentReject
 	ie.Value.Present = ngapType.NGSetupRequestIEsPresentGlobalRANNodeID
-	ie.Value.GlobalRANNodeID = new(ngapType.GlobalRANNodeID)
 
-	globalRANNodeID := ie.Value.GlobalRANNodeID
-	globalRANNodeID.Present = ngapType.GlobalRANNodeIDPresentGlobalGNBID
-	globalRANNodeID.GlobalGNBID = new(ngapType.GlobalGNBID)
+	var ngapRanNodeId ngapType.GlobalRANNodeID = ngapConvert.RanIDToNgap(globalGnbId)
+	ie.Value.GlobalRANNodeID = &ngapRanNodeId
+	nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, ie)
 
-	globalGNBID := globalRANNodeID.GlobalGNBID
-	globalGNBID.PLMNIdentity.Value = aper.OctetString("\x02\xf8\x39")
-	globalGNBID.GNBID.Present = ngapType.GNBIDPresentGNBID
-	globalGNBID.GNBID.GNBID = new(aper.BitString)
+	// Optional RANNodeName TS 138 413 V16.8.0 §9.3.1.5
+	if ranNodeName != nil {
+		ie = ngapType.NGSetupRequestIEs{}
+		ie.Id.Value = ngapType.ProtocolIEIDRANNodeName
+		ie.Criticality.Value = ngapType.CriticalityPresentIgnore
+		ie.Value.Present = ngapType.NGSetupRequestIEsPresentRANNodeName
+		ie.Value.RANNodeName = new(ngapType.RANNodeName)
 
-	gNBID := globalGNBID.GNBID.GNBID
-
-	*gNBID = aper.BitString{
-		Bytes:     []byte{0x45, 0x46, 0x47},
-		BitLength: 24,
+		rANNodeName := ie.Value.RANNodeName
+		rANNodeName.Value = *ranNodeName
+		nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, ie)
 	}
-	nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, ie)
 
-	// RANNodeName
-	ie = ngapType.NGSetupRequestIEs{}
-	ie.Id.Value = ngapType.ProtocolIEIDRANNodeName
-	ie.Criticality.Value = ngapType.CriticalityPresentIgnore
-	ie.Value.Present = ngapType.NGSetupRequestIEsPresentRANNodeName
-	ie.Value.RANNodeName = new(ngapType.RANNodeName)
+	// Mandatory SupportedTAList TS 138 413 V16.8.0
+	nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, supportedTaList)
 
-	rANNodeName := ie.Value.RANNodeName
-	rANNodeName.Value = "free5GC"
-	nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, ie)
-	// SupportedTAList
-	ie = ngapType.NGSetupRequestIEs{}
-	ie.Id.Value = ngapType.ProtocolIEIDSupportedTAList
-	ie.Criticality.Value = ngapType.CriticalityPresentReject
-	ie.Value.Present = ngapType.NGSetupRequestIEsPresentSupportedTAList
-	ie.Value.SupportedTAList = new(ngapType.SupportedTAList)
-
-	supportedTAList := ie.Value.SupportedTAList
-
-	// SupportedTAItem in SupportedTAList
-	supportedTAItem := ngapType.SupportedTAItem{}
-	supportedTAItem.TAC.Value = aper.OctetString("\x00\x00\x01")
-
-	broadcastPLMNList := &supportedTAItem.BroadcastPLMNList
-	// BroadcastPLMNItem in BroadcastPLMNList
-	broadcastPLMNItem := ngapType.BroadcastPLMNItem{}
-	broadcastPLMNItem.PLMNIdentity.Value = aper.OctetString("\x02\xf8\x39")
-
-	sliceSupportList := &broadcastPLMNItem.TAISliceSupportList
-	// SliceSupportItem in SliceSupportList
-	sliceSupportItem := ngapType.SliceSupportItem{}
-	sliceSupportItem.SNSSAI.SST.Value = aper.OctetString("\x01")
-	// optional
-	sliceSupportItem.SNSSAI.SD = new(ngapType.SD)
-	sliceSupportItem.SNSSAI.SD.Value = aper.OctetString("\x01\x02\x03")
-
-	sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
-
-	broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
-
-	supportedTAList.List = append(supportedTAList.List, supportedTAItem)
-
-	nGSetupRequestIEs.List = append(nGSetupRequestIEs.List, ie)
-
-	// PagingDRX
+	// Mandatory Paging DRX TS 138 413 V16.8.0 §9.3.1.90
 	ie = ngapType.NGSetupRequestIEs{}
 	ie.Id.Value = ngapType.ProtocolIEIDDefaultPagingDRX
 	ie.Criticality.Value = ngapType.CriticalityPresentIgnore

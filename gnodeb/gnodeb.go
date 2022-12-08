@@ -55,7 +55,7 @@ func Init(gnb *gnbctx.GNodeB) error {
 
 	if gnb.Amf == nil {
 		gnb.Log.Infoln("Default AMF not configured, continuing ...")
-		gnb.Log.Tracef("GNodeB Initialized %v without connecting to Amf", gnb)
+		gnb.Log.Tracef("GNodeB Initialized without connecting to Amf: ", gnb)
 		return nil
 	}
 
