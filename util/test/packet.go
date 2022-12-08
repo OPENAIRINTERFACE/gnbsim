@@ -9,23 +9,6 @@ import (
 	"github.com/omec-project/ngap"
 )
 
-func GetNGSetupRequest(tac, gnbId []byte, bitlength uint64, name string) ([]byte, error) {
-	message := ngapTestpacket.BuildNGSetupRequest()
-	// GlobalRANNodeID
-	ie := message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[0]
-	gnbID := ie.Value.GlobalRANNodeID.GlobalGNBID.GNBID.GNBID
-	gnbID.Bytes = gnbId
-	gnbID.BitLength = bitlength
-	// RANNodeName
-	ie = message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[1]
-	ie.Value.RANNodeName.Value = name
-	// TAC
-	ie = message.InitiatingMessage.Value.NGSetupRequest.ProtocolIEs.List[2]
-	ie.Value.SupportedTAList.List[0].TAC.Value = tac
-
-	return ngap.Encoder(message)
-}
-
 func GetInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) ([]byte, error) {
 	message := ngapTestpacket.BuildInitialUEMessage(ranUeNgapID, nasPdu, fiveGSTmsi)
 	return ngap.Encoder(message)
