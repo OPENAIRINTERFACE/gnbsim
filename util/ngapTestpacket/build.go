@@ -240,7 +240,11 @@ func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string, 
 	userLocationInformationNR.NRCGI = ngapConvert.NrCgiToNgap(nrCgi)
 
 	userLocationInformationNR.TAI.PLMNIdentity = ngapConvert.PlmnIdToNgap(*nrCgi.PlmnId)
-	userLocationInformationNR.TAI.TAC.Value = aper.OctetString("\x00\x00\x01")
+	bytes, err := hex.DecodeString(tac)
+	if err != nil {
+		fatal.Fatalf("DecodeString error in BuildInitialUEMessage: %+v", err)
+	}
+	userLocationInformationNR.TAI.TAC.Value = bytes
 
 	initialUEMessageIEs.List = append(initialUEMessageIEs.List, ie)
 
