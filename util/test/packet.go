@@ -7,10 +7,11 @@ package test
 import (
 	"github.com/omec-project/gnbsim/util/ngapTestpacket"
 	"github.com/omec-project/ngap"
+	"github.com/omec-project/openapi/models"
 )
 
-func GetInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) ([]byte, error) {
-	message := ngapTestpacket.BuildInitialUEMessage(ranUeNgapID, nasPdu, fiveGSTmsi)
+func GetInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string, tac string, nrCgi models.Ncgi) ([]byte, error) {
+	message := ngapTestpacket.BuildInitialUEMessage(ranUeNgapID, nasPdu, fiveGSTmsi, tac, nrCgi)
 	return ngap.Encoder(message)
 }
 

@@ -7,6 +7,7 @@ package common
 import (
 	"github.com/omec-project/gnbsim/util/ngapTestpacket"
 	"github.com/omec-project/gnbsim/util/test"
+	"github.com/omec-project/openapi/models"
 
 	"github.com/omec-project/nas"
 	"github.com/omec-project/ngap/ngapType"
@@ -48,6 +49,10 @@ type UuMessage struct {
 	// Encoded NAS message
 	NasPdus  NasPduList
 	DBParams []*DataBearerParams
+
+	// NGAP IEs
+	Tac   string
+	NrCgi models.Ncgi
 
 	/* Real UE simply resends this value in the response message to gNB
 	   While setting up Data Bearers, this helps gNB in understanding the

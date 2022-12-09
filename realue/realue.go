@@ -24,8 +24,6 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 		ue.Log.Infoln("Handling:", event)
 
 		switch event {
-		case common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST:
-			err = HandleRegRequestEvent(ue, msg)
 		case common.N1_ENCODE_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
 			err = HandleAuthResponseEvent(ue, msg)
 		case common.N1_ENCODE_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
@@ -78,7 +76,7 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 	return nil
 }
 
-func formUuMessage(event common.EventType, nasPdu []byte) *common.UuMessage {
+func FormUuMessage(event common.EventType, nasPdu []byte) *common.UuMessage {
 	msg := &common.UuMessage{}
 	msg.Event = event
 	msg.NasPdus = append(msg.NasPdus, nasPdu)

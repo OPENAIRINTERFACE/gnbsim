@@ -23,6 +23,7 @@ type GNodeB struct {
 	GnbName              string                 `yaml:"name"`
 	RanId                models.GlobalRanNodeId `yaml:"globalRanId"`
 	SupportedTaList      []SupportedTA          `yaml:"supportedTaList"`
+	NrCgiCellList        []models.Ncgi          `yaml:"nrCgiCellList"`
 	GnbUes               *GnbUeDao
 	GnbPeers             *GnbPeerDao
 	RanUeNGAPIDGenerator *idgenerator.IDGenerator

@@ -25,6 +25,7 @@ func HandleRegRequestEncodedEvent(ue *simuectx.SimUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
 	msg := intfcMsg.(*common.UuMessage)
+	msg.Event = common.N1_SEND_SDU_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST
 	SendToGnbUe(ue, msg)
 	return nil
 }

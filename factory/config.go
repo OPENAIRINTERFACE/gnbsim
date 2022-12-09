@@ -13,6 +13,7 @@ package factory
 import (
 	"fmt"
 	"os"
+	"sort"
 
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
 	"github.com/omec-project/openapi/models"
@@ -95,6 +96,7 @@ type Configuration struct {
 	Amfs                    map[string]*gnbctx.GnbAmf `yaml:"amfs"`
 	Gnbs                    map[string]*gnbctx.GNodeB `yaml:"gnbs"`
 	UeProfiles              map[string]*UeProfile     `yaml:"ueProfiles"`
+	NumUes                  int                       `yaml:"numUes"`
 	SingleInterface         bool                      `yaml:"singleInterface"`
 	ExecScenariosInParallel bool                      `yaml:"execScenariosInParallel"`
 	ExecUesInParallel       bool                      `yaml:"execUesInParallel"`
@@ -183,6 +185,20 @@ func (c *Configuration) GetGNodeB(name string) (*gnbctx.GNodeB, error) {
 		err = fmt.Errorf("no corresponding gNodeB found for:%v", name)
 	}
 	return gnb, err
+}
+
+func (c *Configuration) GetGNodeBAt(pos int) (*gnbctx.GNodeB, error) {
+	var err error
+	if pos >= len(c.Gnbs) {
+		err = fmt.Errorf("no corresponding gNodeB found at pos:%v", pos)
+		return nil, err
+	}
+	keys := make([]string, 0, len(c.Gnbs))
+	for k := range c.Gnbs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return c.Gnbs[keys[pos]], nil
 }
 
 func (c *Configuration) GetUeProfile(model string) (*UeProfile, error) {

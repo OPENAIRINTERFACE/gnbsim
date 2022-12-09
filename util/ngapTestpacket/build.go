@@ -185,7 +185,7 @@ func BuildNGResetAcknowledge() (pdu ngapType.NGAPPDU) {
 	return pdu
 }
 
-func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) (pdu ngapType.NGAPPDU) {
+func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string, tac string, nrCgi models.Ncgi) (pdu ngapType.NGAPPDU) {
 
 	pdu.Present = ngapType.NGAPPDUPresentInitiatingMessage
 	pdu.InitiatingMessage = new(ngapType.InitiatingMessage)
@@ -237,13 +237,9 @@ func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string) 
 	userLocationInformation.UserLocationInformationNR = new(ngapType.UserLocationInformationNR)
 
 	userLocationInformationNR := userLocationInformation.UserLocationInformationNR
-	userLocationInformationNR.NRCGI.PLMNIdentity.Value = TestPlmn.Value
-	userLocationInformationNR.NRCGI.NRCellIdentity.Value = aper.BitString{
-		Bytes:     []byte{0x00, 0x00, 0x00, 0x00, 0x10},
-		BitLength: 36,
-	}
+	userLocationInformationNR.NRCGI = ngapConvert.NrCgiToNgap(nrCgi)
 
-	userLocationInformationNR.TAI.PLMNIdentity.Value = TestPlmn.Value
+	userLocationInformationNR.TAI.PLMNIdentity = ngapConvert.PlmnIdToNgap(*nrCgi.PlmnId)
 	userLocationInformationNR.TAI.TAC.Value = aper.OctetString("\x00\x00\x01")
 
 	initialUEMessageIEs.List = append(initialUEMessageIEs.List, ie)
