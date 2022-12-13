@@ -21,6 +21,30 @@ func init() {
 	SimUeTable = make(map[string]*SimUe)
 }
 
+type LastIndexesProvision struct {
+	Ausf int `json:"ausf"`
+}
+type SequenceNumberProvision struct {
+	Sqn         string               `json:"sqn"`
+	SqnScheme   string               `json:"sqnScheme"`
+	LastIndexes LastIndexesProvision `json:"protectionParameterId"`
+}
+
+type SubscriberProvision struct {
+	AuthenticationMethod          string                  `json:"authenticationMethod"`
+	EncPermanentKey               string                  `json:"encPermanentKey"`
+	ProtectionParameterId         string                  `json:"protectionParameterId"`
+	SequenceNumber                SequenceNumberProvision `json:"sequenceNumber"`
+	AuthenticationManagementField string                  `json:"authenticationManagementField"`
+	AlgorithmId                   string                  `json:"algorithmId"`
+	EncOpcKey                     string                  `json:"encOpcKey"`
+	EncTopcKey                    string                  `json:"encTopcKey"`
+	VectorGenerationInHss         bool                    `json:"vectorGenerationInHss"`
+	N5gcAuthMethod                string                  `json:"n5gcAuthMethod"`
+	RgAuthenticationInd           bool                    `json:"rgAuthenticationInd"`
+	Supi                          string                  `json:"supi"`
+}
+
 // SimUe controls the flow of messages between RealUe and GnbUe as per the test
 // profile. It is the central entry point for all events
 type SimUe struct {

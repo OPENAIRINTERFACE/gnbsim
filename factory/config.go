@@ -77,13 +77,22 @@ type Nas struct {
 	SNssai               *models.Snssai       `yaml:"sNssai" json:"sNssai"`
 }
 
+type Provision struct {
+	CreateSubscriber  bool   `yaml:"createSubscriber" json:"createSubscriber"`
+	CreateRestUrl     string `yaml:"createRestUrl" json:"createRestUrl"`
+	DeleteRestUrl     string `yaml:"deleteRestUrl" json:"deleteRestUrl"`
+	CreateJsonContent string `yaml:"createJsonContent" json:"createJsonContent"`
+}
+
 type UeProfile struct {
 	Model     string         `yaml:"model" json:"model"`
 	StartImsi string         `yaml:"startImsi" json:"startImsi"`
+	NumUes    int            `yaml:"numUes"`
 	Opc       string         `yaml:"opc" json:"opc"`
 	Key       string         `yaml:"key" json:"key"`
 	Nas       Nas            `yaml:"nas" json:"nas"`
 	Plmn      *models.PlmnId `yaml:"plmnId" json:"plmnId"`
+	Provision Provision      `yaml:"provision" json:"provision"`
 }
 
 type Amf struct {
@@ -96,7 +105,6 @@ type Configuration struct {
 	Amfs                    map[string]*gnbctx.GnbAmf `yaml:"amfs"`
 	Gnbs                    map[string]*gnbctx.GNodeB `yaml:"gnbs"`
 	UeProfiles              map[string]*UeProfile     `yaml:"ueProfiles"`
-	NumUes                  int                       `yaml:"numUes"`
 	SingleInterface         bool                      `yaml:"singleInterface"`
 	ExecScenariosInParallel bool                      `yaml:"execScenariosInParallel"`
 	ExecUesInParallel       bool                      `yaml:"execUesInParallel"`
