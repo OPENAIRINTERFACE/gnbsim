@@ -29,7 +29,7 @@ func HandleMessage(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf, pkt []byte) error {
 	case ngapType.NGAPPDUPresentInitiatingMessage:
 		initiatingMessage := pdu.InitiatingMessage
 		if initiatingMessage == nil {
-			return fmt.Errorf("Initiatiting Message is nil")
+			return fmt.Errorf("Initiating Message is nil")
 		}
 		switch initiatingMessage.ProcedureCode.Value {
 		case ngapType.ProcedureCodeDownlinkNASTransport:
@@ -66,6 +66,9 @@ func HandleMessage(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf, pkt []byte) error {
 	return nil
 }
 
+// LG: TODO For the time being interface between CP transport and GnbAmf is procedure call,
+// keep this interface asynchronous, once the former one will be asynchronous we could make
+// this one synchronous.
 func SendToGnbUe(gnbue *gnbctx.GnbCpUe, event common.EventType, ngapPdu *ngapType.NGAPPDU) {
 	amfmsg := common.N2Message{}
 	amfmsg.Event = event
