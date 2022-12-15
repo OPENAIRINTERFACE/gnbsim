@@ -36,6 +36,7 @@ func HandleConnectRequest(gnbue *gnbctx.GnbCpUe,
 	msg := intfcMsg.(*common.UuMessage)
 	gnbue.Supi = msg.Supi
 	gnbue.WriteUeChan = msg.CommChan
+	gnbue.Log.Traceln("Connected to SimUe")
 }
 
 func HandleInitialUEMessage(gnbue *gnbctx.GnbCpUe,
@@ -92,7 +93,7 @@ func HandleDownlinkNasTransport(gnbue *gnbctx.GnbCpUe,
 	gnbue.AmfUeNgapId = amfUeNgapId.Value
 	var pdus common.NasPduList
 	pdus = append(pdus, nasPdu.Value)
-	SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
+	SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
 }
 
 func HandleUlInfoTransfer(gnbue *gnbctx.GnbCpUe,
@@ -154,7 +155,7 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 	if nasPdu.Value != nil {
 		var pdus common.NasPduList
 		pdus = append(pdus, nasPdu.Value)
-		SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
+		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
 		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
 	}
 
@@ -299,7 +300,7 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 	if nasPdu.Value != nil {
 		var pdus common.NasPduList
 		pdus = append(pdus, nasPdu.Value)
-		SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
+		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
 		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
 	}
 
@@ -317,7 +318,7 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 	}
 	gnbue.Log.Traceln("Sent PDU Session Resource Setup Response Message to AMF")
 
-	SendToUe(gnbue, common.DATA_BEARER_RELEASE_REQUEST_EVENT, nil)
+	SendToSimUe(gnbue, common.DATA_BEARER_RELEASE_REQUEST_EVENT, nil)
 }
 
 func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
@@ -586,7 +587,7 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 	}
 
 	if len(nasPdus) != 0 {
-		SendToUe(gnbue, common.DL_INFO_TRANSFER_EVENT, nasPdus)
+		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, nasPdus)
 		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
 	}
 

@@ -156,6 +156,10 @@ func HandleNgSetupResponse(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 
 	amf.SetNgSetupStatus(true)
 	amf.Log.Traceln("Processed NG Setup Response")
+	msg := &common.N2Message{}
+	msg.Event = common.N2_RECV_SDU_EVENT | common.NG_SETUP_RESPONSE_EVENT
+	msg.NgapPdu = pdu
+	amf.SendToScenario(msg)
 }
 
 func HandleNgSetupFailure(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
@@ -200,6 +204,10 @@ func HandleNgSetupFailure(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 	amf.SetNgSetupStatus(false)
 
 	amf.Log.Traceln("Processed NG Setup Failure")
+	msg := &common.N2Message{}
+	msg.Event = common.N2_RECV_SDU_EVENT | common.NG_SETUP_FAILURE_EVENT
+	msg.NgapPdu = pdu
+	amf.SendToScenario(msg)
 }
 
 func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
@@ -251,7 +259,7 @@ func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		return
 	}
 
-	SendToGnbUe(gnbue, common.DOWNLINK_NAS_TRANSPORT_EVENT, pdu)
+	SendToGnbUe(gnbue, common.N2_RECV_SDU_EVENT|common.DOWNLINK_NAS_TRANSPORT_EVENT, pdu)
 }
 
 func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,

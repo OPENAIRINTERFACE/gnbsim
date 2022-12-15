@@ -30,8 +30,7 @@ const (
 	REQUEST_TYPE_EXISTING_PDU_SESS uint8  = 0x02
 )
 
-func HandleRegRequestEvent(ue *realuectx.RealUe,
-	msg common.InterfaceMessage) (nasBytes []byte, err error) {
+func EncodeRegRequestEvent(ue *realuectx.RealUe) (nasBytes []byte, err error) {
 
 	ueSecurityCapability := ue.GetUESecurityCapability()
 
@@ -71,7 +70,8 @@ func HandleAuthResponseEvent(ue *realuectx.RealUe,
 	nasPdu := nasTestpacket.GetAuthenticationResponse(resStat, "")
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_AUTHENTICATION_RESPONSE, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	ue.Log.Traceln("Sent Authentication Reponse Message to SimUe")
 	return nil
 }
@@ -101,7 +101,8 @@ func HandleSecModCompleteEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SECURITY_MODE_COMPLETE, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	ue.Log.Traceln("Sent Security Mode Complete Message to SimUe")
 	return nil
 }
@@ -129,7 +130,8 @@ func HandleRegCompleteEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_REGISTRATION_COMPLETE, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	ue.Log.Traceln("Sent Registration Complete Message to SimUe")
 	return nil
 }
@@ -157,7 +159,8 @@ func HandleDeregRequestEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	ue.Log.Traceln("Sent UE Initiated Deregistration Request message to SimUe")
 	return nil
 }
@@ -180,7 +183,8 @@ func HandlePduSessEstRequestEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
 }
 
@@ -228,7 +232,8 @@ func HandlePduSessReleaseRequestEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
 }
 
@@ -265,7 +270,8 @@ func HandlePduSessReleaseCompleteEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE, nasPdu)
-	SendToSimUe(ue, m)
+	// LG SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
 }
 
@@ -342,7 +348,7 @@ func HandleConnectionReleaseRequestEvent(ue *realuectx.RealUe,
 func HandleErrorEvent(ue *realuectx.RealUe,
 	intfcMsg common.InterfaceMessage) (err error) {
 
-	SendToSimUe(ue, intfcMsg)
+	// LG COMMENT SendToSimUe(ue, intfcMsg)
 	return nil
 }
 
@@ -399,7 +405,8 @@ func HandleDlInfoTransferEvent(ue *realuectx.RealUe,
 		// Simply notify SimUe about the received nas message. Later SimUe will
 		// asynchrously send next event to RealUE informing about what to do with
 		// the received NAS message
-		SendToSimUe(ue, m)
+		// LG COMMENT SendToSimUe(ue, m)
+		ue.Log.Traceln("TODO LG To avoid comment", m)
 	}
 	return nil
 }
@@ -420,7 +427,8 @@ func HandleServiceRequestEvent(ue *realuectx.RealUe,
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SERVICE_REQUEST, nasPdu)
-	SendToSimUe(ue, m)
+	// LG COMMENT SendToSimUe(ue, m)
+	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
 }
 
@@ -437,7 +445,7 @@ func HandleNwDeregAcceptEvent(ue *realuectx.RealUe, msg common.InterfaceMessage)
 	}
 
 	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM, nasPdu)
-	SendToSimUe(ue, m)
-	ue.Log.Traceln("Sent Dereg Accept UE Terminated Message to SimUe")
+	// LG COMMENT SendToSimUe(ue, m)
+	ue.Log.Traceln("Sent Dereg Accept UE Terminated Message to SimUe", m)
 	return nil
 }

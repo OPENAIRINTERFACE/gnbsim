@@ -22,13 +22,13 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 		switch msg.GetEventType() {
 		case common.CONNECTION_REQUEST_EVENT:
 			HandleConnectRequest(gnbue, msg)
-		case common.N1_SEND_SDU_EVENT + common.NAS_5GMM_REGISTRATION_REQUEST, common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
+		case common.N1_SEND_SDU_EVENT | common.NAS_5GMM_REGISTRATION_REQUEST, common.N1_SEND_SDU_EVENT + common.NAS_5GMM_SERVICE_REQUEST:
 			HandleInitialUEMessage(gnbue, msg)
 		case common.UL_INFO_TRANSFER_EVENT:
 			HandleUlInfoTransfer(gnbue, msg)
 		case common.DATA_BEARER_SETUP_RESPONSE_EVENT:
 			HandleDataBearerSetupResponse(gnbue, msg)
-		case common.DOWNLINK_NAS_TRANSPORT_EVENT:
+		case common.N2_RECV_SDU_EVENT | common.DOWNLINK_NAS_TRANSPORT_EVENT:
 			HandleDownlinkNasTransport(gnbue, msg)
 		case common.INITIAL_CTX_SETUP_REQUEST_EVENT:
 			HandleInitialContextSetupRequest(gnbue, msg)
@@ -52,7 +52,7 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 	return nil
 }
 
-func SendToUe(gnbue *gnbctx.GnbCpUe, event common.EventType, nasPdus common.NasPduList) {
+func SendToSimUe(gnbue *gnbctx.GnbCpUe, event common.EventType, nasPdus common.NasPduList) {
 	gnbue.Log.Traceln("Sending event", event, "to SimUe")
 	uemsg := common.UuMessage{}
 	uemsg.Event = event

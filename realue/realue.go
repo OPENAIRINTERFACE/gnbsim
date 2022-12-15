@@ -10,14 +10,15 @@ import (
 	"github.com/omec-project/gnbsim/util/test"
 )
 
-func Init(ue *realuectx.RealUe) {
+func Init(ue *realuectx.RealUe) error {
 
 	ue.AuthenticationSubs = test.GetAuthSubscription(ue.Key, ue.Opc, "", ue.SeqNum)
 
-	HandleEvents(ue)
+	// LG HandleEvents(ue)
+	return nil
 }
 
-func HandleEvents(ue *realuectx.RealUe) (err error) {
+/* LG func HandleEvents(ue *realuectx.RealUe) (err error) {
 
 	for msg := range ue.ReadChan {
 		event := msg.GetEventType()
@@ -74,7 +75,7 @@ func HandleEvents(ue *realuectx.RealUe) (err error) {
 	}
 
 	return nil
-}
+} */
 
 func FormUuMessage(event common.EventType, nasPdu []byte) *common.UuMessage {
 	msg := &common.UuMessage{}
@@ -83,9 +84,10 @@ func FormUuMessage(event common.EventType, nasPdu []byte) *common.UuMessage {
 	return msg
 }
 
-func SendToSimUe(ue *realuectx.RealUe,
+/*  LG func SendToSimUe(ue *realuectx.RealUe,
 	msg common.InterfaceMessage) {
 
 	ue.Log.Traceln("Sending", msg.GetEventType(), "to SimUe")
 	ue.WriteSimUeChan <- msg
 }
+*/

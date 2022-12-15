@@ -15,7 +15,6 @@ import (
 	"github.com/omec-project/gnbsim/gnodeb/idrange"
 	"github.com/omec-project/gnbsim/gnodeb/ngap"
 	"github.com/omec-project/gnbsim/gnodeb/transport"
-	"github.com/omec-project/gnbsim/gnodeb/worker/gnbamfworker"
 	"github.com/omec-project/gnbsim/gnodeb/worker/gnbcpueworker"
 	"github.com/omec-project/gnbsim/logger"
 
@@ -34,7 +33,7 @@ func InitializeAllGnbs() error {
 	return nil
 }
 
-// Init initializes the GNodeB struct var and connects to the default AMF
+// Init initializes the GNodeB struct var and connects (SCTP only) to the default AMF
 func Init(gnb *gnbctx.GNodeB) error {
 	gnb.Log = logger.GNodeBLog.WithField(logger.FieldGnb, gnb.GnbName)
 	gnb.Log.Traceln("Inititializing GNodeB")
@@ -67,14 +66,6 @@ func Init(gnb *gnbctx.GNodeB) error {
 		return fmt.Errorf("failed to connect to amf")
 	}
 
-	successfulOutcome, err := PerformNgSetup(gnb, gnb.Amf)
-	if !successfulOutcome || err != nil {
-		gnb.Log.Errorln("PerformNgSetup returned:", err)
-		return fmt.Errorf("failed to perform ng setup procedure")
-	}
-
-	go gnb.CpTransport.ReceiveFromPeer(gnb.Amf)
-
 	gnb.Log.Tracef("GNodeB Initialized %v ", gnb)
 	return nil
 }
@@ -84,37 +75,23 @@ func QuitGnb(gnb *gnbctx.GNodeB) {
 	close(gnb.Quit)
 }
 
-// PerformNGSetup sends the NGSetupRequest to the provided GnbAmf.
-// It waits for the response, process the response and informs whether it was
-// SuccessfulOutcome or UnsuccessfulOutcome
-func PerformNgSetup(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf) (bool, error) {
-	gnb.Log.Traceln("Performing NG Setup Procedure")
-
-	var status bool
+// SendNGSetup sends the NGSetupRequest to the provided GnbAmf.
+func SendNgSetup(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf) error {
 
 	// Forming NGSetupRequest
 	ngSetupReq, err := ngap.GetNGSetupRequest(gnb)
 	if err != nil {
 		gnb.Log.Errorln("GetNGSetupRequest returned:", err)
-		return status, fmt.Errorf("failed to create ng setup request")
+		return fmt.Errorf("failed to create ng setup request")
 	}
 
 	gnb.Log.Traceln("Sending NG Setup Request")
-	ngSetupResp, err := gnb.CpTransport.SendToPeerBlock(amf, ngSetupReq)
+	err = gnb.CpTransport.SendToPeer(amf, ngSetupReq)
 	if err != nil {
-		gnb.Log.Errorln("SendToPeerBlock returned:", err)
-		return status, fmt.Errorf("failed to send ng setup request")
+		gnb.Log.Errorln("SendToPeer returned:", err)
+		return fmt.Errorf("failed to send ng setup request")
 	}
-	gnb.Log.Traceln("Received NG Setup Response")
-	err = gnbamfworker.HandleMessage(gnb, amf, ngSetupResp)
-	if err != nil {
-		gnb.Log.Errorln("HandleMessage returned:", err)
-		return status, fmt.Errorf("failed to handle ng setup response")
-	}
-
-	status = amf.GetNgSetupStatus()
-	gnb.Log.Infoln("NG Setup Successful:", status)
-	return status, nil
+	return nil
 }
 
 // RequestConnection should be called by UE that is willing to connect to this GNodeB

@@ -68,6 +68,8 @@ func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) 
 			amf.AmfIp, amf.AmfPort, err)
 	}
 
+	go cpTprt.ReceiveFromPeer(amf)
+
 	cpTprt.Log.Infoln("Connected to AMF, AMF IP:", amf.AmfIp, "AMF Port:", amf.AmfPort)
 	return
 }
@@ -144,6 +146,7 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 	conn := amf.Conn.(*sctp.SCTPConn)
 	for {
+		cpTprt.Log.Traceln("GnbCpTransport ready to receive from peer")
 		recvMsg := make([]byte, MAX_SCTP_PKT_LEN)
 		//TODO Handle notification, info
 		n, _, _, err := conn.SCTPRead(recvMsg)
@@ -165,7 +168,7 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 		}
 
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
-		//TODO Post to gnbamfworker channel
+		// TODO Post to gnbamfworker channel, LG: yes TODO
 		gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
 	}
 }
