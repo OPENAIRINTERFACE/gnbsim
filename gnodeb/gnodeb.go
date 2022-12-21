@@ -7,34 +7,23 @@ package gnodeb
 import (
 	"fmt"
 	"log"
+	"net"
 	"sync"
 
 	"github.com/omec-project/gnbsim/common"
 	"github.com/omec-project/gnbsim/factory"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
 	"github.com/omec-project/gnbsim/gnodeb/idrange"
-	"github.com/omec-project/gnbsim/gnodeb/ngap"
 	"github.com/omec-project/gnbsim/gnodeb/transport"
 	"github.com/omec-project/gnbsim/gnodeb/worker/gnbcpueworker"
 	"github.com/omec-project/gnbsim/logger"
+	"github.com/omec-project/gnbsim/util/test"
 
 	"github.com/omec-project/idgenerator"
 )
 
-func InitializeAllGnbs() error {
-	gnbs := factory.AppConfig.Configuration.Gnbs
-	for _, gnb := range gnbs {
-		err := Init(gnb)
-		if err != nil {
-			gnb.Log.Errorln("Failed to initialize GNodeB, err:", err)
-			return err
-		}
-	}
-	return nil
-}
-
 // Init initializes the GNodeB struct var and connects (SCTP only) to the default AMF
-func Init(gnb *gnbctx.GNodeB) error {
+func Init(gnb *gnbctx.GNodeB, scenarioReadChan chan common.InterfaceMessage) error {
 	gnb.Log = logger.GNodeBLog.WithField(logger.FieldGnb, gnb.GnbName)
 	gnb.Log.Traceln("Inititializing GNodeB")
 	gnb.Log.Infoln("GNodeB IP:", gnb.GnbN2Ip, "GNodeB Port:", gnb.GnbN2Port)
@@ -53,9 +42,20 @@ func Init(gnb *gnbctx.GNodeB) error {
 	gnb.DlTeidGenerator = idgenerator.NewGenerator(int64(start), int64(end))
 
 	if gnb.Amf == nil {
-		gnb.Log.Infoln("Default AMF not configured, continuing ...")
-		gnb.Log.Tracef("GNodeB Initialized without connecting to Amf: ", gnb)
-		return nil
+		// LG TODO hardcoded
+		amf, err := factory.AppConfig.Configuration.GetAmf("amf1")
+		if err != nil {
+			gnb.Log.Errorln("GetAmf returned:", err)
+			return err
+		}
+		if amf.AmfIp == "" {
+			// It is important to do this lookup just in time, not at simulation startup
+			addrs, err := net.LookupHost(amf.AmfHostName)
+			if err != nil {
+				return fmt.Errorf("failed to resolve amf host name: %v, err: %s", amf.AmfHostName, err)
+			}
+			gnb.Amf = gnbctx.NewGnbAmf(addrs[0], gnbctx.NGAP_SCTP_PORT, scenarioReadChan)
+		}
 	}
 
 	gnb.Amf.Init()
@@ -76,30 +76,22 @@ func QuitGnb(gnb *gnbctx.GNodeB) {
 }
 
 // SendNGSetup sends the NGSetupRequest to the provided GnbAmf.
-func SendNgSetup(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf) error {
-
-	// Forming NGSetupRequest
-	ngSetupReq, err := ngap.GetNGSetupRequest(gnb)
-	if err != nil {
-		gnb.Log.Errorln("GetNGSetupRequest returned:", err)
-		return fmt.Errorf("failed to create ng setup request")
-	}
-
-	gnb.Log.Traceln("Sending NG Setup Request")
-	err = gnb.CpTransport.SendToPeer(amf, ngSetupReq)
+func SendNgSdu(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf, sdu []byte) error {
+	gnb.Log.Traceln("Sending NG SDU")
+	err := gnb.CpTransport.SendToPeer(amf, sdu)
 	if err != nil {
 		gnb.Log.Errorln("SendToPeer returned:", err)
-		return fmt.Errorf("failed to send ng setup request")
+		return fmt.Errorf("failed to send NG SDU")
 	}
 	return nil
 }
 
 // RequestConnection should be called by UE that is willing to connect to this GNodeB
-func RequestConnection(gnb *gnbctx.GNodeB, uemsg *common.UuMessage) (chan common.InterfaceMessage, error) {
+func RequestConnection(gnb *gnbctx.GNodeB, uemsg *common.UuMessage) (chan common.InterfaceMessage, *gnbctx.GnbCpUe, error) {
 	ranUeNgapID, err := gnb.AllocateRanUeNgapID()
 	if err != nil {
 		gnb.Log.Errorln("AllocateRanUeNgapID returned:", err)
-		return nil, fmt.Errorf("failed to allocate ran ue ngap id")
+		return nil, nil, fmt.Errorf("failed to allocate ran ue ngap id")
 	}
 
 	gnbUe := gnbctx.NewGnbCpUe(ranUeNgapID, gnb, gnb.Amf)
@@ -116,5 +108,16 @@ func RequestConnection(gnb *gnbctx.GNodeB, uemsg *common.UuMessage) (chan common
 	//be reading.
 	ch := gnbUe.ReadChan
 	ch <- uemsg
-	return ch, nil
+	return ch, gnbUe, nil
+}
+
+func GetInitialUEMessage(gnb *gnbctx.GNodeB, gnbCpUe *gnbctx.GnbCpUe, nasBytes []byte) (n2Bytes []byte, err error) {
+
+	msg, err := test.GetInitialUEMessage(gnbCpUe.GnbUeNgapId, nasBytes, "",
+		gnb.SupportedTaList[0].Tac, gnb.NrCgiCellList[0])
+	if err != nil {
+		gnb.Log.Errorln("GetInitialUEMessage failed:", err)
+		return nil, err
+	}
+	return msg, nil
 }

@@ -39,6 +39,16 @@ func HandleConnectRequest(gnbue *gnbctx.GnbCpUe,
 	gnbue.Log.Traceln("Connected to SimUe")
 }
 
+func SendToPeer(gnbue *gnbctx.GnbCpUe,
+	intfcMsg common.InterfaceMessage) error {
+	msg := intfcMsg.(*common.N2EncodedMessage)
+	err := gnbue.Gnb.CpTransport.SendToPeer(gnbue.Amf, msg.N2Pdus)
+	if err != nil {
+		gnbue.Log.Errorln("SendToPeer failed:", err)
+	}
+	return err
+}
+
 func HandleInitialUEMessage(gnbue *gnbctx.GnbCpUe,
 	intfcMsg common.InterfaceMessage) {
 

@@ -22,6 +22,7 @@ var (
 	AppSummaryLog *logrus.Entry
 	RealUeLog     *logrus.Entry
 	SimUeLog      *logrus.Entry
+	SimGnbLog     *logrus.Entry
 	ProfileLog    *logrus.Entry
 	ScenarioLog   *logrus.Entry
 	GNodeBLog     *logrus.Entry
@@ -86,6 +87,7 @@ func init() {
 	AppSummaryLog = summaryLog.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Summary"})
 	RealUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "RealUe"})
 	SimUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "SimUe"})
+	SimGnbLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "SimGnb"})
 	ProfUeCtxLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "ProfUeCtx"})
 	ScnrUeCtxLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "ScnrUeCtx"})
 	ScenarioLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Scenario"})

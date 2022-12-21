@@ -391,12 +391,14 @@ var evtStrMap map[EventType]string = map[EventType]string{
 	N2_RECV_SDU_EVENT | NG_SETUP_FAILURE_EVENT:                                  "NG_SETUP_FAILURE_RECV_EVENT",
 	N2_RECV_SDU_EVENT | DOWNLINK_NAS_TRANSPORT_EVENT:                            "DOWNLINK-NAS-TRANSPORT-RECV_EVENT",
 	N2_RECV_SDU_EVENT | INITIAL_CTX_SETUP_REQUEST_EVENT:                         "INITIAL_CONTEXT_SETUP_REQUEST_RECV_EVENT",
-	PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT:                                       "PDU_SESSION_RESOURCE_SETUP_REQUEST_EVENT",
-	UE_CTX_RELEASE_COMMAND_EVENT:                                                "UE_CONTEXT_RELEASE_COMMAND_EVENT",
-	DL_UE_DATA_TRANSPORT_EVENT:                                                  "DL-UE-DATA-TRANSPORT-EVENT",
-	PROC_START_EVENT:                                                            "PROC-START-EVENT",
-	PROC_PASS_EVENT:                                                             "PROC-PASS-EVENT",
-	PROC_FAIL_EVENT:                                                             "PROC-FAIL-EVENT",
+	N2_RECV_SDU_EVENT:                     "N2_RECV_SDU_EVENT",
+	N2_SEND_SDU_EVENT:                     "N2_SEND_SDU_EVENT",
+	PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT: "PDU_SESSION_RESOURCE_SETUP_REQUEST_EVENT",
+	UE_CTX_RELEASE_COMMAND_EVENT:          "UE_CONTEXT_RELEASE_COMMAND_EVENT",
+	DL_UE_DATA_TRANSPORT_EVENT:            "DL-UE-DATA-TRANSPORT-EVENT",
+	PROC_START_EVENT:                      "PROC-START-EVENT",
+	PROC_PASS_EVENT:                       "PROC-PASS-EVENT",
+	PROC_FAIL_EVENT:                       "PROC-FAIL-EVENT",
 }
 
 func (id EventType) String() string {

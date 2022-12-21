@@ -39,6 +39,13 @@ type N2Message struct {
 	NgapPdu *ngapType.NGAPPDU
 }
 
+// Encoded Messages to be sent over N2 interface
+type N2EncodedMessage struct {
+	DefaultMessage
+	// Pdus to remind this can be a concatenated sequence of N2 messages
+	N2Pdus []byte
+}
+
 type NasPduList [][]byte
 
 // UuMessage is used to carry information between the UE and GNodeB
