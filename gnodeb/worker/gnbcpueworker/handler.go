@@ -101,9 +101,7 @@ func HandleDownlinkNasTransport(gnbue *gnbctx.GnbCpUe,
 
 	//TODO: check what needs to be done with AmfUeNgapId on every DownlinkNasTransport message
 	gnbue.AmfUeNgapId = amfUeNgapId.Value
-	var pdus common.NasPduList
-	pdus = append(pdus, nasPdu.Value)
-	SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
+	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodeDownlinkNASTransport, nasPdu)
 }
 
 func HandleUlInfoTransfer(gnbue *gnbctx.GnbCpUe,
@@ -162,13 +160,6 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 		}
 	}
 
-	if nasPdu.Value != nil {
-		var pdus common.NasPduList
-		pdus = append(pdus, nasPdu.Value)
-		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
-		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
-	}
-
 	var list []pduSessResourceSetupItem
 	if pduSessResourceSetupReqList != nil {
 		for _, v := range pduSessResourceSetupReqList.List {
@@ -184,22 +175,10 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 	if len(list) != 0 {
 		ProcessPduSessResourceSetupList(gnbue, list,
 			common.INITIAL_CTX_SETUP_REQUEST_EVENT)
-
-		return
 	}
 
 	//TODO: Handle other mandatory IEs
-	resp, err := test.GetInitialContextSetupResponse(gnbue.AmfUeNgapId, gnbue.GnbUeNgapId)
-	if err != nil {
-		gnbue.Log.Errorln("Failed to create Initial Context Setup Response Message ")
-		return
-	}
-
-	err = gnbue.Gnb.CpTransport.SendToPeer(gnbue.Amf, resp)
-	if err != nil {
-		gnbue.Log.Errorln("SendToPeer failed:", err)
-		return
-	}
+	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodeInitialContextSetup, nasPdu)
 }
 
 // TODO: Error handling
@@ -307,12 +286,12 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 		gnbue.RemoveGnbUpUe(pduSessId)
 	}
 
-	if nasPdu.Value != nil {
+	/* 	LG TEMP if nasPdu.Value != nil {
 		var pdus common.NasPduList
 		pdus = append(pdus, nasPdu.Value)
 		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, pdus)
 		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
-	}
+	} */
 
 	ngapPdu, err := test.GetPDUSessionResourceReleaseResponse(gnbue.AmfUeNgapId,
 		gnbue.GnbUeNgapId)
@@ -328,7 +307,7 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 	}
 	gnbue.Log.Traceln("Sent PDU Session Resource Setup Response Message to AMF")
 
-	SendToSimUe(gnbue, common.DATA_BEARER_RELEASE_REQUEST_EVENT, nil)
+	/* 	LG TEMP SendToSimUe(gnbue, common.DATA_BEARER_RELEASE_REQUEST_EVENT, nil) */
 }
 
 func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
@@ -596,10 +575,10 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 		dbParamSet = append(dbParamSet, dbParam)
 	}
 
-	if len(nasPdus) != 0 {
+	/* LG TEMP	if len(nasPdus) != 0 {
 		SendToSimUe(gnbue, common.DL_INFO_TRANSFER_EVENT, nasPdus)
 		gnbue.Log.Traceln("Sent DL Information Transfer Event to UE")
-	}
+	} */
 
 	/* TODO: To be fixed, currently Data Bearer Setup Event may get processed
 	 * before the pdu sessions are established on the UE side

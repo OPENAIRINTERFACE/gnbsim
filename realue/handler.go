@@ -49,69 +49,8 @@ func EncodeRegRequestEvent(ue *realuectx.RealUe) (nasBytes []byte, err error) {
 	return nasPdu, nil
 }
 
-func HandleAuthResponseEvent(ue *realuectx.RealUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
-	msg := intfcMsg.(*common.UeMessage)
-	// First process the corresponding Auth Request
-	ue.Log.Traceln("Processing corresponding Authentication Request Message")
-	authReq := msg.NasMsg.AuthenticationRequest
-
-	ue.NgKsi = nasConvert.SpareHalfOctetAndNgksiToModels(authReq.SpareHalfOctetAndNgksi)
-
-	rand := authReq.GetRANDValue()
-	autn := authReq.GetAUTN()
-	resStat := ue.DeriveRESstarAndSetKey(autn[:], rand[:], SN_NAME)
-
-	// TODO: Parse Auth Request IEs and update the RealUE Context
-
-	// Now generate NAS Authentication Response
-	ue.Log.Traceln("Generating Authentication Reponse Message")
-	nasPdu := nasTestpacket.GetAuthenticationResponse(resStat, "")
-
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_AUTHENTICATION_RESPONSE, nasPdu)
-	// LG SendToSimUe(ue, m)
-	ue.Log.Traceln("TODO LG To avoid comment", m)
-	ue.Log.Traceln("Sent Authentication Reponse Message to SimUe")
-	return nil
-}
-
-func HandleSecModCompleteEvent(ue *realuectx.RealUe,
-	msg common.InterfaceMessage) (err error) {
-
-	//TODO: Process corresponding Security Mode Command first
-
-	mobileId5GS := nasType.MobileIdentity5GS{
-		Len:    uint16(len(ue.Suci)), // suci
-		Buffer: ue.Suci,
-	}
-	registrationRequestWith5GMM := nasTestpacket.GetRegistrationRequest(
-		nasMessage.RegistrationType5GSInitialRegistration, mobileId5GS, nil,
-		ue.GetUESecurityCapability(), ue.Get5GMMCapability(), nil, nil)
-
-	ue.Log.Traceln("Generating Security Mode Complete Message")
-	nasPdu := nasTestpacket.GetSecurityModeComplete(registrationRequestWith5GMM)
-
-	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
-		nas.SecurityHeaderTypeIntegrityProtectedAndCipheredWithNew5gNasSecurityContext,
-		true)
-	if err != nil {
-		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
-		return fmt.Errorf("failed to encrypt security mode complete message")
-	}
-
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SECURITY_MODE_COMPLETE, nasPdu)
-	// LG SendToSimUe(ue, m)
-	ue.Log.Traceln("TODO LG To avoid comment", m)
-	ue.Log.Traceln("Sent Security Mode Complete Message to SimUe")
-	return nil
-}
-
-func HandleRegCompleteEvent(ue *realuectx.RealUe,
-	intfcMsg common.InterfaceMessage) (err error) {
-
-	//TODO: Process corresponding Registration Accept first
-	msg := intfcMsg.(*common.UeMessage).NasMsg.RegistrationAccept
+func HandleRegistrationAccept(ue *realuectx.RealUe,
+	msg *nasMessage.RegistrationAccept) error {
 
 	var guti []uint8
 	if msg.GUTI5G != nil {
@@ -119,21 +58,19 @@ func HandleRegCompleteEvent(ue *realuectx.RealUe,
 	}
 
 	_, ue.Guti = nasConvert.GutiToString(guti)
+	return nil
+}
 
+func EncodeRegistrationComplete(ue *realuectx.RealUe) (nasBytes []byte, err error) {
 	ue.Log.Traceln("Generating Registration Complete Message")
 	nasPdu := nasTestpacket.GetRegistrationComplete(nil)
 	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
 		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
-		return fmt.Errorf("failed to encrypt registration complete message")
+		return nasPdu, fmt.Errorf("failed to encrypt registration complete message")
 	}
-
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_REGISTRATION_COMPLETE, nasPdu)
-	// LG SendToSimUe(ue, m)
-	ue.Log.Traceln("TODO LG To avoid comment", m)
-	ue.Log.Traceln("Sent Registration Complete Message to SimUe")
-	return nil
+	return nasPdu, nil
 }
 
 func HandleDeregRequestEvent(ue *realuectx.RealUe,
@@ -363,52 +300,35 @@ func HandleQuitEvent(ue *realuectx.RealUe, intfcMsg common.InterfaceMessage) (er
 	return nil
 }
 
-func HandleDlInfoTransferEvent(ue *realuectx.RealUe,
-	intfcMsg common.InterfaceMessage) (err error) {
+func HandleDlInfoTransferEvent(ue *realuectx.RealUe, nasPdu []byte) (*nas.Message, error) {
 
-	msg := intfcMsg.(*common.UuMessage)
-	for _, pdu := range msg.NasPdus {
-		nasMsg, err := realue_nas.NASDecode(ue, nas.GetSecurityHeaderType(pdu), pdu)
-		if err != nil {
-			ue.Log.Errorln("Failed to decode dowlink NAS Message due to", err)
-			return err
-		}
-		msgType := nasMsg.GmmHeader.GetMessageType()
-		ue.Log.Infoln("Received Message Type:", msgType)
-
-		if msgType == nas.MsgTypeDLNASTransport {
-			ue.Log.Info("Payload contaner type:",
-				nasMsg.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType)
-			payload := nasMsg.GmmMessage.DLNASTransport.PayloadContainer
-			if payload.Len == 0 {
-				return fmt.Errorf("payload container length is 0")
-			}
-			buffer := payload.Buffer[:payload.Len]
-			m := nas.NewMessage()
-			err := m.PlainNasDecode(&buffer)
-			if err != nil {
-				ue.Log.Errorln("PlainNasDecode returned:", err)
-				return fmt.Errorf("failed to decode payload container")
-			}
-			nasMsg = m
-			msgType = nasMsg.GsmHeader.GetMessageType()
-
-		}
-
-		m := &common.UeMessage{}
-
-		// The MSB out of the 32 bytes represents event type, which in this case
-		// is N1_EVENT
-		m.Event = common.EventType(msgType) | common.N1_DECODED_EVENT
-		m.NasMsg = nasMsg
-
-		// Simply notify SimUe about the received nas message. Later SimUe will
-		// asynchrously send next event to RealUE informing about what to do with
-		// the received NAS message
-		// LG COMMENT SendToSimUe(ue, m)
-		ue.Log.Traceln("TODO LG To avoid comment", m)
+	nasMsg, err := realue_nas.NASDecode(ue, nas.GetSecurityHeaderType(nasPdu), nasPdu)
+	if err != nil {
+		ue.Log.Errorln("Failed to decode dowlink NAS Message due to", err)
+		return nil, err
 	}
-	return nil
+	msgType := nasMsg.GmmHeader.GetMessageType()
+	ue.Log.Infoln("Received Message Type:", msgType)
+
+	if msgType == nas.MsgTypeDLNASTransport {
+		ue.Log.Info("Payload contaner type:",
+			nasMsg.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType)
+		payload := nasMsg.GmmMessage.DLNASTransport.PayloadContainer
+		if payload.Len == 0 {
+			return nasMsg, fmt.Errorf("payload container length is 0")
+		}
+		buffer := payload.Buffer[:payload.Len]
+		m := nas.NewMessage()
+		err := m.PlainNasDecode(&buffer)
+		if err != nil {
+			ue.Log.Errorln("PlainNasDecode returned:", err)
+			return nasMsg, fmt.Errorf("failed to decode payload container")
+		}
+		nasMsg = m
+		msgType = nasMsg.GsmHeader.GetMessageType()
+
+	}
+	return nasMsg, err
 }
 
 func HandleServiceRequestEvent(ue *realuectx.RealUe,

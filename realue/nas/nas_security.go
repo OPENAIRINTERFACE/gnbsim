@@ -96,7 +96,9 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 			ue.Log.Debugln("Security header type: Integrity Protected With New 5G Security Context")
 			ue.ULCount.Set(0, 0)
 			ue.DLCount.Set(0, 0)
+			// LG if ue.CipheringAlg != security.AlgCiphering128NEA0 {
 			needCiphering = true
+			// LG}
 		default:
 			return nil, fmt.Errorf("Wrong security header type: 0x%0x", msg.SecurityHeader.SecurityHeaderType)
 		}
@@ -121,7 +123,7 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 		mac32, err := security.NASMacCalculate(ue.IntegrityAlg, ue.KnasInt, ue.ULCount.Get(),
 			security.Bearer3GPP, security.DirectionUplink, payload)
 		if err != nil {
-			return nil, fmt.Errorf("nas mac calcuate failed: %+v", err)
+			return nil, fmt.Errorf("nas mac calculate failed: %+v", err)
 		}
 
 		// Add mac value
@@ -138,11 +140,11 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 
 func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (msg *nas.Message, err error) {
 	if ue == nil {
-		err = fmt.Errorf("amfUe is nil")
+		err = fmt.Errorf("RealUe is nil")
 		return
 	}
 	if payload == nil {
-		err = fmt.Errorf("Nas payload is empty")
+		err = fmt.Errorf("NAS payload to decode is empty")
 		return
 	}
 
@@ -208,7 +210,7 @@ func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (
 			fmt.Printf("cmac value: 0x%x\n", mac32)
 		}
 
-		// remove sequece Number
+		// remove sequence Number
 		payload = payload[1:]
 		if ciphered {
 			if err = security.NASEncrypt(ue.CipheringAlg, ue.KnasEnc, ue.DLCount.Get(), security.Bearer3GPP,

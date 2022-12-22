@@ -39,6 +39,14 @@ type N2Message struct {
 	NgapPdu *ngapType.NGAPPDU
 }
 
+// Message received over N2 interface
+type N1N2Message struct {
+	DefaultMessage
+	NgapPdu           *ngapType.NGAPPDU
+	NgapProcedureCode int64
+	NasPdu            *ngapType.NASPDU
+}
+
 // Encoded Messages to be sent over N2 interface
 type N2EncodedMessage struct {
 	DefaultMessage

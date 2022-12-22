@@ -7,6 +7,7 @@ package gnbcpueworker
 import (
 	"github.com/omec-project/gnbsim/common"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
+	"github.com/omec-project/ngap/ngapType"
 )
 
 func Init(gnbue *gnbctx.GnbCpUe) {
@@ -32,7 +33,7 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 			HandleDataBearerSetupResponse(gnbue, msg)
 		case common.N2_RECV_SDU_EVENT | common.DOWNLINK_NAS_TRANSPORT_EVENT:
 			HandleDownlinkNasTransport(gnbue, msg)
-		case common.INITIAL_CTX_SETUP_REQUEST_EVENT:
+		case common.N2_RECV_SDU_EVENT | common.INITIAL_CTX_SETUP_REQUEST_EVENT:
 			HandleInitialContextSetupRequest(gnbue, msg)
 		case common.PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT:
 			HandlePduSessResourceSetupRequest(gnbue, msg)
@@ -54,10 +55,12 @@ func HandleEvents(gnbue *gnbctx.GnbCpUe) (err error) {
 	return nil
 }
 
-func SendToSimUe(gnbue *gnbctx.GnbCpUe, event common.EventType, nasPdus common.NasPduList) {
+func SendToSimUe(gnbue *gnbctx.GnbCpUe, event common.EventType, ngapPdu *ngapType.NGAPPDU, ngapProcedureCode int64, nasPdu *ngapType.NASPDU) {
 	gnbue.Log.Traceln("Sending event", event, "to SimUe")
-	uemsg := common.UuMessage{}
+	uemsg := common.N1N2Message{}
 	uemsg.Event = event
-	uemsg.NasPdus = nasPdus
+	uemsg.NgapPdu = ngapPdu
+	uemsg.NgapProcedureCode = ngapProcedureCode
+	uemsg.NasPdu = nasPdu
 	gnbue.WriteUeChan <- &uemsg
 }

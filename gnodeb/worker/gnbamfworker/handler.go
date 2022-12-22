@@ -310,7 +310,7 @@ func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		return
 	}
 
-	SendToGnbUe(gnbue, common.INITIAL_CTX_SETUP_REQUEST_EVENT, pdu)
+	SendToGnbUe(gnbue, common.N2_RECV_SDU_EVENT|common.INITIAL_CTX_SETUP_REQUEST_EVENT, pdu)
 }
 
 // TODO : Much of the code is repeated in each handler

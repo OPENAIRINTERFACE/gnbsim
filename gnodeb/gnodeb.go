@@ -121,3 +121,23 @@ func GetInitialUEMessage(gnb *gnbctx.GNodeB, gnbCpUe *gnbctx.GnbCpUe, nasBytes [
 	}
 	return msg, nil
 }
+
+func GetUplinkNASTransport(gnb *gnbctx.GNodeB, gnbCpUe *gnbctx.GnbCpUe, nasBytes []byte) (n2Bytes []byte, err error) {
+
+	msg, err := test.GetUplinkNASTransport(gnbCpUe.AmfUeNgapId, gnbCpUe.GnbUeNgapId, nasBytes)
+	if err != nil {
+		gnb.Log.Errorln("GetInitialUEMessage failed:", err)
+		return nil, err
+	}
+	return msg, nil
+}
+
+func GetInitialContextSetupResponse(gnb *gnbctx.GNodeB, gnbCpUe *gnbctx.GnbCpUe) (n2Bytes []byte, err error) {
+
+	msg, err := test.GetInitialContextSetupResponse(gnbCpUe.AmfUeNgapId, gnbCpUe.GnbUeNgapId)
+	if err != nil {
+		gnb.Log.Errorln("GetInitialContextSetupResponse failed:", err)
+		return nil, err
+	}
+	return msg, nil
+}
