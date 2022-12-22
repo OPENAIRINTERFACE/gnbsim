@@ -25,12 +25,6 @@ func Init(ue *realuectx.RealUe) error {
 		ue.Log.Infoln("Handling:", event)
 
 		switch event {
-		case common.N1_ENCODE_EVENT + common.NAS_5GMM_AUTHENTICATION_RESPONSE:
-			err = HandleAuthResponseEvent(ue, msg)
-		case common.N1_ENCODE_EVENT + common.NAS_5GMM_SECURITY_MODE_COMPLETE:
-			err = HandleSecModCompleteEvent(ue, msg)
-		case common.N1_ENCODE_EVENT + common.NAS_5GMM_REGISTRATION_COMPLETE:
-			err = HandleRegCompleteEvent(ue, msg)
 		case common.N1_ENCODE_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG:
 			err = HandleDeregRequestEvent(ue, msg)
 		case common.DL_INFO_TRANSFER_EVENT:

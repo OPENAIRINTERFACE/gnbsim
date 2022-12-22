@@ -9,10 +9,18 @@ import (
 	"fmt"
 
 	realuectx "github.com/omec-project/gnbsim/realue/context"
+	"github.com/omec-project/gnbsim/realue/util"
 	"github.com/omec-project/gnbsim/util/nastestpacket"
+	"github.com/omec-project/nas"
 
 	"github.com/omec-project/nas/nasConvert"
 	"github.com/omec-project/nas/nasMessage"
+	"github.com/omec-project/nas/nasTestpacket"
+	"github.com/omec-project/nas/nasType"
+)
+
+const (
+	SWITCH_OFF uint8 = 0
 )
 
 func GetServiceRequest(ue *realuectx.RealUe) ([]byte, error) {
@@ -34,4 +42,59 @@ func GetServiceRequest(ue *realuectx.RealUe) ([]byte, error) {
 	}
 
 	return data.Bytes(), nil
+}
+
+func GetRegisterRequest(ue *realuectx.RealUe) ([]byte, error) {
+	var err error
+
+	ueSecurityCapability := ue.GetUESecurityCapability()
+	ue.Suci, err = util.SupiToSuci(ue.Supi, ue.Plmn)
+	if err != nil {
+		ue.Log.Errorln("SupiToSuci returned:", err)
+		return nil, fmt.Errorf("failed to derive suci")
+	}
+	mobileId5GS := nasType.MobileIdentity5GS{
+		Len:    uint16(len(ue.Suci)), // suci
+		Buffer: ue.Suci,
+	}
+	ue.Log.Traceln("Generating SUPI Registration Request Message")
+	nasPdu := nasTestpacket.GetRegistrationRequest(nasMessage.RegistrationType5GSInitialRegistration,
+		mobileId5GS, nil, ueSecurityCapability, nil, nil, nil)
+	return nasPdu, nil
+}
+
+func GetDeregisterRequest(ue *realuectx.RealUe) ([]byte, error) {
+	var err error
+
+	if ue.Guti == "" {
+		ue.Log.Errorln("guti not allocated")
+		return nil, fmt.Errorf("failed to create deregistration request: guti not allocated")
+	}
+	gutiNas := nasConvert.GutiToNas(ue.Guti)
+	mobileIdentity5GS := nasType.MobileIdentity5GS{
+		Len:    11, // 5g-guti
+		Buffer: gutiNas.Octet[:],
+	}
+
+	nasPdu := nasTestpacket.GetDeregistrationRequest(nasMessage.AccessType3GPP,
+		SWITCH_OFF, uint8(ue.NgKsi.Ksi), mobileIdentity5GS)
+	nasPdu, err = EncodeNasPduWithSecurity(ue, nasPdu,
+		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
+	if err != nil {
+		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
+		return nil, fmt.Errorf("failed to encrypt deregistration request message")
+	}
+	return nasPdu, nil
+}
+
+func GetRegistrationComplete(ue *realuectx.RealUe) ([]byte, error) {
+	ue.Log.Traceln("Generating Registration Complete Message")
+	nasPdu := nasTestpacket.GetRegistrationComplete(nil)
+	nasPdu, err := EncodeNasPduWithSecurity(ue, nasPdu,
+		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
+	if err != nil {
+		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
+		return nasPdu, fmt.Errorf("failed to encrypt registration complete message")
+	}
+	return nasPdu, nil
 }

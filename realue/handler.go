@@ -10,7 +10,6 @@ import (
 
 	"github.com/omec-project/gnbsim/common"
 	realuectx "github.com/omec-project/gnbsim/realue/context"
-	"github.com/omec-project/gnbsim/realue/util"
 	"github.com/omec-project/gnbsim/realue/worker/pdusessworker"
 
 	realue_nas "github.com/omec-project/gnbsim/realue/nas"
@@ -30,25 +29,6 @@ const (
 	REQUEST_TYPE_EXISTING_PDU_SESS uint8  = 0x02
 )
 
-func EncodeRegRequestEvent(ue *realuectx.RealUe) (nasBytes []byte, err error) {
-
-	ueSecurityCapability := ue.GetUESecurityCapability()
-
-	ue.Suci, err = util.SupiToSuci(ue.Supi, ue.Plmn)
-	if err != nil {
-		ue.Log.Errorln("SupiToSuci returned:", err)
-		return nil, fmt.Errorf("failed to derive suci")
-	}
-	mobileId5GS := nasType.MobileIdentity5GS{
-		Len:    uint16(len(ue.Suci)), // suci
-		Buffer: ue.Suci,
-	}
-	ue.Log.Traceln("Generating SUPI Registration Request Message")
-	nasPdu := nasTestpacket.GetRegistrationRequest(nasMessage.RegistrationType5GSInitialRegistration,
-		mobileId5GS, nil, ueSecurityCapability, nil, nil, nil)
-	return nasPdu, nil
-}
-
 func HandleRegistrationAccept(ue *realuectx.RealUe,
 	msg *nasMessage.RegistrationAccept) error {
 
@@ -59,18 +39,6 @@ func HandleRegistrationAccept(ue *realuectx.RealUe,
 
 	_, ue.Guti = nasConvert.GutiToString(guti)
 	return nil
-}
-
-func EncodeRegistrationComplete(ue *realuectx.RealUe) (nasBytes []byte, err error) {
-	ue.Log.Traceln("Generating Registration Complete Message")
-	nasPdu := nasTestpacket.GetRegistrationComplete(nil)
-	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
-		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
-	if err != nil {
-		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
-		return nasPdu, fmt.Errorf("failed to encrypt registration complete message")
-	}
-	return nasPdu, nil
 }
 
 func HandleDeregRequestEvent(ue *realuectx.RealUe,
