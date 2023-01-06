@@ -163,6 +163,7 @@ func HandleDlMessage(pduSess *realuectx.PduSession,
 
 func HandleDataPktGenRequestEvent(pduSess *realuectx.PduSession,
 	intfcMsg common.InterfaceMessage) (err error) {
+	pduSess.Log.Traceln("Generating traffic...")
 	cmd := intfcMsg.(*common.UeMessage)
 	pduSess.ReqDataPktCount = cmd.UserDataPktCount
 	pduSess.DefaultAs = cmd.DefaultAs

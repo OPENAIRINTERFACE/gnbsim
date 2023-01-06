@@ -111,3 +111,30 @@ func GetRegistrationComplete(ue *realuectx.RealUe) ([]byte, error) {
 	}
 	return nasPdu, nil
 }
+
+func NasGetTransferContent(ue *realuectx.RealUe, xNasTransport *nas.Message) (msgType uint8, nasMsg *nas.Message, err error) {
+
+	msgType = xNasTransport.GmmHeader.GetMessageType()
+	ue.Log.Infoln("Received Message Type:", msgType)
+
+	if msgType == nas.MsgTypeDLNASTransport {
+		ue.Log.Info("Payload container type:",
+			xNasTransport.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType)
+		payload := xNasTransport.GmmMessage.DLNASTransport.PayloadContainer
+		if payload.Len == 0 {
+			err = fmt.Errorf("payload container length is 0")
+			return
+		}
+		buffer := payload.Buffer[:payload.Len]
+		m := nas.NewMessage()
+		err = m.PlainNasDecode(&buffer)
+		if err != nil {
+			ue.Log.Errorln("PlainNasDecode returned:", err)
+			err = fmt.Errorf("failed to decode payload container")
+			return
+		}
+		nasMsg = m
+		msgType = nasMsg.GsmHeader.GetMessageType()
+	}
+	return
+}

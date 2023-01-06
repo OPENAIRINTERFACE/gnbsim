@@ -228,11 +228,14 @@ func HandleDataBearerSetupRequestEvent(ue *realuectx.RealUe,
 func HandleDataPktGenRequestEvent(ue *realuectx.RealUe,
 	msg common.InterfaceMessage) (err error) {
 
+	if len(ue.PduSessions) == 0 {
+		err = fmt.Errorf("Can't generate traffic, no PDU sessions")
+	}
 	for _, v := range ue.PduSessions {
 		v.ReadCmdChan <- msg
 	}
 
-	return nil
+	return
 }
 
 func HandleDataPktGenSuccessEvent(ue *realuectx.RealUe,
