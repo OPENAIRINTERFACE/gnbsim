@@ -181,7 +181,7 @@ func HandlePduSessReleaseCompleteEvent(ue *realuectx.RealUe,
 }
 
 func HandleDataBearerSetupRequestEvent(ue *realuectx.RealUe,
-	intfcMsg common.InterfaceMessage) (err error) {
+	intfcMsg common.InterfaceMessage) (response *common.UuMessage, err error) {
 
 	msg := intfcMsg.(*common.UuMessage)
 	for _, item := range msg.DBParams {
@@ -215,12 +215,14 @@ func HandleDataBearerSetupRequestEvent(ue *realuectx.RealUe,
 		}
 	}
 
-	rsp := &common.UuMessage{}
-	rsp.Event = common.DATA_BEARER_SETUP_RESPONSE_EVENT
-	rsp.DBParams = msg.DBParams
-	rsp.TriggeringEvent = msg.TriggeringEvent
-	ue.WriteSimUeChan <- rsp
-	return nil
+	response = &common.UuMessage{}
+	response.Event = common.DATA_BEARER_SETUP_RESPONSE_EVENT
+	response.DBParams = msg.DBParams
+	response.TriggeringEvent = msg.TriggeringEvent
+	/* LG COMMENT kept it temp for memo
+	ue.WriteSimUeChan <- response
+	*/
+	return
 }
 
 func HandleDataPktGenRequestEvent(ue *realuectx.RealUe,

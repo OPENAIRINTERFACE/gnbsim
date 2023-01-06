@@ -25,16 +25,17 @@ import (
 
 // RealUe represents a Real UE
 type RealUe struct {
-	Supi               string
-	Suci               []uint8
-	Guti               string
-	Key                string
-	Opc                string
-	SeqNum             string
-	Dnn                string
-	SNssai             *models.Snssai
-	ULCount            security.Count
-	DLCount            security.Count
+	Supi    string
+	Suci    []uint8
+	Guti    string
+	Key     string
+	Opc     string
+	SeqNum  string
+	Dnn     string
+	SNssai  *models.Snssai
+	ULCount security.Count
+	DLCount security.Count
+	// selected algorithms by CN
 	CipheringAlg       uint8
 	IntegrityAlg       uint8
 	KnasEnc            [16]uint8
@@ -46,6 +47,8 @@ type RealUe struct {
 	PduSessions        map[int64]*PduSession
 	WaitGrp            sync.WaitGroup
 
+	UeSecurityCapability *nasType.UESecurityCapability
+
 	//RealUe writes messages to SimUE on this channel
 	WriteSimUeChan chan common.InterfaceMessage
 
@@ -56,20 +59,21 @@ type RealUe struct {
 	Log *logrus.Entry
 }
 
-func NewRealUe(supi string, cipheringAlg, integrityAlg uint8,
+func NewRealUe(supi string, ueSecurityCapability *nasType.UESecurityCapability,
 	simuechan chan common.InterfaceMessage, plmnid *models.PlmnId,
 	key string, opc string, seqNum string, Dnn string, SNssai *models.Snssai) *RealUe {
 
 	ue := RealUe{}
 	ue.Supi = supi
-	ue.CipheringAlg = cipheringAlg
-	ue.IntegrityAlg = integrityAlg
+	ue.CipheringAlg = security.AlgCiphering128NEA0
+	ue.IntegrityAlg = security.AlgIntegrity128NIA2
 	ue.Key = key
 	ue.Opc = opc
 	ue.SeqNum = seqNum
 	ue.Dnn = Dnn
 	ue.SNssai = SNssai
 	ue.Plmn = plmnid
+	ue.UeSecurityCapability = ueSecurityCapability
 	ue.WriteSimUeChan = simuechan
 	ue.PduSessions = make(map[int64]*PduSession)
 	ue.ReadChan = make(chan common.InterfaceMessage, 5)
@@ -80,34 +84,7 @@ func NewRealUe(supi string, cipheringAlg, integrityAlg uint8,
 }
 
 func (ue *RealUe) GetUESecurityCapability() (UESecurityCapability *nasType.UESecurityCapability) {
-	UESecurityCapability = &nasType.UESecurityCapability{
-		Iei:    nasMessage.RegistrationRequestUESecurityCapabilityType,
-		Len:    2,
-		Buffer: []uint8{0x00, 0x00},
-	}
-	switch ue.CipheringAlg {
-	case security.AlgCiphering128NEA0:
-		UESecurityCapability.SetEA0_5G(1)
-	case security.AlgCiphering128NEA1:
-		UESecurityCapability.SetEA1_128_5G(1)
-	case security.AlgCiphering128NEA2:
-		UESecurityCapability.SetEA2_128_5G(1)
-	case security.AlgCiphering128NEA3:
-		UESecurityCapability.SetEA3_128_5G(1)
-	}
-
-	switch ue.IntegrityAlg {
-	case security.AlgIntegrity128NIA0:
-		UESecurityCapability.SetIA0_5G(1)
-	case security.AlgIntegrity128NIA1:
-		UESecurityCapability.SetIA1_128_5G(1)
-	case security.AlgIntegrity128NIA2:
-		UESecurityCapability.SetIA2_128_5G(1)
-	case security.AlgIntegrity128NIA3:
-		UESecurityCapability.SetIA3_128_5G(1)
-	}
-
-	return
+	return ue.UeSecurityCapability
 }
 
 func (ue *RealUe) DeriveRESstarAndSetKey(

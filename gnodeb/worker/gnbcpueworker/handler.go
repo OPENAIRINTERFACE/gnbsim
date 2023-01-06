@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/omec-project/gnbsim/common"
 	gnbctx "github.com/omec-project/gnbsim/gnodeb/context"
@@ -23,7 +22,7 @@ import (
 	"github.com/omec-project/ngap/ngapType"
 )
 
-type pduSessResourceSetupItem struct {
+type PduSessResourceSetupItem struct {
 	PDUSessionID                           ngapType.PDUSessionID
 	NASPDU                                 *ngapType.NASPDU
 	SNSSAI                                 ngapType.SNSSAI
@@ -160,10 +159,10 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 		}
 	}
 
-	var list []pduSessResourceSetupItem
+	var list []PduSessResourceSetupItem
 	if pduSessResourceSetupReqList != nil {
 		for _, v := range pduSessResourceSetupReqList.List {
-			dst := pduSessResourceSetupItem{}
+			dst := PduSessResourceSetupItem{}
 			dst.NASPDU = v.NASPDU
 			dst.PDUSessionID = v.PDUSessionID
 			dst.SNSSAI = v.SNSSAI
@@ -173,6 +172,7 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 	}
 
 	if len(list) != 0 {
+		// LG: TODO add return error
 		ProcessPduSessResourceSetupList(gnbue, list,
 			common.INITIAL_CTX_SETUP_REQUEST_EVENT)
 	}
@@ -211,6 +211,8 @@ func HandlePduSessResourceSetupRequest(gnbue *gnbctx.GnbCpUe,
 		}
 	}
 
+	/* LG kept it for memo (will erase)
+	   process message only if needed (we can simulate loss of NAS messages)
 	var list []pduSessResourceSetupItem
 	for _, v := range pduSessResourceSetupReqList.List {
 		dst := pduSessResourceSetupItem{}
@@ -223,6 +225,9 @@ func HandlePduSessResourceSetupRequest(gnbue *gnbctx.GnbCpUe,
 
 	ProcessPduSessResourceSetupList(gnbue, list,
 		common.PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT)
+	*/
+	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodePDUSessionResourceSetup, nil)
+
 }
 
 // TODO: Error handling
@@ -311,7 +316,7 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 }
 
 func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
-	intfcMsg common.InterfaceMessage) {
+	intfcMsg common.InterfaceMessage) error {
 
 	msg := intfcMsg.(*common.UuMessage)
 	var pduSessions []*ngapTestpacket.PduSession
@@ -323,6 +328,7 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 			gnbUpUe, err := gnbue.GetGnbUpUe(pduSess.PduSessId)
 			if err != nil {
 				gnbue.Log.Errorln("Failed to fetch PDU session context:", err)
+				return err
 			}
 			// TODO: Addition to this map should only be through GnbUpfWorker
 			// routine. This will help in replacing sync map with normal map
@@ -346,23 +352,24 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 			gnbue.AmfUeNgapId, gnbue.GnbUeNgapId, gnbue.Gnb.GnbN3Ip)
 		if err != nil {
 			gnbue.Log.Errorln("Failed to create PDU Session Resource Setup Response:", err)
-			return
+			return err
 		}
 	} else if msg.TriggeringEvent == common.INITIAL_CTX_SETUP_REQUEST_EVENT {
 		ngapPdu, err = test.GetInitialContextSetupResponseForServiceRequest(pduSessions,
 			gnbue.AmfUeNgapId, gnbue.GnbUeNgapId, gnbue.Gnb.GnbN3Ip)
 		if err != nil {
 			gnbue.Log.Errorln("Failed to create Initial Context Setup Response:", err)
-			return
+			return err
 		}
 	}
 
 	err = gnbue.Gnb.CpTransport.SendToPeer(gnbue.Amf, ngapPdu)
 	if err != nil {
 		gnbue.Log.Errorln("SendToPeer failed:", err)
-		return
+		return err
 	}
 	gnbue.Log.Traceln("Sent PDU Session Resource Setup Response Message to AMF")
+	return nil
 }
 
 func HandleUeCtxReleaseCommand(gnbue *gnbctx.GnbCpUe,
@@ -464,19 +471,19 @@ func HandleRanConnectionRelease(gnbue *gnbctx.GnbCpUe,
 }
 
 func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
-	lst []pduSessResourceSetupItem, event common.EventType) {
+	lst []PduSessResourceSetupItem, event common.EventType) (result *common.UuMessage, err error) {
 	//var pduSessions []ngapTestpacket.PduSession
-	var dbParamSet []*common.DataBearerParams
 
+	var dbParamSet []*common.DataBearerParams
 	var nasPdus common.NasPduList
 
 	for _, item := range lst {
 
 		resourceSetupRequestTransfer := ngapType.PDUSessionResourceSetupRequestTransfer{}
-		err := aper.UnmarshalWithParams(item.PDUSessionResourceSetupRequestTransfer,
+		err = aper.UnmarshalWithParams(item.PDUSessionResourceSetupRequestTransfer,
 			&resourceSetupRequestTransfer, "valueExt")
 		if err != nil {
-			gnbue.Log.Errorln("UnmarshalWithParams returned:", err)
+			err = fmt.Errorf("UnmarshalWithParams returned:", err)
 			return
 		}
 
@@ -488,28 +495,28 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 			case ngapType.ProtocolIEIDULNGUUPTNLInformation:
 				gtpTunnel = ie.Value.ULNGUUPTNLInformation.GTPTunnel
 				if gtpTunnel == nil {
-					gnbue.Log.Errorln("GTPTunnel is nil")
+					err = fmt.Errorf("GTPTunnel is nil")
 					return
 				}
 			case ngapType.ProtocolIEIDPDUSessionType:
 				pduSessType = ie.Value.PDUSessionType
 				if pduSessType == nil {
-					gnbue.Log.Errorln("PDUSessionType is nil")
+					err = fmt.Errorf("PDUSessionType is nil")
 					return
 				}
 			case ngapType.ProtocolIEIDQosFlowSetupRequestList:
 				qosFlowSetupReqList = ie.Value.QosFlowSetupRequestList
 				if qosFlowSetupReqList == nil || len(qosFlowSetupReqList.List) == 0 {
-					gnbue.Log.Errorln("QosFlowSetupRequestList is empty")
+					err = fmt.Errorf("QosFlowSetupRequestList is empty")
 					return
 				}
 			}
 		}
 
 		ulteid := binary.BigEndian.Uint32(gtpTunnel.GTPTEID.Value)
-		dlteid, err := gnbue.Gnb.DlTeidGenerator.Allocate()
-		if err != nil {
-			gnbue.Log.Errorln("ID Generator Allocate() returned:", err)
+		dlteid, errA := gnbue.Gnb.DlTeidGenerator.Allocate()
+		if errA != nil {
+			err = fmt.Errorf("ID Generator Allocate() returned:", errA)
 			return
 		}
 		upfIp, _ := ngapConvert.IPAddressToString(gtpTunnel.TransportLayerAddress)
@@ -543,7 +550,7 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 			if qosChar.Present == ngapType.QosCharacteristicsPresentNonDynamic5QI {
 				nonDynamic5QI = qosChar.NonDynamic5QI
 				if nonDynamic5QI == nil {
-					gnbue.Log.Errorln("NonDynamic5QI is nil")
+					err = fmt.Errorf("NonDynamic5QI is nil")
 					return
 				}
 				gnbue.Log.Infoln("Non Dynamic 5QI:", nonDynamic5QI.FiveQI.Value)
@@ -583,12 +590,16 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 	/* TODO: To be fixed, currently Data Bearer Setup Event may get processed
 	 * before the pdu sessions are established on the UE side
 	 */
+	/* LG COMMENTED
 	time.Sleep(500 * time.Millisecond)
-	uemsg := common.UuMessage{}
-	uemsg.Event = common.DATA_BEARER_SETUP_REQUEST_EVENT
-	uemsg.DBParams = dbParamSet
-	uemsg.TriggeringEvent = event
-	gnbue.WriteUeChan <- &uemsg
+	*/
+	result = &common.UuMessage{}
+	result.Event = common.DATA_BEARER_SETUP_REQUEST_EVENT
+	result.DBParams = dbParamSet
+	result.TriggeringEvent = event
+	/* LG COMMENTED
+	gnbue.WriteUeChan <- &result */
+	return
 }
 
 func HandleQuitEvent(gnbue *gnbctx.GnbCpUe, intfcMsg common.InterfaceMessage) {

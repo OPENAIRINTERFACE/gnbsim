@@ -46,7 +46,7 @@ func action(c *cli.Context) error {
 
 	cfg := c.String("cfg")
 	if cfg == "" {
-		logger.AppLog.Warnln("No configuration file provided. Using default configuration file:", factory.GNBSIM_DEFAULT_CONFIG_PATH)
+		logger.AppLog.Warnln("No configuration file provided. Using default configuration file: ", factory.GNBSIM_DEFAULT_CONFIG_PATH)
 		logger.AppLog.Infoln("Application Usage:", c.App.Usage)
 		cfg = factory.GNBSIM_DEFAULT_CONFIG_PATH
 	}

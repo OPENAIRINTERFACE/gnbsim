@@ -36,6 +36,7 @@ type Info struct {
 }
 
 type SecurityCapabilities struct {
+	Len   int  `yaml:"len" json:"len"`
 	FgIa0 bool `yaml:"fgIa0" json:"fgIa0"`
 	FgIa1 bool `yaml:"fgIa1" json:"fgIa1"`
 	FgIa2 bool `yaml:"fgIa2" json:"fgIa2"`
@@ -216,4 +217,109 @@ func (c *Configuration) GetUeProfile(model string) (*UeProfile, error) {
 		err = fmt.Errorf("no corresponding Ue model found for:%v", model)
 	}
 	return ue, err
+}
+
+func (sc *SecurityCapabilities) ToBytes() []uint8 {
+	buffer := make([]byte, 4)
+	if sc.FgEa0 {
+		buffer[0] = buffer[0] | 0x80
+	}
+	if sc.FgEa1 {
+		buffer[0] = buffer[0] | 0x40
+	}
+	if sc.FgEa2 {
+		buffer[0] = buffer[0] | 0x20
+	}
+	if sc.FgEa3 {
+		buffer[0] = buffer[0] | 0x10
+	}
+	if sc.FgEa4 {
+		buffer[0] = buffer[0] | 0x08
+	}
+	if sc.FgEa5 {
+		buffer[0] = buffer[0] | 0x04
+	}
+	if sc.FgEa6 {
+		buffer[0] = buffer[0] | 0x02
+	}
+	if sc.FgEa7 {
+		buffer[0] = buffer[0] | 0x01
+	}
+	if sc.FgIa0 {
+		buffer[1] = buffer[1] | 0x80
+	}
+	if sc.FgIa1 {
+		buffer[1] = buffer[1] | 0x40
+	}
+	if sc.FgIa2 {
+		buffer[1] = buffer[1] | 0x20
+	}
+	if sc.FgIa3 {
+		buffer[1] = buffer[1] | 0x10
+	}
+	if sc.FgIa4 {
+		buffer[1] = buffer[1] | 0x08
+	}
+	if sc.FgIa5 {
+		buffer[1] = buffer[1] | 0x04
+	}
+	if sc.FgIa6 {
+		buffer[1] = buffer[1] | 0x02
+	}
+	if sc.FgIa7 {
+		buffer[1] = buffer[1] | 0x01
+	}
+	if sc.Eea0 {
+		buffer[2] = buffer[2] | 0x80
+	}
+	if sc.Eea1 {
+		buffer[2] = buffer[2] | 0x40
+	}
+	if sc.Eea2 {
+		buffer[2] = buffer[2] | 0x20
+	}
+	if sc.Eea3 {
+		buffer[2] = buffer[2] | 0x10
+	}
+	if sc.Eea4 {
+		buffer[2] = buffer[2] | 0x08
+	}
+	if sc.Eea5 {
+		buffer[2] = buffer[2] | 0x04
+	}
+	if sc.Eea6 {
+		buffer[2] = buffer[2] | 0x02
+	}
+	if sc.Eea7 {
+		buffer[2] = buffer[2] | 0x01
+	}
+	if sc.Eia0 {
+		buffer[3] = buffer[3] | 0x80
+	}
+	if sc.Eia1 {
+		buffer[3] = buffer[3] | 0x40
+	}
+	if sc.Eia2 {
+		buffer[3] = buffer[3] | 0x20
+	}
+	if sc.Eia3 {
+		buffer[3] = buffer[3] | 0x10
+	}
+	if sc.Eia4 {
+		buffer[3] = buffer[3] | 0x08
+	}
+	if sc.Eia5 {
+		buffer[3] = buffer[3] | 0x04
+	}
+	if sc.Eia6 {
+		buffer[3] = buffer[3] | 0x02
+	}
+	if sc.Eia7 {
+		buffer[3] = buffer[3] | 0x01
+	}
+	if sc.Len == 4 {
+		return buffer
+	} else {
+		return buffer[0:sc.Len]
+	}
 }

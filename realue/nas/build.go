@@ -57,9 +57,22 @@ func GetRegisterRequest(ue *realuectx.RealUe) ([]byte, error) {
 		Len:    uint16(len(ue.Suci)), // suci
 		Buffer: ue.Suci,
 	}
+	snssaiBuf := nasConvert.SnssaiToNas(*ue.SNssai)
+	requestedNSSAI := &nasType.RequestedNSSAI{
+		Iei:    nasMessage.RegistrationRequestRequestedNSSAIType,
+		Len:    uint8(len(snssaiBuf)),
+		Buffer: snssaiBuf,
+	}
+
+	networkSlicingIndication := nasType.NewNetworkSlicingIndication(
+		nasMessage.RegistrationRequestNetworkSlicingIndicationType)
+	// LG: Useless, for memo
+	networkSlicingIndication.SetDCNI(0)
+	networkSlicingIndication.SetNSSCI(0)
+
 	ue.Log.Traceln("Generating SUPI Registration Request Message")
 	nasPdu := nasTestpacket.GetRegistrationRequest(nasMessage.RegistrationType5GSInitialRegistration,
-		mobileId5GS, nil, ueSecurityCapability, nil, nil, nil)
+		mobileId5GS, requestedNSSAI, networkSlicingIndication, ueSecurityCapability, nil, nil, nil)
 	return nasPdu, nil
 }
 
