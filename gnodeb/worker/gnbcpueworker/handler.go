@@ -52,7 +52,13 @@ func HandleInitialUEMessage(gnbue *gnbctx.GnbCpUe,
 	intfcMsg common.InterfaceMessage) {
 
 	msg := intfcMsg.(*common.UuMessage)
-	sendMsg, err := test.GetInitialUEMessage(gnbue.GnbUeNgapId, msg.NasPdus[0], "", msg.Tac, msg.NrCgi)
+	sendMsg, err := test.GetInitialUEMessage(
+		gnbue.GnbUeNgapId,
+		msg.NasPdus[0],
+		"",
+		msg.Tac,
+		msg.NrCgi,
+	)
 	if err != nil {
 		gnbue.Log.Errorln("GetInitialUEMessage failed:", err)
 		return
@@ -100,7 +106,13 @@ func HandleDownlinkNasTransport(gnbue *gnbctx.GnbCpUe,
 
 	//TODO: check what needs to be done with AmfUeNgapId on every DownlinkNasTransport message
 	gnbue.AmfUeNgapId = amfUeNgapId.Value
-	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodeDownlinkNASTransport, nasPdu)
+	SendToSimUe(
+		gnbue,
+		common.N1_N2_RECV_SDU_EVENT,
+		pdu,
+		ngapType.ProcedureCodeDownlinkNASTransport,
+		nasPdu,
+	)
 }
 
 func HandleUlInfoTransfer(gnbue *gnbctx.GnbCpUe,
@@ -108,7 +120,11 @@ func HandleUlInfoTransfer(gnbue *gnbctx.GnbCpUe,
 
 	msg := intfcMsg.(*common.UuMessage)
 	gnbue.Log.Traceln("Creating Uplink NAS Transport Message")
-	sendMsg, err := test.GetUplinkNASTransport(gnbue.AmfUeNgapId, gnbue.GnbUeNgapId, msg.NasPdus[0])
+	sendMsg, err := test.GetUplinkNASTransport(
+		gnbue.AmfUeNgapId,
+		gnbue.GnbUeNgapId,
+		msg.NasPdus[0],
+	)
 	if err != nil {
 		gnbue.Log.Errorln("GetUplinkNASTransport failed:", err)
 		return
@@ -152,7 +168,8 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 			}
 		case ngapType.ProtocolIEIDPDUSessionResourceSetupListCxtReq:
 			pduSessResourceSetupReqList = ie.Value.PDUSessionResourceSetupListCxtReq
-			if pduSessResourceSetupReqList == nil || len(pduSessResourceSetupReqList.List) == 0 {
+			if pduSessResourceSetupReqList == nil ||
+				len(pduSessResourceSetupReqList.List) == 0 {
 				gnbue.Log.Errorln("PDUSessionResourceSetupListCxtReq is empty")
 				return
 			}
@@ -178,7 +195,13 @@ func HandleInitialContextSetupRequest(gnbue *gnbctx.GnbCpUe,
 	}
 
 	//TODO: Handle other mandatory IEs
-	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodeInitialContextSetup, nasPdu)
+	SendToSimUe(
+		gnbue,
+		common.N1_N2_RECV_SDU_EVENT,
+		pdu,
+		ngapType.ProcedureCodeInitialContextSetup,
+		nasPdu,
+	)
 }
 
 // TODO: Error handling
@@ -204,7 +227,8 @@ func HandlePduSessResourceSetupRequest(gnbue *gnbctx.GnbCpUe,
 			}
 		case ngapType.ProtocolIEIDPDUSessionResourceSetupListSUReq:
 			pduSessResourceSetupReqList = ie.Value.PDUSessionResourceSetupListSUReq
-			if pduSessResourceSetupReqList == nil || len(pduSessResourceSetupReqList.List) == 0 {
+			if pduSessResourceSetupReqList == nil ||
+				len(pduSessResourceSetupReqList.List) == 0 {
 				gnbue.Log.Errorln("PDUSessionResourceSetupListSUReq is empty")
 				return
 			}
@@ -226,7 +250,13 @@ func HandlePduSessResourceSetupRequest(gnbue *gnbctx.GnbCpUe,
 	ProcessPduSessResourceSetupList(gnbue, list,
 		common.PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT)
 	*/
-	SendToSimUe(gnbue, common.N1_N2_RECV_SDU_EVENT, pdu, ngapType.ProcedureCodePDUSessionResourceSetup, nil)
+	SendToSimUe(
+		gnbue,
+		common.N1_N2_RECV_SDU_EVENT,
+		pdu,
+		ngapType.ProcedureCodePDUSessionResourceSetup,
+		nil,
+	)
 
 }
 
@@ -254,8 +284,11 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 			}
 		case ngapType.ProtocolIEIDPDUSessionResourceToReleaseListRelCmd:
 			pduSessResourceToReleaseList = ie.Value.PDUSessionResourceToReleaseListRelCmd
-			if pduSessResourceToReleaseList == nil || len(pduSessResourceToReleaseList.List) == 0 {
-				gnbue.Log.Errorln("PDUSessionResourceToReleaseListRelCmd is empty")
+			if pduSessResourceToReleaseList == nil ||
+				len(pduSessResourceToReleaseList.List) == 0 {
+				gnbue.Log.Errorln(
+					"PDUSessionResourceToReleaseListRelCmd is empty",
+				)
 				return
 			}
 		case ngapType.ProtocolIEIDNASPDU:
@@ -269,8 +302,11 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 
 	for _, item := range pduSessResourceToReleaseList.List {
 		resourceReleaseCmdTransfer := ngapType.PDUSessionResourceReleaseCommandTransfer{}
-		err := aper.UnmarshalWithParams(item.PDUSessionResourceReleaseCommandTransfer,
-			&resourceReleaseCmdTransfer, "valueExt")
+		err := aper.UnmarshalWithParams(
+			item.PDUSessionResourceReleaseCommandTransfer,
+			&resourceReleaseCmdTransfer,
+			"valueExt",
+		)
 		if err != nil {
 			gnbue.Log.Errorln("UnmarshalWithParams returned:", err)
 			return
@@ -301,7 +337,10 @@ func HandlePduSessResourceReleaseCommand(gnbue *gnbctx.GnbCpUe,
 	ngapPdu, err := test.GetPDUSessionResourceReleaseResponse(gnbue.AmfUeNgapId,
 		gnbue.GnbUeNgapId)
 	if err != nil {
-		gnbue.Log.Errorln("Failed to create PDU Session Resource Release Response:", err)
+		gnbue.Log.Errorln(
+			"Failed to create PDU Session Resource Release Response:",
+			err,
+		)
 		return
 	}
 
@@ -343,32 +382,6 @@ func HandleDataBearerSetupResponse(gnbue *gnbctx.GnbCpUe,
 		}
 		pduSessions = append(pduSessions, pduSess)
 	}
-
-	var ngapPdu []byte
-	var err error
-
-	if msg.TriggeringEvent == common.PDU_SESS_RESOURCE_SETUP_REQUEST_EVENT {
-		ngapPdu, err = test.GetPDUSessionResourceSetupResponse(pduSessions,
-			gnbue.AmfUeNgapId, gnbue.GnbUeNgapId, gnbue.Gnb.GnbN3Ip)
-		if err != nil {
-			gnbue.Log.Errorln("Failed to create PDU Session Resource Setup Response:", err)
-			return err
-		}
-	} else if msg.TriggeringEvent == common.INITIAL_CTX_SETUP_REQUEST_EVENT {
-		ngapPdu, err = test.GetInitialContextSetupResponseForServiceRequest(pduSessions,
-			gnbue.AmfUeNgapId, gnbue.GnbUeNgapId, gnbue.Gnb.GnbN3Ip)
-		if err != nil {
-			gnbue.Log.Errorln("Failed to create Initial Context Setup Response:", err)
-			return err
-		}
-	}
-
-	err = gnbue.Gnb.CpTransport.SendToPeer(gnbue.Amf, ngapPdu)
-	if err != nil {
-		gnbue.Log.Errorln("SendToPeer failed:", err)
-		return err
-	}
-	gnbue.Log.Traceln("Sent PDU Session Resource Setup Response Message to AMF")
 	return nil
 }
 
@@ -470,8 +483,11 @@ func HandleRanConnectionRelease(gnbue *gnbctx.GnbCpUe,
 	gnbue.Log.Traceln("Sent Uplink NAS Transport Message to AMF")
 }
 
-func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
-	lst []PduSessResourceSetupItem, event common.EventType) (result *common.UuMessage, err error) {
+func ProcessPduSessResourceSetupList(
+	gnbue *gnbctx.GnbCpUe,
+	lst []PduSessResourceSetupItem,
+	event common.EventType,
+) (result *common.UuMessage, err error) {
 	//var pduSessions []ngapTestpacket.PduSession
 
 	var dbParamSet []*common.DataBearerParams
@@ -480,8 +496,11 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 	for _, item := range lst {
 
 		resourceSetupRequestTransfer := ngapType.PDUSessionResourceSetupRequestTransfer{}
-		err = aper.UnmarshalWithParams(item.PDUSessionResourceSetupRequestTransfer,
-			&resourceSetupRequestTransfer, "valueExt")
+		err = aper.UnmarshalWithParams(
+			item.PDUSessionResourceSetupRequestTransfer,
+			&resourceSetupRequestTransfer,
+			"valueExt",
+		)
 		if err != nil {
 			err = fmt.Errorf("UnmarshalWithParams returned:", err)
 			return
@@ -506,7 +525,8 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 				}
 			case ngapType.ProtocolIEIDQosFlowSetupRequestList:
 				qosFlowSetupReqList = ie.Value.QosFlowSetupRequestList
-				if qosFlowSetupReqList == nil || len(qosFlowSetupReqList.List) == 0 {
+				if qosFlowSetupReqList == nil ||
+					len(qosFlowSetupReqList.List) == 0 {
 					err = fmt.Errorf("QosFlowSetupRequestList is empty")
 					return
 				}
@@ -519,7 +539,9 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 			err = fmt.Errorf("ID Generator Allocate() returned:", errA)
 			return
 		}
-		upfIp, _ := ngapConvert.IPAddressToString(gtpTunnel.TransportLayerAddress)
+		upfIp, _ := ngapConvert.IPAddressToString(
+			gtpTunnel.TransportLayerAddress,
+		)
 
 		gnbupue := gnbctx.NewGnbUpUe(uint32(dlteid), ulteid, gnbue.Gnb)
 		gnbupue.Snssai = ngapConvert.SNssaiToModels(item.SNSSAI)
@@ -556,8 +578,14 @@ func ProcessPduSessResourceSetupList(gnbue *gnbctx.GnbCpUe,
 				gnbue.Log.Infoln("Non Dynamic 5QI:", nonDynamic5QI.FiveQI.Value)
 			}
 			gnbue.Log.Infoln("ARP Priority Level:", arp.PriorityLevelARP.Value)
-			gnbue.Log.Infoln("Pre-emption Capability:", arp.PreEmptionCapability.Value)
-			gnbue.Log.Infoln("Pre-emption Vulnerability:", arp.PreEmptionVulnerability.Value)
+			gnbue.Log.Infoln(
+				"Pre-emption Capability:",
+				arp.PreEmptionCapability.Value,
+			)
+			gnbue.Log.Infoln(
+				"Pre-emption Vulnerability:",
+				arp.PreEmptionVulnerability.Value,
+			)
 
 			pduSess.SuccessQfiList = append(pduSess.SuccessQfiList, qosFlowId)
 			gnbupue.AddQosFlow(qosFlowId, &qosFlowSetupReqItem)

@@ -54,7 +54,11 @@ func HandleMessage(gnbUpf *gnbctx.GnbUpf, msg common.InterfaceMessage) error {
 	return nil
 }
 
-func SendToGnbUe(gnbue *gnbctx.GnbCpUe, event common.EventType, ngapPdu *ngapType.NGAPPDU) {
+func SendToGnbUe(
+	gnbue *gnbctx.GnbCpUe,
+	event common.EventType,
+	ngapPdu *ngapType.NGAPPDU,
+) {
 	gnbue.Log.Traceln("Sending:", event)
 	amfmsg := common.N2Message{}
 	amfmsg.Event = event

@@ -41,21 +41,33 @@ func GetNGSetupRequest(gnb *gnbctx.GNodeB) ([]byte, error) {
 		for _, plmnItem := range ta.BroadcastPLMNList {
 			// BroadcastPLMNItem in BroadcastPLMNList
 			broadcastPLMNItem := ngapType.BroadcastPLMNItem{}
-			broadcastPLMNItem.PLMNIdentity = ngapConvert.PlmnIdToNgap(plmnItem.PlmnId)
+			broadcastPLMNItem.PLMNIdentity = ngapConvert.PlmnIdToNgap(
+				plmnItem.PlmnId,
+			)
 
 			sliceSupportList := &broadcastPLMNItem.TAISliceSupportList
 			for _, snssai := range plmnItem.TaiSliceSupportList {
 				// SliceSupportItem in SliceSupportList
 				sliceSupportItem := ngapType.SliceSupportItem{}
 				sliceSupportItem.SNSSAI = ngapConvert.SNssaiToNgap(snssai)
-				sliceSupportList.List = append(sliceSupportList.List, sliceSupportItem)
+				sliceSupportList.List = append(
+					sliceSupportList.List,
+					sliceSupportItem,
+				)
 			}
-			broadcastPLMNList.List = append(broadcastPLMNList.List, broadcastPLMNItem)
+			broadcastPLMNList.List = append(
+				broadcastPLMNList.List,
+				broadcastPLMNItem,
+			)
 		}
 		supportedTaList.List = append(supportedTaList.List, supportedTAItem)
 	}
 
-	message := ngapTestpacket.BuildNGSetupRequest(gnb.RanId, &gnb.GnbName, ieSupportedTaList)
+	message := ngapTestpacket.BuildNGSetupRequest(
+		gnb.RanId,
+		&gnb.GnbName,
+		ieSupportedTaList,
+	)
 	return ngap.Encoder(message)
 }
 

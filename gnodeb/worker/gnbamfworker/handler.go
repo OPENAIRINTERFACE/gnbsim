@@ -135,7 +135,10 @@ func HandleNgSetupResponse(amf *gnbctx.GnbAmf, pdu *ngapType.NGAPPDU) {
 		capOfSNssaiList := cap(plmnSI.SNssaiList)
 		for _, sliceSupportItem := range plmnSupportItem.SliceSupportList.List {
 			if len(plmnSI.SNssaiList) < capOfSNssaiList {
-				plmnSI.SNssaiList = append(plmnSI.SNssaiList, ngapConvert.SNssaiToModels(sliceSupportItem.SNSSAI))
+				plmnSI.SNssaiList = append(
+					plmnSI.SNssaiList,
+					ngapConvert.SNssaiToModels(sliceSupportItem.SNSSAI),
+				)
 			} else {
 				break
 			}
@@ -259,7 +262,11 @@ func HandleDownlinkNasTransport(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		return
 	}
 
-	SendToGnbUe(gnbue, common.N2_RECV_SDU_EVENT|common.DOWNLINK_NAS_TRANSPORT_EVENT, pdu)
+	SendToGnbUe(
+		gnbue,
+		common.N2_RECV_SDU_EVENT|common.DOWNLINK_NAS_TRANSPORT_EVENT,
+		pdu,
+	)
 }
 
 func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
@@ -310,7 +317,11 @@ func HandleInitialContextSetupRequest(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf,
 		return
 	}
 
-	SendToGnbUe(gnbue, common.N2_RECV_SDU_EVENT|common.INITIAL_CTX_SETUP_REQUEST_EVENT, pdu)
+	SendToGnbUe(
+		gnbue,
+		common.N2_RECV_SDU_EVENT|common.INITIAL_CTX_SETUP_REQUEST_EVENT,
+		pdu,
+	)
 }
 
 // TODO : Much of the code is repeated in each handler

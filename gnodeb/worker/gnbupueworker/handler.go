@@ -12,7 +12,10 @@ import (
 	"github.com/omec-project/gnbsim/util/test"
 )
 
-func HandleUlMessage(gnbue *gnbctx.GnbUpUe, msg common.InterfaceMessage) (err error) {
+func HandleUlMessage(
+	gnbue *gnbctx.GnbUpUe,
+	msg common.InterfaceMessage,
+) (err error) {
 	gnbue.Log.Traceln("Handling UL Packet from UE")
 
 	if msg.GetEventType() == common.LAST_DATA_PKT_EVENT {
@@ -36,7 +39,10 @@ func HandleUlMessage(gnbue *gnbctx.GnbUpUe, msg common.InterfaceMessage) (err er
 	return nil
 }
 
-func HandleDlMessage(gnbue *gnbctx.GnbUpUe, intfcMsg common.InterfaceMessage) (err error) {
+func HandleDlMessage(
+	gnbue *gnbctx.GnbUpUe,
+	intfcMsg common.InterfaceMessage,
+) (err error) {
 	gnbue.Log.Traceln("Handling DL Packet from UPF Worker")
 
 	msg := intfcMsg.(*common.N3Message)
@@ -57,11 +63,17 @@ func HandleDlMessage(gnbue *gnbctx.GnbUpUe, intfcMsg common.InterfaceMessage) (e
 			ueDataMsg.Payload, extHdr, err =
 				test.DecodePduSessContainerExtHeader(msg.Pdu.Payload)
 			if err != nil {
-				return fmt.Errorf("failed to decode pdu session container extension header:%v", err)
+				return fmt.Errorf(
+					"failed to decode pdu session container extension header:%v",
+					err,
+				)
 			}
 			ueDataMsg.Qfi = new(uint8)
 			*ueDataMsg.Qfi = extHdr.Qfi
-			gnbue.Log.Infoln("Received QFI value in downlink G-PDU:", extHdr.Qfi)
+			gnbue.Log.Infoln(
+				"Received QFI value in downlink G-PDU:",
+				extHdr.Qfi,
+			)
 		}
 	}
 
@@ -72,7 +84,10 @@ func HandleDlMessage(gnbue *gnbctx.GnbUpUe, intfcMsg common.InterfaceMessage) (e
 	return nil
 }
 
-func HandleQuitEvent(gnbue *gnbctx.GnbUpUe, intfcMsg common.InterfaceMessage) (err error) {
+func HandleQuitEvent(
+	gnbue *gnbctx.GnbUpUe,
+	intfcMsg common.InterfaceMessage,
+) (err error) {
 	userDataMsg := &common.UserDataMessage{}
 	userDataMsg.Event = common.LAST_DATA_PKT_EVENT
 	gnbue.WriteUeChan <- userDataMsg

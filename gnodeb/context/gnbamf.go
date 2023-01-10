@@ -40,13 +40,19 @@ type GnbAmf struct {
 	Log *logrus.Entry
 }
 
-func NewGnbAmf(ip string, port int, writeScenarioChan chan common.InterfaceMessage) *GnbAmf {
+func NewGnbAmf(
+	ip string,
+	port int,
+	writeScenarioChan chan common.InterfaceMessage,
+) *GnbAmf {
 	gnbAmf := &GnbAmf{}
 	gnbAmf.AmfIp = ip
 	gnbAmf.AmfPort = port
 	gnbAmf.WriteScenarioChan = writeScenarioChan
-	gnbAmf.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "GnbAmf",
-		logger.FieldIp: gnbAmf.AmfIp})
+	gnbAmf.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "GnbAmf",
+			logger.FieldIp: gnbAmf.AmfIp},
+	)
 	return gnbAmf
 }
 

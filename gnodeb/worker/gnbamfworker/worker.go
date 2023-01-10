@@ -69,7 +69,11 @@ func HandleMessage(gnb *gnbctx.GNodeB, amf *gnbctx.GnbAmf, pkt []byte) error {
 // LG: TODO For the time being interface between CP transport and GnbAmf is procedure call,
 // keep this interface asynchronous, once the former one will be asynchronous we could make
 // this one synchronous.
-func SendToGnbUe(gnbue *gnbctx.GnbCpUe, event common.EventType, ngapPdu *ngapType.NGAPPDU) {
+func SendToGnbUe(
+	gnbue *gnbctx.GnbCpUe,
+	event common.EventType,
+	ngapPdu *ngapType.NGAPPDU,
+) {
 	amfmsg := common.N2Message{}
 	amfmsg.Event = event
 	amfmsg.NgapPdu = ngapPdu

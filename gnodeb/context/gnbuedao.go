@@ -31,7 +31,9 @@ type GnbUeDao struct {
 
 func NewGnbUeDao() *GnbUeDao {
 	dao := &GnbUeDao{}
-	dao.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "GnbUeDao"})
+	dao.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "GnbUeDao"},
+	)
 	return dao
 }
 
