@@ -424,6 +424,14 @@ func HandleUeCtxReleaseCommand(gnbue *gnbctx.GnbCpUe,
 		}
 	}
 
+	SendToSimUe(
+		gnbue,
+		common.N1_N2_RECV_SDU_EVENT,
+		pdu,
+		ngapType.ProcedureCodeUEContextRelease,
+		nil,
+	)
+
 	var pduSessIds []int64
 	f := func(k interface{}, v interface{}) bool {
 		pduSessIds = append(pduSessIds, k.(int64))

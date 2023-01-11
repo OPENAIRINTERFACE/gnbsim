@@ -31,7 +31,14 @@ func StartHttpServer() (err error) {
 
 	router := logger_util.NewGinWithLogrus(logger.GinLog)
 	router.Use(cors.New(cors.Config{
-		AllowMethods: []string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"},
+		AllowMethods: []string{
+			"GET",
+			"POST",
+			"OPTIONS",
+			"PUT",
+			"PATCH",
+			"DELETE",
+		},
 		AllowHeaders: []string{
 			"Origin", "Content-Length", "Content-Type", "User-Agent", "Referrer", "Host",
 			"Token", "X-Requested-With",
@@ -76,7 +83,10 @@ func StartHttpServer() (err error) {
 
 func StopHttpServer() {
 	logger.HttpLog.Infoln("Shutting down HTTP server")
-	ctx, cancel := context.WithTimeout(context.Background(), CTX_TIMEOUT*time.Second)
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		CTX_TIMEOUT*time.Second,
+	)
 	defer func() {
 		cancel()
 	}()

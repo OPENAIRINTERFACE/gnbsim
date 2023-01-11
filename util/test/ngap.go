@@ -12,11 +12,16 @@ import (
 	"github.com/omec-project/ngap/ngapType"
 )
 
-func PrintAndGetCause(cause *ngapType.Cause) (present int, value aper.Enumerated) {
+func PrintAndGetCause(
+	cause *ngapType.Cause,
+) (present int, value aper.Enumerated) {
 	present = cause.Present
 	switch cause.Present {
 	case ngapType.CausePresentRadioNetwork:
-		logger.NgapLog.Infof("Cause RadioNetwork[%d]\n", cause.RadioNetwork.Value)
+		logger.NgapLog.Infof(
+			"Cause RadioNetwork[%d]\n",
+			cause.RadioNetwork.Value,
+		)
 		value = cause.RadioNetwork.Value
 	case ngapType.CausePresentTransport:
 		logger.NgapLog.Infof("Cause Transport[%d]\n", cause.Transport.Value)
@@ -34,4 +39,27 @@ func PrintAndGetCause(cause *ngapType.Cause) (present int, value aper.Enumerated
 		logger.NgapLog.Errorln("Invalid Cause group[%d]\n", cause.Present)
 	}
 	return
+}
+
+func EqualCause(
+	cause *ngapType.Cause,
+	present int,
+	value aper.Enumerated,
+) bool {
+	if cause == nil {
+		return false
+	}
+	switch cause.Present {
+	case ngapType.CausePresentRadioNetwork:
+		return value == cause.RadioNetwork.Value
+	case ngapType.CausePresentTransport:
+		return value == cause.Transport.Value
+	case ngapType.CausePresentProtocol:
+		return value == cause.Protocol.Value
+	case ngapType.CausePresentNas:
+		return value == cause.Nas.Value
+	case ngapType.CausePresentMisc:
+		return value == cause.Misc.Value
+	}
+	return false
 }

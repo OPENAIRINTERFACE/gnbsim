@@ -36,7 +36,7 @@ type Info struct {
 }
 
 type SecurityCapabilities struct {
-	Len   int  `yaml:"len" json:"len"`
+	Len   int  `yaml:"len"   json:"len"`
 	FgIa0 bool `yaml:"fgIa0" json:"fgIa0"`
 	FgIa1 bool `yaml:"fgIa1" json:"fgIa1"`
 	FgIa2 bool `yaml:"fgIa2" json:"fgIa2"`
@@ -53,46 +53,46 @@ type SecurityCapabilities struct {
 	FgEa5 bool `yaml:"fgEa5" json:"fgEa5"`
 	FgEa6 bool `yaml:"fgEa6" json:"fgEa6"`
 	FgEa7 bool `yaml:"fgEa7" json:"fgEa7"`
-	Eia0  bool `yaml:"eia0" json:"Eia0"`
-	Eia1  bool `yaml:"eia1" json:"Eia1"`
-	Eia2  bool `yaml:"eia2" json:"Eia2"`
-	Eia3  bool `yaml:"eia3" json:"Eia3"`
-	Eia4  bool `yaml:"eia4" json:"Eia4"`
-	Eia5  bool `yaml:"eia5" json:"Eia5"`
-	Eia6  bool `yaml:"eia6" json:"Eia6"`
-	Eia7  bool `yaml:"eia7" json:"Eia7"`
-	Eea0  bool `yaml:"eea0" json:"Eea0"`
-	Eea1  bool `yaml:"eea1" json:"Eea1"`
-	Eea2  bool `yaml:"eea2" json:"Eea2"`
-	Eea3  bool `yaml:"eea3" json:"Eea3"`
-	Eea4  bool `yaml:"eea4" json:"Eea4"`
-	Eea5  bool `yaml:"eea5" json:"Eea5"`
-	Eea6  bool `yaml:"eea6" json:"Eea6"`
-	Eea7  bool `yaml:"eea7" json:"Eea7"`
+	Eia0  bool `yaml:"eia0"  json:"Eia0"`
+	Eia1  bool `yaml:"eia1"  json:"Eia1"`
+	Eia2  bool `yaml:"eia2"  json:"Eia2"`
+	Eia3  bool `yaml:"eia3"  json:"Eia3"`
+	Eia4  bool `yaml:"eia4"  json:"Eia4"`
+	Eia5  bool `yaml:"eia5"  json:"Eia5"`
+	Eia6  bool `yaml:"eia6"  json:"Eia6"`
+	Eia7  bool `yaml:"eia7"  json:"Eia7"`
+	Eea0  bool `yaml:"eea0"  json:"Eea0"`
+	Eea1  bool `yaml:"eea1"  json:"Eea1"`
+	Eea2  bool `yaml:"eea2"  json:"Eea2"`
+	Eea3  bool `yaml:"eea3"  json:"Eea3"`
+	Eea4  bool `yaml:"eea4"  json:"Eea4"`
+	Eea5  bool `yaml:"eea5"  json:"Eea5"`
+	Eea6  bool `yaml:"eea6"  json:"Eea6"`
+	Eea7  bool `yaml:"eea7"  json:"Eea7"`
 }
 
 type Nas struct {
 	SecurityCapabilities SecurityCapabilities `yaml:"securityCapabilities" json:"securityCapabilities"`
-	SeqNum               string               `yaml:"sequenceNumber" json:"sequenceNumber"`
-	Dnn                  string               `yaml:"dnn" json:"dnn"`
-	SNssai               *models.Snssai       `yaml:"sNssai" json:"sNssai"`
+	SeqNum               string               `yaml:"sequenceNumber"       json:"sequenceNumber"`
+	Dnn                  string               `yaml:"dnn"                  json:"dnn"`
+	SNssai               *models.Snssai       `yaml:"sNssai"               json:"sNssai"`
 }
 
 type Provision struct {
-	CreateSubscriber  bool   `yaml:"createSubscriber" json:"createSubscriber"`
-	CreateRestUrl     string `yaml:"createRestUrl" json:"createRestUrl"`
-	DeleteRestUrl     string `yaml:"deleteRestUrl" json:"deleteRestUrl"`
+	CreateSubscriber  bool   `yaml:"createSubscriber"  json:"createSubscriber"`
+	CreateRestUrl     string `yaml:"createRestUrl"     json:"createRestUrl"`
+	DeleteRestUrl     string `yaml:"deleteRestUrl"     json:"deleteRestUrl"`
 	CreateJsonContent string `yaml:"createJsonContent" json:"createJsonContent"`
 }
 
 type UeProfile struct {
-	Model     string         `yaml:"model" json:"model"`
+	Model     string         `yaml:"model"     json:"model"`
 	StartImsi string         `yaml:"startImsi" json:"startImsi"`
 	NumUes    int            `yaml:"numUes"`
-	Opc       string         `yaml:"opc" json:"opc"`
-	Key       string         `yaml:"key" json:"key"`
-	Nas       Nas            `yaml:"nas" json:"nas"`
-	Plmn      *models.PlmnId `yaml:"plmnId" json:"plmnId"`
+	Opc       string         `yaml:"opc"       json:"opc"`
+	Key       string         `yaml:"key"       json:"key"`
+	Nas       Nas            `yaml:"nas"       json:"nas"`
+	Plmn      *models.PlmnId `yaml:"plmnId"    json:"plmnId"`
 	Provision Provision      `yaml:"provision" json:"provision"`
 }
 

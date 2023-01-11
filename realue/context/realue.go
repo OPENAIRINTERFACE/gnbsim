@@ -59,9 +59,17 @@ type RealUe struct {
 	Log *logrus.Entry
 }
 
-func NewRealUe(supi string, ueSecurityCapability *nasType.UESecurityCapability,
-	simuechan chan common.InterfaceMessage, plmnid *models.PlmnId,
-	key string, opc string, seqNum string, Dnn string, SNssai *models.Snssai) *RealUe {
+func NewRealUe(
+	supi string,
+	ueSecurityCapability *nasType.UESecurityCapability,
+	simuechan chan common.InterfaceMessage,
+	plmnid *models.PlmnId,
+	key string,
+	opc string,
+	seqNum string,
+	Dnn string,
+	SNssai *models.Snssai,
+) *RealUe {
 
 	ue := RealUe{}
 	ue.Supi = supi
@@ -161,7 +169,16 @@ func (ue *RealUe) DeriveRESstarAndSetKey(
 	ue.DerivateKamf(key, snName, rcvSQN, ak)
 	ue.DerivateAlgKey()
 	kdfVal_for_resStar :=
-		UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1), P2, UeauCommon.KDFLen(P2))
+		UeauCommon.GetKDFValue(
+			key,
+			FC,
+			P0,
+			UeauCommon.KDFLen(P0),
+			P1,
+			UeauCommon.KDFLen(P1),
+			P2,
+			UeauCommon.KDFLen(P2),
+		)
 	return kdfVal_for_resStar[len(kdfVal_for_resStar)/2:]
 
 }
@@ -175,9 +192,21 @@ func (ue *RealUe) DerivateKamf(key []byte, snName string, SQN, AK []byte) {
 		SQNxorAK[i] = SQN[i] ^ AK[i]
 	}
 	P1 := SQNxorAK
-	Kausf := UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1))
+	Kausf := UeauCommon.GetKDFValue(
+		key,
+		FC,
+		P0,
+		UeauCommon.KDFLen(P0),
+		P1,
+		UeauCommon.KDFLen(P1),
+	)
 	P0 = []byte(snName)
-	Kseaf := UeauCommon.GetKDFValue(Kausf, UeauCommon.FC_FOR_KSEAF_DERIVATION, P0, UeauCommon.KDFLen(P0))
+	Kseaf := UeauCommon.GetKDFValue(
+		Kausf,
+		UeauCommon.FC_FOR_KSEAF_DERIVATION,
+		P0,
+		UeauCommon.KDFLen(P0),
+	)
 
 	supiRegexp, err := regexp.Compile("(?:imsi|supi)-([0-9]{5,15})")
 	if err != nil {
@@ -190,7 +219,14 @@ func (ue *RealUe) DerivateKamf(key []byte, snName string, SQN, AK []byte) {
 	P1 = []byte{0x00, 0x00}
 	L1 := UeauCommon.KDFLen(P1)
 
-	ue.Kamf = UeauCommon.GetKDFValue(Kseaf, UeauCommon.FC_FOR_KAMF_DERIVATION, P0, L0, P1, L1)
+	ue.Kamf = UeauCommon.GetKDFValue(
+		Kseaf,
+		UeauCommon.FC_FOR_KAMF_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 }
 
 // Algorithm key Derivation function defined in TS 33.501 Annex A.9
@@ -201,7 +237,14 @@ func (ue *RealUe) DerivateAlgKey() {
 	P1 := []byte{ue.CipheringAlg}
 	L1 := UeauCommon.KDFLen(P1)
 
-	kenc := UeauCommon.GetKDFValue(ue.Kamf, UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION, P0, L0, P1, L1)
+	kenc := UeauCommon.GetKDFValue(
+		ue.Kamf,
+		UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 	copy(ue.KnasEnc[:], kenc[16:32])
 
 	// Integrity Key
@@ -210,15 +253,36 @@ func (ue *RealUe) DerivateAlgKey() {
 	P1 = []byte{ue.IntegrityAlg}
 	L1 = UeauCommon.KDFLen(P1)
 
-	kint := UeauCommon.GetKDFValue(ue.Kamf, UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION, P0, L0, P1, L1)
+	kint := UeauCommon.GetKDFValue(
+		ue.Kamf,
+		UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 	copy(ue.KnasInt[:], kint[16:32])
 }
 
 func (ue *RealUe) Get5GMMCapability() (capability5GMM *nasType.Capability5GMM) {
 	return &nasType.Capability5GMM{
-		Iei:   nasMessage.RegistrationRequestCapability5GMMType,
-		Len:   1,
-		Octet: [13]uint8{0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		Iei: nasMessage.RegistrationRequestCapability5GMMType,
+		Len: 1,
+		Octet: [13]uint8{
+			0x07,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+		},
 	}
 }
 

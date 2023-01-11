@@ -12,7 +12,12 @@ import (
 
 func Init(ue *realuectx.RealUe) error {
 
-	ue.AuthenticationSubs = test.GetAuthSubscription(ue.Key, ue.Opc, "", ue.SeqNum)
+	ue.AuthenticationSubs = test.GetAuthSubscription(
+		ue.Key,
+		ue.Opc,
+		"",
+		ue.SeqNum,
+	)
 
 	// LG HandleEvents(ue)
 	return nil

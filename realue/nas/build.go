@@ -70,9 +70,22 @@ func GetRegisterRequest(ue *realuectx.RealUe) ([]byte, error) {
 	networkSlicingIndication.SetDCNI(0)
 	networkSlicingIndication.SetNSSCI(0)
 
+	capability5GMM := &nasType.Capability5GMM{
+		Iei: nasMessage.RegistrationRequestCapability5GMMType,
+		Len: 1,
+	}
+
 	ue.Log.Traceln("Generating SUPI Registration Request Message")
-	nasPdu := nasTestpacket.GetRegistrationRequest(nasMessage.RegistrationType5GSInitialRegistration,
-		mobileId5GS, requestedNSSAI, networkSlicingIndication, ueSecurityCapability, nil, nil, nil)
+	nasPdu := nasTestpacket.GetRegistrationRequest(
+		nasMessage.RegistrationType5GSInitialRegistration,
+		mobileId5GS,
+		requestedNSSAI,
+		networkSlicingIndication,
+		ueSecurityCapability,
+		capability5GMM,
+		nil,
+		nil,
+	)
 	return nasPdu, nil
 }
 
@@ -81,7 +94,9 @@ func GetDeregisterRequest(ue *realuectx.RealUe) ([]byte, error) {
 
 	if ue.Guti == "" {
 		ue.Log.Errorln("guti not allocated")
-		return nil, fmt.Errorf("failed to create deregistration request: guti not allocated")
+		return nil, fmt.Errorf(
+			"failed to create deregistration request: guti not allocated",
+		)
 	}
 	gutiNas := nasConvert.GutiToNas(ue.Guti)
 	mobileIdentity5GS := nasType.MobileIdentity5GS{
@@ -95,7 +110,9 @@ func GetDeregisterRequest(ue *realuectx.RealUe) ([]byte, error) {
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
 		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
-		return nil, fmt.Errorf("failed to encrypt deregistration request message")
+		return nil, fmt.Errorf(
+			"failed to encrypt deregistration request message",
+		)
 	}
 	return nasPdu, nil
 }
@@ -107,19 +124,26 @@ func GetRegistrationComplete(ue *realuectx.RealUe) ([]byte, error) {
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
 		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
-		return nasPdu, fmt.Errorf("failed to encrypt registration complete message")
+		return nasPdu, fmt.Errorf(
+			"failed to encrypt registration complete message",
+		)
 	}
 	return nasPdu, nil
 }
 
-func NasGetTransferContent(ue *realuectx.RealUe, xNasTransport *nas.Message) (msgType uint8, nasMsg *nas.Message, err error) {
+func NasGetTransferContent(
+	ue *realuectx.RealUe,
+	xNasTransport *nas.Message,
+) (msgType uint8, nasMsg *nas.Message, err error) {
 
 	msgType = xNasTransport.GmmHeader.GetMessageType()
 	ue.Log.Infoln("Received Message Type:", msgType)
 
 	if msgType == nas.MsgTypeDLNASTransport {
-		ue.Log.Info("Payload container type:",
-			xNasTransport.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType)
+		ue.Log.Info(
+			"Payload container type:",
+			xNasTransport.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType,
+		)
 		payload := xNasTransport.GmmMessage.DLNASTransport.PayloadContainer
 		if payload.Len == 0 {
 			err = fmt.Errorf("payload container length is 0")

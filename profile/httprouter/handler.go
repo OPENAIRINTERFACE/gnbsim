@@ -22,7 +22,9 @@ func HTTPStepProfile(c *gin.Context) {
 	logger.HttpLog.Infoln("HTTPStepProfile!")
 	profName, exists := c.Params.Get("profile-name")
 	if exists == false {
-		logger.HttpLog.Printf("Received HTTPStepProfile, but profile-name not found ")
+		logger.HttpLog.Printf(
+			"Received HTTPStepProfile, but profile-name not found ",
+		)
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
 	}
@@ -39,7 +41,9 @@ func HTTPAddNewCallsProfile(c *gin.Context) {
 	logger.HttpLog.Infoln("HTTPAddNewCallsProfile!")
 	profName, exists := c.Params.Get("profile-name")
 	if exists == false {
-		logger.HttpLog.Printf("Received HTTPAddNewCallsProfile, but profile-name not found ")
+		logger.HttpLog.Printf(
+			"Received HTTPAddNewCallsProfile, but profile-name not found ",
+		)
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
 	}

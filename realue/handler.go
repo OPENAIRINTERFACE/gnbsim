@@ -46,7 +46,9 @@ func HandleDeregRequestEvent(ue *realuectx.RealUe,
 
 	if ue.Guti == "" {
 		ue.Log.Errorln("guti not allocated")
-		return fmt.Errorf("failed to create deregistration request: guti not unallocated")
+		return fmt.Errorf(
+			"failed to create deregistration request: guti not unallocated",
+		)
 	}
 	gutiNas := nasConvert.GutiToNas(ue.Guti)
 	mobileIdentity5GS := nasType.MobileIdentity5GS{
@@ -63,7 +65,10 @@ func HandleDeregRequestEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encrypt deregistration request message")
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG,
+		nasPdu,
+	)
 	// LG SendToSimUe(ue, m)
 	ue.Log.Traceln("TODO LG To avoid comment", m)
 	ue.Log.Traceln("Sent UE Initiated Deregistration Request message to SimUe")
@@ -83,11 +88,17 @@ func HandlePduSessEstRequestEvent(ue *realuectx.RealUe,
 	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
-		fmt.Println("Failed to encrypt PDU Session Establishment Request Message", err)
+		fmt.Println(
+			"Failed to encrypt PDU Session Establishment Request Message",
+			err,
+		)
 		return
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_ESTABLISHMENT_REQUEST,
+		nasPdu,
+	)
 	// LG SendToSimUe(ue, m)
 	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
@@ -132,11 +143,17 @@ func HandlePduSessReleaseRequestEvent(ue *realuectx.RealUe,
 	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
-		fmt.Println("Failed to encrypt PDU Session Release Request Message", err)
+		fmt.Println(
+			"Failed to encrypt PDU Session Release Request Message",
+			err,
+		)
 		return
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_REQUEST,
+		nasPdu,
+	)
 	// LG SendToSimUe(ue, m)
 	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
@@ -164,17 +181,27 @@ func HandlePduSessReleaseCompleteEvent(ue *realuectx.RealUe,
 	quitMsg.Event = common.QUIT_EVENT
 	pduSess.ReadCmdChan <- quitMsg
 
-	nasPdu := nasTestpacket.GetUlNasTransport_PduSessionReleaseComplete(pduSessId,
-		REQUEST_TYPE_EXISTING_PDU_SESS, "", nil)
+	nasPdu := nasTestpacket.GetUlNasTransport_PduSessionReleaseComplete(
+		pduSessId,
+		REQUEST_TYPE_EXISTING_PDU_SESS,
+		"",
+		nil,
+	)
 
 	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
 		nas.SecurityHeaderTypeIntegrityProtectedAndCiphered, true)
 	if err != nil {
-		fmt.Println("Failed to encrypt PDU Session Release Request Message", err)
+		fmt.Println(
+			"Failed to encrypt PDU Session Release Request Message",
+			err,
+		)
 		return
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GSM_PDU_SESSION_RELEASE_COMPLETE,
+		nasPdu,
+	)
 	// LG SendToSimUe(ue, m)
 	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
@@ -262,7 +289,10 @@ func HandleErrorEvent(ue *realuectx.RealUe,
 	return nil
 }
 
-func HandleQuitEvent(ue *realuectx.RealUe, intfcMsg common.InterfaceMessage) (err error) {
+func HandleQuitEvent(
+	ue *realuectx.RealUe,
+	intfcMsg common.InterfaceMessage,
+) (err error) {
 	ue.WriteSimUeChan = nil
 	for _, pdusess := range ue.PduSessions {
 		pdusess.ReadCmdChan <- intfcMsg
@@ -273,9 +303,16 @@ func HandleQuitEvent(ue *realuectx.RealUe, intfcMsg common.InterfaceMessage) (er
 	return nil
 }
 
-func HandleDlInfoTransferEvent(ue *realuectx.RealUe, nasPdu []byte) (*nas.Message, error) {
+func HandleDlInfoTransferEvent(
+	ue *realuectx.RealUe,
+	nasPdu []byte,
+) (*nas.Message, error) {
 
-	nasMsg, err := realue_nas.NASDecode(ue, nas.GetSecurityHeaderType(nasPdu), nasPdu)
+	nasMsg, err := realue_nas.NASDecode(
+		ue,
+		nas.GetSecurityHeaderType(nasPdu),
+		nasPdu,
+	)
 	if err != nil {
 		ue.Log.Errorln("Failed to decode dowlink NAS Message due to", err)
 		return nil, err
@@ -284,8 +321,10 @@ func HandleDlInfoTransferEvent(ue *realuectx.RealUe, nasPdu []byte) (*nas.Messag
 	ue.Log.Infoln("Received Message Type:", msgType)
 
 	if msgType == nas.MsgTypeDLNASTransport {
-		ue.Log.Info("Payload contaner type:",
-			nasMsg.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType)
+		ue.Log.Info(
+			"Payload contaner type:",
+			nasMsg.GmmMessage.DLNASTransport.SpareHalfOctetAndPayloadContainerType,
+		)
 		payload := nasMsg.GmmMessage.DLNASTransport.PayloadContainer
 		if payload.Len == 0 {
 			return nasMsg, fmt.Errorf("payload container length is 0")
@@ -319,25 +358,37 @@ func HandleServiceRequestEvent(ue *realuectx.RealUe,
 		return fmt.Errorf("failed to encode with security: %v", err)
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_SERVICE_REQUEST, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GMM_SERVICE_REQUEST,
+		nasPdu,
+	)
 	// LG COMMENT SendToSimUe(ue, m)
 	ue.Log.Traceln("TODO LG To avoid comment", m)
 	return nil
 }
 
-func HandleNwDeregAcceptEvent(ue *realuectx.RealUe, msg common.InterfaceMessage) (err error) {
+func HandleNwDeregAcceptEvent(
+	ue *realuectx.RealUe,
+	msg common.InterfaceMessage,
+) (err error) {
 	ue.Log.Traceln("Generating Dereg Accept Message")
 	nasPdu := nasTestpacket.GetDeregistrationAccept()
 
-	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(ue, nasPdu,
+	nasPdu, err = realue_nas.EncodeNasPduWithSecurity(
+		ue,
+		nasPdu,
 		nas.SecurityHeaderTypeIntegrityProtectedAndCipheredWithNew5gNasSecurityContext,
-		true)
+		true,
+	)
 	if err != nil {
 		ue.Log.Errorln("EncodeNasPduWithSecurity() returned:", err)
 		return fmt.Errorf("failed to encrypt security mode complete message")
 	}
 
-	m := FormUuMessage(common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM, nasPdu)
+	m := FormUuMessage(
+		common.N1_ENCODED_EVENT+common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM,
+		nasPdu,
+	)
 	// LG COMMENT SendToSimUe(ue, m)
 	ue.Log.Traceln("Sent Dereg Accept UE Terminated Message to SimUe", m)
 	return nil

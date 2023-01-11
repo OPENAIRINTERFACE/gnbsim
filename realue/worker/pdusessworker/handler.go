@@ -38,7 +38,9 @@ func SendIcmpEchoRequest(pduSess *realuectx.PduSession) (err error) {
 
 	pduSess.Log.Traceln("Sending UL ICMP ping message")
 
-	icmpPayload, err := hex.DecodeString("8c870d0000000000101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637")
+	icmpPayload, err := hex.DecodeString(
+		"8c870d0000000000101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637",
+	)
 	if err != nil {
 		pduSess.Log.Errorln("Failed to decode icmp hexString ")
 		return
@@ -53,9 +55,10 @@ func SendIcmpEchoRequest(pduSess *realuectx.PduSession) (err error) {
 		Flags:    0,
 		TotalLen: IPV4_MIN_HEADER_LEN + ICMP_HEADER_LEN + icmpPayloadLen,
 		TTL:      64,
-		Src:      pduSess.PduAddress,                   // ue IP address
-		Dst:      net.ParseIP(pduSess.DefaultAs).To4(), // upstream router interface connected to Gi
-		ID:       1,
+		Src:      pduSess.PduAddress, // ue IP address
+		// upstream router interface connected to Gi
+		Dst: net.ParseIP(pduSess.DefaultAs).To4(),
+		ID: 1,
 	}
 	checksum := test.CalculateIpv4HeaderChecksum(&ipv4hdr)
 	ipv4hdr.Checksum = int(checksum)
@@ -139,7 +142,10 @@ func HandleDlMessage(pduSess *realuectx.PduSession,
 	dataMsg := msg.(*common.UserDataMessage)
 
 	if dataMsg.Qfi != nil {
-		pduSess.Log.Infoln("Received QFI value in downlink user data packet:", *dataMsg.Qfi)
+		pduSess.Log.Infoln(
+			"Received QFI value in downlink user data packet:",
+			*dataMsg.Qfi,
+		)
 	}
 
 	ipv4Hdr, err := ipv4.ParseHeader(dataMsg.Payload)

@@ -14,7 +14,10 @@ import (
 
 const NgapPPID uint32 = 0x3c000000
 
-func getNgapIp(amfIP, ranIP string, amfPort, ranPort int) (amfAddr, ranAddr *sctp.SCTPAddr, err error) {
+func getNgapIp(
+	amfIP, ranIP string,
+	amfPort, ranPort int,
+) (amfAddr, ranAddr *sctp.SCTPAddr, err error) {
 	ips := []net.IPAddr{}
 	if ip, err1 := net.ResolveIPAddr("ip", amfIP); err1 != nil {
 		err = fmt.Errorf("Error resolving address '%s': %v", amfIP, err1)
@@ -40,7 +43,10 @@ func getNgapIp(amfIP, ranIP string, amfPort, ranPort int) (amfAddr, ranAddr *sct
 	return amfAddr, ranAddr, nil
 }
 
-func ConnectToAmf(amfIP, ranIP string, amfPort, ranPort int) (*sctp.SCTPConn, error) {
+func ConnectToAmf(
+	amfIP, ranIP string,
+	amfPort, ranPort int,
+) (*sctp.SCTPConn, error) {
 	amfAddr, ranAddr, err := getNgapIp(amfIP, ranIP, amfPort, ranPort)
 	if err != nil {
 		return nil, err

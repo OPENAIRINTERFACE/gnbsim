@@ -9,7 +9,9 @@ import (
 	"github.com/omec-project/openapi/models"
 )
 
-func PDUSessionTypeToModels(ngapPduSessType ngapType.PDUSessionType) (pduSessType models.PduSessionType) {
+func PDUSessionTypeToModels(
+	ngapPduSessType ngapType.PDUSessionType,
+) (pduSessType models.PduSessionType) {
 	switch ngapPduSessType.Value {
 	case ngapType.PDUSessionTypePresentIpv4:
 		pduSessType = models.PduSessionType_IPV4

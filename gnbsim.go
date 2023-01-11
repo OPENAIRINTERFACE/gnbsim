@@ -46,7 +46,10 @@ func action(c *cli.Context) error {
 
 	cfg := c.String("cfg")
 	if cfg == "" {
-		logger.AppLog.Warnln("No configuration file provided. Using default configuration file: ", factory.GNBSIM_DEFAULT_CONFIG_PATH)
+		logger.AppLog.Warnln(
+			"No configuration file provided. Using default configuration file: ",
+			factory.GNBSIM_DEFAULT_CONFIG_PATH,
+		)
 		logger.AppLog.Infoln("Application Usage:", c.App.Usage)
 		cfg = factory.GNBSIM_DEFAULT_CONFIG_PATH
 	}
@@ -160,8 +163,18 @@ func ListenAndLogSummary() {
 			logger.AppLog.Fatalln("Invalid Message Type")
 		}
 
-		logger.AppSummaryLog.Infoln("Profile Name:", msg.ProfileName, ", Profile Type:", msg.ProfileType)
-		logger.AppSummaryLog.Infoln("Ue's Passed:", msg.UePassedCount, ", Ue's Failed:", msg.UeFailedCount)
+		logger.AppSummaryLog.Infoln(
+			"Profile Name:",
+			msg.ProfileName,
+			", Profile Type:",
+			msg.ProfileType,
+		)
+		logger.AppSummaryLog.Infoln(
+			"Ue's Passed:",
+			msg.UePassedCount,
+			", Ue's Failed:",
+			msg.UeFailedCount,
+		)
 
 		if len(msg.ErrorList) != 0 {
 			result = "FAIL"

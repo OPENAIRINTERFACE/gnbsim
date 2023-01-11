@@ -61,24 +61,24 @@ type ProfileUeContext struct {
 }
 
 type Profile struct {
-	ProfileType    string         `yaml:"profileType" json:"profileType"`
-	Name           string         `yaml:"profileName" json:"profileName"`
-	Enable         bool           `yaml:"enable" json:"enable"`
-	GnbName        string         `yaml:"gnbName" json:"gnbName"`
-	StartImsi      string         `yaml:"startImsi" json:"startImsi"`
+	ProfileType    string         `yaml:"profileType"    json:"profileType"`
+	Name           string         `yaml:"profileName"    json:"profileName"`
+	Enable         bool           `yaml:"enable"         json:"enable"`
+	GnbName        string         `yaml:"gnbName"        json:"gnbName"`
+	StartImsi      string         `yaml:"startImsi"      json:"startImsi"`
 	Imsi           int            // StartImsi in int
-	UeCount        int            `yaml:"ueCount" json:"ueCount"`
-	Plmn           *models.PlmnId `yaml:"plmnId" json:"plmnId"`
-	DataPktCount   int            `yaml:"dataPktCount" json:"dataPktCount"`
+	UeCount        int            `yaml:"ueCount"        json:"ueCount"`
+	Plmn           *models.PlmnId `yaml:"plmnId"         json:"plmnId"`
+	DataPktCount   int            `yaml:"dataPktCount"   json:"dataPktCount"`
 	PerUserTimeout uint32         `yaml:"perUserTimeout" json:"perUserTimeout"`
-	DefaultAs      string         `yaml:"defaultAs" json:"defaultAs"`
-	Key            string         `yaml:"key" json:"key"`
-	Opc            string         `yaml:"opc" json:"opc"`
+	DefaultAs      string         `yaml:"defaultAs"      json:"defaultAs"`
+	Key            string         `yaml:"key"            json:"key"`
+	Opc            string         `yaml:"opc"            json:"opc"`
 	SeqNum         string         `yaml:"sequenceNumber" json:"sequenceNumber"`
-	Dnn            string         `yaml:"dnn" json:"dnn"`
-	SNssai         *models.Snssai `yaml:"sNssai" json:"sNssai"`
+	Dnn            string         `yaml:"dnn"            json:"dnn"`
+	SNssai         *models.Snssai `yaml:"sNssai"         json:"sNssai"`
 	ExecInParallel bool           `yaml:"execInParallel" json:"execInParallel"`
-	StepTrigger    bool           `yaml:"stepTrigger" json:"stepTrigger"`
+	StepTrigger    bool           `yaml:"stepTrigger"    json:"stepTrigger"`
 	StartIteration string         `yaml:"startiteration" json:"startiteration"`
 	Iterations     []*Iterations  `yaml:"iterations"`
 
@@ -111,10 +111,18 @@ func (profile *Profile) Init() {
 		profile.DefaultAs = "192.168.250.1" // default destination for AIAB
 	}
 	ProfileMap[profile.Name] = profile
-	profile.Log.Traceln("profile initialized ", profile.Name, ", Enable ", profile.Enable)
+	profile.Log.Traceln(
+		"profile initialized ",
+		profile.Name,
+		", Enable ",
+		profile.Enable,
+	)
 }
 
-func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent common.EventType) (common.EventType, error) {
+func (p *Profile) GetNextEvent(
+	Procedure common.ProcedureType,
+	currentEvent common.EventType,
+) (common.EventType, error) {
 	var err error
 	proc := ProceduresMap[Procedure]
 
@@ -125,7 +133,10 @@ func (p *Profile) GetNextEvent(Procedure common.ProcedureType, currentEvent comm
 	return nextEvent, err
 }
 
-func (p *Profile) CheckCurrentEvent(Procedure common.ProcedureType, triggerEvent, recvEvent common.EventType) (err error) {
+func (p *Profile) CheckCurrentEvent(
+	Procedure common.ProcedureType,
+	triggerEvent, recvEvent common.EventType,
+) (err error) {
 	proc := ProceduresMap[Procedure]
 	expected, ok := proc.Events[triggerEvent]
 	if !ok {
@@ -163,7 +174,10 @@ func ChangeProcedure(ue *simuectx.SimUe) {
 	return
 }*/
 
-func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure common.ProcedureType) common.ProcedureType {
+func (p *Profile) GetNextProcedure(
+	pCtx *ProfileUeContext,
+	currentProcedure common.ProcedureType,
+) common.ProcedureType {
 	length := len(p.Procedures)
 	var nextProcedure common.ProcedureType
 
@@ -193,12 +207,18 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 		itp, found := p.PIterations[pCtx.CurrentItr]
 		pCtx.Log.Infoln("Current Iteration map - ", itp)
 		if itp.WaitMap[pCtx.CurrentProcIndex] != 0 {
-			time.Sleep(time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]))
+			time.Sleep(
+				time.Second * time.Duration(itp.WaitMap[pCtx.CurrentProcIndex]),
+			)
 		}
 		nextProcIndex := pCtx.CurrentProcIndex + 1
 		nextProcedure, found := itp.ProcMap[nextProcIndex]
 		if found == true {
-			pCtx.Log.Infof("Next Procedure Index %v and next Procedure = %v ", nextProcIndex, nextProcedure)
+			pCtx.Log.Infof(
+				"Next Procedure Index %v and next Procedure = %v ",
+				nextProcIndex,
+				nextProcedure,
+			)
 			pCtx.Procedure = nextProcedure
 			pCtx.CurrentProcIndex = nextProcIndex
 			pCtx.Log.Infoln("Updated procedure to", nextProcedure)
@@ -206,7 +226,12 @@ func (p *Profile) GetNextProcedure(pCtx *ProfileUeContext, currentProcedure comm
 		}
 		if pCtx.Repeat > 0 {
 			pCtx.Repeat = pCtx.Repeat - 1
-			pCtx.Log.Infoln("Repeat current iteration : ", itp.Name, ", Repeat Count ", pCtx.Repeat)
+			pCtx.Log.Infoln(
+				"Repeat current iteration : ",
+				itp.Name,
+				", Repeat Count ",
+				pCtx.Repeat,
+			)
 			pCtx.CurrentProcIndex = 1
 			nextProcedure := itp.ProcMap[1]
 			pCtx.Procedure = nextProcedure

@@ -331,7 +331,10 @@ var evtStrMap map[EventType]string = map[EventType]string{
 func (id EventType) String() string {
 	evtStr, ok := evtStrMap[id]
 	if !ok {
-		logger.AppLog.Fatalf("Cannot convert to string, Invalid Event ID: %#v", id)
+		logger.AppLog.Fatalf(
+			"Cannot convert to string, Invalid Event ID: %#v",
+			id,
+		)
 	}
 	return evtStr
 }
