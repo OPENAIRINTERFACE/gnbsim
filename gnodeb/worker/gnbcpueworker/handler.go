@@ -403,23 +403,24 @@ func HandleUeCtxReleaseCommand(gnbue *gnbctx.GnbCpUe,
 		case ngapType.ProtocolIEIDUENGAPIDs:
 			ueNgapIds = ie.Value.UENGAPIDs
 			if ueNgapIds == nil {
+				// LG : TODO send error to SimUe
 				gnbue.Log.Errorln("UENGAPIDs is nil")
 				return
 			}
 		case ngapType.ProtocolIEIDCause:
 			cause = ie.Value.Cause
 			if cause == nil {
+				// LG : TODO send error to SimUe
 				gnbue.Log.Errorln("Cause is nil")
 				return
 			}
 		}
 	}
 
-	_, causeNum := test.PrintAndGetCause(cause)
-
 	if ueNgapIds.Present == ngapType.UENGAPIDsPresentUENGAPIDPair {
 		amfUeNgapId = ueNgapIds.UENGAPIDPair.AMFUENGAPID
 		if gnbue.AmfUeNgapId != amfUeNgapId.Value {
+			// LG : TODO send error to SimUe
 			gnbue.Log.Errorln("AmfUeNgapId mismatch")
 		}
 	}
@@ -431,41 +432,6 @@ func HandleUeCtxReleaseCommand(gnbue *gnbctx.GnbCpUe,
 		ngapType.ProcedureCodeUEContextRelease,
 		nil,
 	)
-
-	var pduSessIds []int64
-	f := func(k interface{}, v interface{}) bool {
-		pduSessIds = append(pduSessIds, k.(int64))
-		return true
-	}
-	gnbue.GnbUpUes.Range(f)
-
-	ngapPdu, err := test.GetUEContextReleaseComplete(gnbue.AmfUeNgapId,
-		gnbue.GnbUeNgapId, pduSessIds)
-	if err != nil {
-		fmt.Println("Failed to create UE Context Release Complete message")
-		return
-	}
-
-	err = gnbue.Gnb.CpTransport.SendToPeer(gnbue.Amf, ngapPdu)
-	if err != nil {
-		gnbue.Log.Errorln("SendToPeer failed:", err)
-		return
-	}
-	gnbue.Log.Traceln("Sent UE Context Release Complete Message to AMF")
-
-	quitEvt := &common.DefaultMessage{}
-	quitEvt.Event = common.QUIT_EVENT
-	gnbue.ReadChan <- quitEvt
-
-	req := &common.UuMessage{}
-	req.Event = common.CONNECTION_RELEASE_REQUEST_EVENT
-	if causeNum == ngapType.CauseNasPresentDeregister {
-		req.TriggeringEvent = common.N1_SEND_SDU_EVENT + common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG
-	} else {
-		req.TriggeringEvent = common.TRIGGER_AN_RELEASE_EVENT
-	}
-
-	gnbue.WriteUeChan <- req
 }
 
 func HandleRanConnectionRelease(gnbue *gnbctx.GnbCpUe,
