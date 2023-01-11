@@ -37,13 +37,17 @@ type GnbCpTransport struct {
 func NewGnbCpTransport(gnb *gnbctx.GNodeB) *GnbCpTransport {
 	transport := &GnbCpTransport{}
 	transport.GnbInstance = gnb
-	transport.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "ControlPlaneTransport"})
+	transport.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "ControlPlaneTransport"},
+	)
 
 	return transport
 }
 
 // ConnectToPeer establishes SCTP connection with the AMF
-func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) (err error) {
+func (cpTprt *GnbCpTransport) ConnectToPeer(
+	peer transportcommon.TransportPeer,
+) (err error) {
 	cpTprt.Log.Traceln("Connecting to AMF")
 
 	amf := peer.(*gnbctx.GnbAmf)
@@ -68,7 +72,14 @@ func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) 
 			amf.AmfIp, amf.AmfPort, err)
 	}
 
-	cpTprt.Log.Infoln("Connected to AMF, AMF IP:", amf.AmfIp, "AMF Port:", amf.AmfPort)
+	go cpTprt.ReceiveFromPeer(amf)
+
+	cpTprt.Log.Infoln(
+		"Connected to AMF, AMF IP:",
+		amf.AmfIp,
+		"AMF Port:",
+		amf.AmfPort,
+	)
 	return
 }
 
@@ -76,8 +87,10 @@ func (cpTprt *GnbCpTransport) ConnectToPeer(peer transportcommon.TransportPeer) 
 
 // SendToPeer sends an NGAP encoded packet to the specified AMF over the socket
 // connection and waits for the response
-func (cpTprt *GnbCpTransport) SendToPeerBlock(peer transportcommon.TransportPeer,
-	pkt []byte) ([]byte, error) {
+func (cpTprt *GnbCpTransport) SendToPeerBlock(
+	peer transportcommon.TransportPeer,
+	pkt []byte,
+) ([]byte, error) {
 
 	err := cpTprt.SendToPeer(peer, pkt)
 	if err != nil {
@@ -132,7 +145,9 @@ func (cpTprt *GnbCpTransport) SendToPeer(peer transportcommon.TransportPeer,
 
 // ReceiveFromPeer continuously waits for an incoming message from the AMF
 // It then routes the message to the GnbAmfWorker
-func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer) {
+func (cpTprt *GnbCpTransport) ReceiveFromPeer(
+	peer transportcommon.TransportPeer,
+) {
 	amf := peer.(*gnbctx.GnbAmf)
 
 	defer func() {
@@ -144,6 +159,7 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 	conn := amf.Conn.(*sctp.SCTPConn)
 	for {
+		cpTprt.Log.Traceln("GnbCpTransport ready to receive from peer")
 		recvMsg := make([]byte, MAX_SCTP_PKT_LEN)
 		//TODO Handle notification, info
 		n, _, _, err := conn.SCTPRead(recvMsg)
@@ -159,18 +175,25 @@ func (cpTprt *GnbCpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 				cpTprt.Log.Warnln("SCTPRead: %+v\n", err)
 				continue
 			default:
-				cpTprt.Log.Errorln("Handle connection[addr: %+v] error: %+v\n", amf.Conn.RemoteAddr(), err)
+				cpTprt.Log.Errorln(
+					"Handle connection[addr: %+v] error: %+v\n",
+					amf.Conn.RemoteAddr(),
+					err,
+				)
 				return
 			}
 		}
 
 		cpTprt.Log.Infof("Read %v bytes from %v\n", n, amf.GetIpAddr())
-		//TODO Post to gnbamfworker channel
+		// TODO Post to gnbamfworker channel, LG: yes TODO
 		gnbamfworker.HandleMessage(cpTprt.GnbInstance, amf, recvMsg[:n])
 	}
 }
 
-func (cpTprt *GnbCpTransport) CheckTransportParam(peer transportcommon.TransportPeer, pkt []byte) error {
+func (cpTprt *GnbCpTransport) CheckTransportParam(
+	peer transportcommon.TransportPeer,
+	pkt []byte,
+) error {
 	amf := peer.(*gnbctx.GnbAmf)
 
 	if amf == nil {

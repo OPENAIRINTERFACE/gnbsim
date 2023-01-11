@@ -29,7 +29,9 @@ type GnbPeerDao struct {
 
 func NewGnbPeerDao() *GnbPeerDao {
 	dao := &GnbPeerDao{}
-	dao.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "GnbPeerDao"})
+	dao.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "GnbPeerDao"},
+	)
 	return dao
 }
 

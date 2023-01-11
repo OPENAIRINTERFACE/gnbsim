@@ -13,9 +13,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/omec-project/gnbsim/logger"
 	"gopkg.in/yaml.v2"
-
-	"github.com/omec-project/amf/logger"
 )
 
 var AppConfig *Config

@@ -28,7 +28,10 @@ func HandleEvents(gnbue *gnbctx.GnbUpUe) {
 		case msg := <-gnbue.ReadDlChan:
 			err = HandleDlMessage(gnbue, msg)
 			if err != nil {
-				gnbue.Log.Errorln("failed to handle downlink gtp-u message:", err)
+				gnbue.Log.Errorln(
+					"failed to handle downlink gtp-u message:",
+					err,
+				)
 			}
 
 		/* Reading commands from GnbCpUe (Control plane context)*/

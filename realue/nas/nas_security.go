@@ -17,8 +17,12 @@ import (
 	"github.com/omec-project/ngap/ngapType"
 )
 
-func EncodeNasPduWithSecurity(ue *realuectx.RealUe, pdu []byte, securityHeaderType uint8,
-	securityContextAvailable bool) ([]byte, error) {
+func EncodeNasPduWithSecurity(
+	ue *realuectx.RealUe,
+	pdu []byte,
+	securityHeaderType uint8,
+	securityContextAvailable bool,
+) ([]byte, error) {
 	m := nas.NewMessage()
 	err := m.PlainNasDecode(&pdu)
 	if err != nil {
@@ -31,7 +35,10 @@ func EncodeNasPduWithSecurity(ue *realuectx.RealUe, pdu []byte, securityHeaderTy
 	return NASEncode(ue, m, securityContextAvailable)
 }
 
-func GetNasPdu(ue *realuectx.RealUe, msg *ngapType.DownlinkNASTransport) (m *nas.Message) {
+func GetNasPdu(
+	ue *realuectx.RealUe,
+	msg *ngapType.DownlinkNASTransport,
+) (m *nas.Message) {
 	for _, ie := range msg.ProtocolIEs.List {
 		if ie.Id.Value == ngapType.ProtocolIEIDNASPDU {
 			pkg := []byte(ie.Value.NASPDU.Value)
@@ -45,7 +52,10 @@ func GetNasPdu(ue *realuectx.RealUe, msg *ngapType.DownlinkNASTransport) (m *nas
 	return nil
 }
 
-func GetNasPduSetupRequest(ue *realuectx.RealUe, msg *ngapType.PDUSessionResourceSetupRequest) (m *nas.Message) {
+func GetNasPduSetupRequest(
+	ue *realuectx.RealUe,
+	msg *ngapType.PDUSessionResourceSetupRequest,
+) (m *nas.Message) {
 	for _, ie := range msg.ProtocolIEs.List {
 		if ie.Id.Value == ngapType.ProtocolIEIDPDUSessionResourceSetupListSUReq {
 			x := ie.Value.PDUSessionResourceSetupListSUReq
@@ -54,7 +64,10 @@ func GetNasPduSetupRequest(ue *realuectx.RealUe, msg *ngapType.PDUSessionResourc
 					fmt.Println("Found NAS PDU inside ResourceSEtupList")
 					pkg := []byte(ie1.PDUSessionNASPDU.Value)
 					m, err := NASDecode(ue, nas.GetSecurityHeaderType(pkg), pkg)
-					fmt.Println("UE address - ", m.GmmMessage.DLNASTransport.Ipaddr)
+					fmt.Println(
+						"UE address - ",
+						m.GmmMessage.DLNASTransport.Ipaddr,
+					)
 					if err != nil {
 						return nil
 					}
@@ -66,7 +79,11 @@ func GetNasPduSetupRequest(ue *realuectx.RealUe, msg *ngapType.PDUSessionResourc
 	return nil
 }
 
-func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable bool) (
+func NASEncode(
+	ue *realuectx.RealUe,
+	msg *nas.Message,
+	securityContextAvailable bool,
+) (
 	payload []byte, err error) {
 
 	if ue == nil {
@@ -96,7 +113,9 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 			ue.Log.Debugln("Security header type: Integrity Protected With New 5G Security Context")
 			ue.ULCount.Set(0, 0)
 			ue.DLCount.Set(0, 0)
+			// LG if ue.CipheringAlg != security.AlgCiphering128NEA0 {
 			needCiphering = true
+			// LG}
 		default:
 			return nil, fmt.Errorf("Wrong security header type: 0x%0x", msg.SecurityHeader.SecurityHeaderType)
 		}
@@ -121,7 +140,7 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 		mac32, err := security.NASMacCalculate(ue.IntegrityAlg, ue.KnasInt, ue.ULCount.Get(),
 			security.Bearer3GPP, security.DirectionUplink, payload)
 		if err != nil {
-			return nil, fmt.Errorf("nas mac calcuate failed: %+v", err)
+			return nil, fmt.Errorf("nas mac calculate failed: %+v", err)
 		}
 
 		// Add mac value
@@ -136,13 +155,17 @@ func NASEncode(ue *realuectx.RealUe, msg *nas.Message, securityContextAvailable 
 	return payload, err
 }
 
-func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (msg *nas.Message, err error) {
+func NASDecode(
+	ue *realuectx.RealUe,
+	securityHeaderType uint8,
+	payload []byte,
+) (msg *nas.Message, err error) {
 	if ue == nil {
-		err = fmt.Errorf("amfUe is nil")
+		err = fmt.Errorf("RealUe is nil")
 		return
 	}
 	if payload == nil {
-		err = fmt.Errorf("Nas payload is empty")
+		err = fmt.Errorf("NAS payload to decode is empty")
 		return
 	}
 
@@ -208,7 +231,7 @@ func NASDecode(ue *realuectx.RealUe, securityHeaderType uint8, payload []byte) (
 			fmt.Printf("cmac value: 0x%x\n", mac32)
 		}
 
-		// remove sequece Number
+		// remove sequence Number
 		payload = payload[1:]
 		if ciphered {
 			if err = security.NASEncrypt(ue.CipheringAlg, ue.KnasEnc, ue.DLCount.Get(), security.Bearer3GPP,

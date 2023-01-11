@@ -7,6 +7,7 @@ package common
 import (
 	"github.com/omec-project/gnbsim/util/ngapTestpacket"
 	"github.com/omec-project/gnbsim/util/test"
+	"github.com/omec-project/openapi/models"
 
 	"github.com/omec-project/nas"
 	"github.com/omec-project/ngap/ngapType"
@@ -38,6 +39,21 @@ type N2Message struct {
 	NgapPdu *ngapType.NGAPPDU
 }
 
+// Message received over N2 interface
+type N1N2Message struct {
+	DefaultMessage
+	NgapPdu           *ngapType.NGAPPDU
+	NgapProcedureCode int64
+	NasPdu            *ngapType.NASPDU
+}
+
+// Encoded Messages to be sent over N2 interface
+type N2EncodedMessage struct {
+	DefaultMessage
+	// Pdus to remind this can be a concatenated sequence of N2 messages
+	N2Pdus []byte
+}
+
 type NasPduList [][]byte
 
 // UuMessage is used to carry information between the UE and GNodeB
@@ -48,6 +64,10 @@ type UuMessage struct {
 	// Encoded NAS message
 	NasPdus  NasPduList
 	DBParams []*DataBearerParams
+
+	// NGAP IEs
+	Tac   string
+	NrCgi models.Ncgi
 
 	/* Real UE simply resends this value in the response message to gNB
 	   While setting up Data Bearers, this helps gNB in understanding the
@@ -116,6 +136,9 @@ type UeMessage struct {
 
 	// Number of user data packets to be generated as directed by profile
 	UserDataPktCount int
+
+	// User data packets generating interval as directed by profile
+	UserDataPktInterval int
 
 	// default destination of data pkt
 	DefaultAs string

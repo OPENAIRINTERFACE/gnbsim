@@ -18,7 +18,7 @@ import (
 	"github.com/omec-project/gnbsim/simue"
 )
 
-//profile names
+// profile names
 const (
 	REGISTER                string = "register"
 	PDU_SESS_EST            string = "pdusessest"
@@ -38,7 +38,10 @@ func InitializeAllProfiles() {
 	initProcedureEventMap()
 }
 
-func InitProfile(profile *profctx.Profile, summaryChan chan common.InterfaceMessage) {
+func InitProfile(
+	profile *profctx.Profile,
+	summaryChan chan common.InterfaceMessage,
+) {
 
 	summary := &common.SummaryMessage{
 		ProfileType: profile.ProfileType,
@@ -109,7 +112,10 @@ func initImsi(profile *profctx.Profile, gnb *gnbctx.GNodeB, imsiStr string) {
 //    - Hold the calls
 //    - We should be able to pass events to profile
 
-func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceMessage) {
+func ExecuteProfile(
+	profile *profctx.Profile,
+	summaryChan chan common.InterfaceMessage,
+) {
 
 	profile.Log.Infoln("ExecuteProfile started ")
 	var wg sync.WaitGroup
@@ -133,7 +139,9 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 				profile.Log.Infoln("Received trigger for profile ", msg)
 				// works only if profile is still running.
 				// Typically if execInParallel set true in profile
-				gnb, err := factory.AppConfig.Configuration.GetGNodeB(profile.GnbName)
+				gnb, err := factory.AppConfig.Configuration.GetGNodeB(
+					profile.GnbName,
+				)
 				if err != nil {
 					err = fmt.Errorf("Failed to fetch gNB context: %v", err)
 					summary.ErrorList = append(summary.ErrorList, err)
@@ -151,7 +159,12 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 				wg.Add(1)
 				go func(pCtx *profctx.ProfileUeContext) {
 					defer wg.Done()
-					err := simue.ImsiStateMachine(profile, pCtx, imsiStr, summaryChan)
+					err := simue.ImsiStateMachine(
+						profile,
+						pCtx,
+						imsiStr,
+						summaryChan,
+					)
 					// Execution for the UE is complete. Count UE result as success or failure
 					Mu.Lock()
 					if err != nil {
@@ -188,12 +201,16 @@ func ExecuteProfile(profile *profctx.Profile, summaryChan chan common.InterfaceM
 		}(pCtx)
 
 		if profile.ExecInParallel == false {
-			profile.Log.Infoln("ExecuteProfile ExecInParallel false. Waiting for UEs to finish procesessing")
+			profile.Log.Infoln(
+				"ExecuteProfile ExecInParallel false. Waiting for UEs to finish procesessing",
+			)
 			wg.Wait()
 		}
 	}
 	if profile.ExecInParallel == true {
-		profile.Log.Infoln("ExecuteProfile ExecInParallel true. Waiting for for all UEs to finish processing")
+		profile.Log.Infoln(
+			"ExecuteProfile ExecInParallel true. Waiting for for all UEs to finish processing",
+		)
 		wg.Wait()
 	}
 	profile.Log.Infoln("ExecuteProfile ended")
@@ -205,11 +222,11 @@ func initProcedureEventMap() {
 
 	//common.REGISTRATION_PROCEDURE:
 	proc1.Events = map[common.EventType]common.EventType{
-		common.REG_REQUEST_EVENT:     common.AUTH_REQUEST_EVENT,
-		common.AUTH_REQUEST_EVENT:    common.AUTH_RESPONSE_EVENT,
-		common.SEC_MOD_COMMAND_EVENT: common.SEC_MOD_COMPLETE_EVENT,
-		common.REG_ACCEPT_EVENT:      common.REG_COMPLETE_EVENT,
-		common.PROFILE_PASS_EVENT:    common.QUIT_EVENT,
+		common.NAS_5GMM_REGISTRATION_REQUEST_EVENT:   common.NAS_5GMM_AUTHENTICATION_REQUEST_EVENT,
+		common.NAS_5GMM_AUTHENTICATION_REQUEST_EVENT: common.NAS_5GMM_AUTHENTICATION_RESPONSE_EVENT,
+		common.NAS_5GMM_SECURITY_MODE_COMMAND_EVENT:  common.NAS_5GMM_SECURITY_MODE_COMPLETE_EVENT,
+		common.NAS_5GMM_REGISTRATION_ACCEPT_EVENT:    common.NAS_5GMM_REGISTRATION_COMPLETE_EVENT,
+		common.PROFILE_PASS_EVENT:                    common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.REGISTRATION_PROCEDURE] = &proc1
 
@@ -234,8 +251,8 @@ func initProcedureEventMap() {
 	// common.UE_INITIATED_DEREGISTRATION_PROCEDURE:
 	proc4 := profctx.ProcedureEventsDetails{}
 	proc4.Events = map[common.EventType]common.EventType{
-		common.DEREG_REQUEST_UE_ORIG_EVENT: common.DEREG_ACCEPT_UE_ORIG_EVENT,
-		common.PROFILE_PASS_EVENT:          common.QUIT_EVENT,
+		common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_ORIG_EVENT: common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_ORIG_EVENT,
+		common.PROFILE_PASS_EVENT:                            common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.UE_INITIATED_DEREGISTRATION_PROCEDURE] = &proc4
 
@@ -250,16 +267,16 @@ func initProcedureEventMap() {
 	// common.UE_TRIGGERED_SERVICE_REQUEST_PROCEDURE:
 	proc6 := profctx.ProcedureEventsDetails{}
 	proc6.Events = map[common.EventType]common.EventType{
-		common.SERVICE_REQUEST_EVENT: common.SERVICE_ACCEPT_EVENT,
-		common.PROFILE_PASS_EVENT:    common.QUIT_EVENT,
+		common.NAS_5GMM_SERVICE_REQUEST_EVENT: common.NAS_5GMM_SERVICE_ACCEPT_EVENT,
+		common.PROFILE_PASS_EVENT:             common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.UE_TRIGGERED_SERVICE_REQUEST_PROCEDURE] = &proc6
 
 	// common.NW_TRIGGERED_UE_DEREGISTRATION_PROCEDURE:
 	proc7 := profctx.ProcedureEventsDetails{}
 	proc7.Events = map[common.EventType]common.EventType{
-		common.DEREG_REQUEST_UE_TERM_EVENT: common.DEREG_ACCEPT_UE_TERM_EVENT,
-		common.PROFILE_PASS_EVENT:          common.QUIT_EVENT,
+		common.NAS_5GMM_DEREGISTRATION_REQUEST_UE_TERM_EVENT: common.NAS_5GMM_DEREGISTRATION_ACCEPT_UE_TERM_EVENT,
+		common.PROFILE_PASS_EVENT:                            common.QUIT_EVENT,
 	}
 	profctx.ProceduresMap[common.NW_TRIGGERED_UE_DEREGISTRATION_PROCEDURE] = &proc7
 
@@ -283,7 +300,9 @@ func initProcedureEventMap() {
 func initProcedureList(profile *profctx.Profile) error {
 	switch profile.ProfileType {
 	case REGISTER:
-		profile.Procedures = []common.ProcedureType{common.REGISTRATION_PROCEDURE}
+		profile.Procedures = []common.ProcedureType{
+			common.REGISTRATION_PROCEDURE,
+		}
 	case PDU_SESS_EST:
 		profile.Procedures = []common.ProcedureType{
 			common.REGISTRATION_PROCEDURE,

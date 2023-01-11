@@ -51,7 +51,9 @@ func CalculateIpv4HeaderChecksum(hdr *ipv4.Header) uint32 {
 	return ^(Checksum&0xffff0000>>16 + Checksum&0xffff)
 }
 
-func GetAuthSubscription(k, opc, op, seqNum string) *models.AuthenticationSubscription {
+func GetAuthSubscription(
+	k, opc, op, seqNum string,
+) *models.AuthenticationSubscription {
 	var authSubs models.AuthenticationSubscription
 	authSubs.PermanentKey = &models.PermanentKey{
 		PermanentKeyValue: k,
@@ -91,7 +93,11 @@ func GetSmPolicyData() (smPolicyData models.SmPolicyData) {
 	return TestRegistrationProcedure.TestSmPolicyDataTable[TestRegistrationProcedure.FREE5GC_CASE]
 }
 
-func NewRanUeContext(supi string, ranUeNgapId int64, cipheringAlg, integrityAlg uint8) *RanUeContext {
+func NewRanUeContext(
+	supi string,
+	ranUeNgapId int64,
+	cipheringAlg, integrityAlg uint8,
+) *RanUeContext {
 	ue := RanUeContext{}
 	ue.RanUeNgapId = ranUeNgapId
 	ue.Supi = supi
@@ -101,7 +107,10 @@ func NewRanUeContext(supi string, ranUeNgapId int64, cipheringAlg, integrityAlg 
 }
 
 func (ue *RanUeContext) DeriveRESstarAndSetKey(
-	authSubs models.AuthenticationSubscription, rand []byte, snName string) []byte {
+	authSubs models.AuthenticationSubscription,
+	rand []byte,
+	snName string,
+) []byte {
 
 	sqn, err := hex.DecodeString(authSubs.SequenceNumber)
 	if err != nil {
@@ -167,12 +176,25 @@ func (ue *RanUeContext) DeriveRESstarAndSetKey(
 	ue.DerivateKamf(key, snName, sqn, ak)
 	ue.DerivateAlgKey()
 	kdfVal_for_resStar :=
-		UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1), P2, UeauCommon.KDFLen(P2))
+		UeauCommon.GetKDFValue(
+			key,
+			FC,
+			P0,
+			UeauCommon.KDFLen(P0),
+			P1,
+			UeauCommon.KDFLen(P1),
+			P2,
+			UeauCommon.KDFLen(P2),
+		)
 	return kdfVal_for_resStar[len(kdfVal_for_resStar)/2:]
 
 }
 
-func (ue *RanUeContext) DerivateKamf(key []byte, snName string, SQN, AK []byte) {
+func (ue *RanUeContext) DerivateKamf(
+	key []byte,
+	snName string,
+	SQN, AK []byte,
+) {
 
 	FC := UeauCommon.FC_FOR_KAUSF_DERIVATION
 	P0 := []byte(snName)
@@ -181,9 +203,21 @@ func (ue *RanUeContext) DerivateKamf(key []byte, snName string, SQN, AK []byte) 
 		SQNxorAK[i] = SQN[i] ^ AK[i]
 	}
 	P1 := SQNxorAK
-	Kausf := UeauCommon.GetKDFValue(key, FC, P0, UeauCommon.KDFLen(P0), P1, UeauCommon.KDFLen(P1))
+	Kausf := UeauCommon.GetKDFValue(
+		key,
+		FC,
+		P0,
+		UeauCommon.KDFLen(P0),
+		P1,
+		UeauCommon.KDFLen(P1),
+	)
 	P0 = []byte(snName)
-	Kseaf := UeauCommon.GetKDFValue(Kausf, UeauCommon.FC_FOR_KSEAF_DERIVATION, P0, UeauCommon.KDFLen(P0))
+	Kseaf := UeauCommon.GetKDFValue(
+		Kausf,
+		UeauCommon.FC_FOR_KSEAF_DERIVATION,
+		P0,
+		UeauCommon.KDFLen(P0),
+	)
 
 	supiRegexp, err := regexp.Compile("(?:imsi|supi)-([0-9]{5,15})")
 	if err != nil {
@@ -196,7 +230,14 @@ func (ue *RanUeContext) DerivateKamf(key []byte, snName string, SQN, AK []byte) 
 	P1 = []byte{0x00, 0x00}
 	L1 := UeauCommon.KDFLen(P1)
 
-	ue.Kamf = UeauCommon.GetKDFValue(Kseaf, UeauCommon.FC_FOR_KAMF_DERIVATION, P0, L0, P1, L1)
+	ue.Kamf = UeauCommon.GetKDFValue(
+		Kseaf,
+		UeauCommon.FC_FOR_KAMF_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 }
 
 // Algorithm key Derivation function defined in TS 33.501 Annex A.9
@@ -207,7 +248,14 @@ func (ue *RanUeContext) DerivateAlgKey() {
 	P1 := []byte{ue.CipheringAlg}
 	L1 := UeauCommon.KDFLen(P1)
 
-	kenc := UeauCommon.GetKDFValue(ue.Kamf, UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION, P0, L0, P1, L1)
+	kenc := UeauCommon.GetKDFValue(
+		ue.Kamf,
+		UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 	copy(ue.KnasEnc[:], kenc[16:32])
 
 	// Integrity Key
@@ -216,7 +264,14 @@ func (ue *RanUeContext) DerivateAlgKey() {
 	P1 = []byte{ue.IntegrityAlg}
 	L1 = UeauCommon.KDFLen(P1)
 
-	kint := UeauCommon.GetKDFValue(ue.Kamf, UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION, P0, L0, P1, L1)
+	kint := UeauCommon.GetKDFValue(
+		ue.Kamf,
+		UeauCommon.FC_FOR_ALGORITHM_KEY_DERIVATION,
+		P0,
+		L0,
+		P1,
+		L1,
+	)
 	copy(ue.KnasInt[:], kint[16:32])
 }
 
@@ -253,8 +308,22 @@ func (ue *RanUeContext) GetUESecurityCapability() (UESecurityCapability *nasType
 
 func (ue *RanUeContext) Get5GMMCapability() (capability5GMM *nasType.Capability5GMM) {
 	return &nasType.Capability5GMM{
-		Iei:   nasMessage.RegistrationRequestCapability5GMMType,
-		Len:   1,
-		Octet: [13]uint8{0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+		Iei: nasMessage.RegistrationRequestCapability5GMMType,
+		Len: 1,
+		Octet: [13]uint8{
+			0x07,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+		},
 	}
 }

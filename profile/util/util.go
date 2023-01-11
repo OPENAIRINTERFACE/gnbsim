@@ -9,7 +9,11 @@ import (
 	simueCtx "github.com/omec-project/gnbsim/simue/context"
 )
 
-func SendToSimUe(simUe *simueCtx.SimUe, event common.EventType, proc common.ProcedureType) {
+func SendToSimUe(
+	simUe *simueCtx.SimUe,
+	event common.EventType,
+	proc common.ProcedureType,
+) {
 	msg := &common.ProfileMessage{}
 	msg.Event = event
 	msg.Proc = proc

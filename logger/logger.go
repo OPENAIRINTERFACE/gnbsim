@@ -22,7 +22,9 @@ var (
 	AppSummaryLog *logrus.Entry
 	RealUeLog     *logrus.Entry
 	SimUeLog      *logrus.Entry
+	SimGnbLog     *logrus.Entry
 	ProfileLog    *logrus.Entry
+	ScenarioLog   *logrus.Entry
 	GNodeBLog     *logrus.Entry
 	CfgLog        *logrus.Entry
 	UtilLog       *logrus.Entry
@@ -31,11 +33,13 @@ var (
 	PsuppLog      *logrus.Entry
 	GinLog        *logrus.Entry
 	HttpLog       *logrus.Entry
+	ScnrUeCtxLog  *logrus.Entry
 	ProfUeCtxLog  *logrus.Entry
 )
 
 const (
 	FieldSupi        string = "supi"
+	FieldScenario    string = "scenario"
 	FieldProfile     string = "profile"
 	FieldGnb         string = "gnb"
 	FieldGnbUeNgapId string = "ranuengapid"
@@ -79,17 +83,48 @@ func init() {
 		summaryLog.Hooks.Add(summaryLogHook)
 	}
 
-	AppLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "App"})
-	AppSummaryLog = summaryLog.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Summary"})
-	RealUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "RealUe"})
-	SimUeLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "SimUe"})
-	ProfUeCtxLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "ProfUeCtx"})
-	ProfileLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Profile"})
-	GNodeBLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "GNodeB"})
-	GinLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Gin"})
-	HttpLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "HTTP"})
-	CfgLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "CFG"})
-	UtilLog = log.WithFields(logrus.Fields{"component": "GNBSIM", "category": "Util"})
+	AppLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "App"},
+	)
+	AppSummaryLog = summaryLog.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "Summary"},
+	)
+	RealUeLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "RealUe"},
+	)
+	SimUeLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "SimUe"},
+	)
+	SimGnbLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "SimGnb"},
+	)
+	ProfUeCtxLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "ProfUeCtx"},
+	)
+	ScnrUeCtxLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "ScnrUeCtx"},
+	)
+	ScenarioLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "Scenario"},
+	)
+	ProfileLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "Profile"},
+	)
+	GNodeBLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "GNodeB"},
+	)
+	GinLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "Gin"},
+	)
+	HttpLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "HTTP"},
+	)
+	CfgLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "CFG"},
+	)
+	UtilLog = log.WithFields(
+		logrus.Fields{"component": "GNBSIM", "category": "Util"},
+	)
 	GtpLog = UtilLog.WithField("subcategory", "GTP")
 	NgapLog = UtilLog.WithField("subcategory", "NGAP")
 	PsuppLog = UtilLog.WithField("subcategory", "PSUPP")

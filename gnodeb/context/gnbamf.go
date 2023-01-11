@@ -7,6 +7,7 @@ package context
 import (
 	"net"
 
+	"github.com/omec-project/gnbsim/common"
 	"github.com/omec-project/gnbsim/logger"
 
 	amfctx "github.com/omec-project/amf/context"
@@ -32,16 +33,26 @@ type GnbAmf struct {
 	/*Socket Connection*/
 	Conn net.Conn
 
+	// GnbAmf writes messages to test scenario on this channel
+	WriteScenarioChan chan common.InterfaceMessage
+
 	/* logger */
 	Log *logrus.Entry
 }
 
-func NewGnbAmf(ip string, port int) *GnbAmf {
+func NewGnbAmf(
+	ip string,
+	port int,
+	writeScenarioChan chan common.InterfaceMessage,
+) *GnbAmf {
 	gnbAmf := &GnbAmf{}
 	gnbAmf.AmfIp = ip
 	gnbAmf.AmfPort = port
-	gnbAmf.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "GnbAmf",
-		logger.FieldIp: gnbAmf.AmfIp})
+	gnbAmf.WriteScenarioChan = writeScenarioChan
+	gnbAmf.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "GnbAmf",
+			logger.FieldIp: gnbAmf.AmfIp},
+	)
 	return gnbAmf
 }
 
@@ -76,6 +87,11 @@ func (amf *GnbAmf) GetNgSetupStatus() bool {
 	// TODO Access to this either should not be concurrent or should be
 	// synchronized
 	return amf.NgSetupStatus
+}
+
+func (amf *GnbAmf) SendToScenario(msg common.InterfaceMessage) {
+	amf.Log.Traceln("Sending", msg.GetEventType(), "to Scenario")
+	amf.WriteScenarioChan <- msg
 }
 
 func NewServedGUAMIList() []models.Guami {

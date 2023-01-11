@@ -37,7 +37,9 @@ type GnbUpTransport struct {
 func NewGnbUpTransport(gnb *gnbctx.GNodeB) *GnbUpTransport {
 	transport := &GnbUpTransport{}
 	transport.GnbInstance = gnb
-	transport.Log = logger.GNodeBLog.WithFields(logrus.Fields{"subcategory": "UserPlaneTransport"})
+	transport.Log = logger.GNodeBLog.WithFields(
+		logrus.Fields{"subcategory": "UserPlaneTransport"},
+	)
 
 	return transport
 }
@@ -90,7 +92,9 @@ func (upTprt *GnbUpTransport) SendToPeer(peer transportcommon.TransportPeer,
 
 // ReceiveFromPeer continuously waits for an incoming message from the UPF
 // It then routes the message to the GnbUpfWorker
-func (upTprt *GnbUpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer) {
+func (upTprt *GnbUpTransport) ReceiveFromPeer(
+	peer transportcommon.TransportPeer,
+) {
 	for {
 		recvMsg := make([]byte, MAX_UDP_PKT_LEN)
 		//TODO Handle notification, info
@@ -103,7 +107,10 @@ func (upTprt *GnbUpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 
 		gnbupf := upTprt.GnbInstance.GnbPeers.GetGnbUpf(srcIp)
 		if gnbupf == nil {
-			upTprt.Log.Errorln("No UPF Context found corresponding to IP:", srcIp)
+			upTprt.Log.Errorln(
+				"No UPF Context found corresponding to IP:",
+				srcIp,
+			)
 			continue
 		}
 		tMsg := &common.TransportMessage{}
@@ -113,8 +120,10 @@ func (upTprt *GnbUpTransport) ReceiveFromPeer(peer transportcommon.TransportPeer
 	}
 }
 
-func (upTprt *GnbUpTransport) CheckTransportParam(peer transportcommon.TransportPeer,
-	pkt []byte) error {
+func (upTprt *GnbUpTransport) CheckTransportParam(
+	peer transportcommon.TransportPeer,
+	pkt []byte,
+) error {
 
 	upf := peer.(*gnbctx.GnbUpf)
 
@@ -133,10 +142,15 @@ func (upTprt *GnbUpTransport) CheckTransportParam(peer transportcommon.Transport
 	return nil
 }
 
-func (upTprt *GnbUpTransport) SendToPeerBlock(peer transportcommon.TransportPeer, pkt []byte) ([]byte, error) {
+func (upTprt *GnbUpTransport) SendToPeerBlock(
+	peer transportcommon.TransportPeer,
+	pkt []byte,
+) ([]byte, error) {
 	return nil, nil
 }
 
-func (upTprt *GnbUpTransport) ConnectToPeer(peer transportcommon.TransportPeer) error {
+func (upTprt *GnbUpTransport) ConnectToPeer(
+	peer transportcommon.TransportPeer,
+) error {
 	return nil
 }

@@ -200,7 +200,11 @@ func DecodePduSessContainerExtHeader(pkt []uint8) (payload []uint8,
 	// First octet is Extension Header Length
 	octetCount := pkt[0] * 4
 	if octetCount == 0 || bufLen < int(octetCount) {
-		err = fmt.Errorf("incomplete extension header - buffer length: %v, extension header length value: %v", bufLen, pkt[0])
+		err = fmt.Errorf(
+			"incomplete extension header - buffer length: %v, extension header length value: %v",
+			bufLen,
+			pkt[0],
+		)
 		return
 	}
 
@@ -208,7 +212,10 @@ func DecodePduSessContainerExtHeader(pkt []uint8) (payload []uint8,
 	// Last octet of Extension header is Next Extension Header Type
 	extHdr.Qfi, err = DecodeDlPduSessInformation(pkt[1:(octetCount - 1)])
 	if err != nil {
-		err = fmt.Errorf("failed to decode downlink pdu sessioon information:%v", err)
+		err = fmt.Errorf(
+			"failed to decode downlink pdu sessioon information:%v",
+			err,
+		)
 		return
 	}
 

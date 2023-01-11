@@ -23,6 +23,7 @@ type GNodeB struct {
 	GnbName              string                 `yaml:"name"`
 	RanId                models.GlobalRanNodeId `yaml:"globalRanId"`
 	SupportedTaList      []SupportedTA          `yaml:"supportedTaList"`
+	NrCgiCellList        []models.Ncgi          `yaml:"nrCgiCellList"`
 	GnbUes               *GnbUeDao
 	GnbPeers             *GnbPeerDao
 	RanUeNGAPIDGenerator *idgenerator.IDGenerator
@@ -31,8 +32,8 @@ type GNodeB struct {
 	/*channel to notify all the go routines corresponding to this GNodeB instance to stop*/
 	Quit chan int
 
-	/* Default AMF to connect to */
-	DefaultAmf *GnbAmf `yaml:"defaultAmf"`
+	/* AMF to connect to */
+	Amf *GnbAmf
 
 	/* Control Plane transport */
 	CpTransport transport.Transport
@@ -44,8 +45,8 @@ type GNodeB struct {
 	Log *logrus.Entry
 }
 
-func (gnb *GNodeB) GetDefaultAmf() *GnbAmf {
-	return gnb.DefaultAmf
+func (gnb *GNodeB) GetAmf() *GnbAmf {
+	return gnb.Amf
 }
 
 func (gnb *GNodeB) AllocateRanUeNgapID() (int64, error) {

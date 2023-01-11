@@ -105,7 +105,11 @@ func (u *udphdr) checksum(ip *iphdr, payload []byte) {
 	u.csum = checksum(b.Bytes())
 }
 
-func BuildRawUdpIp(srcIP, dstIP string, srcPort, dstPort uint16, payload []byte) ([]byte, error) {
+func BuildRawUdpIp(
+	srcIP, dstIP string,
+	srcPort, dstPort uint16,
+	payload []byte,
+) ([]byte, error) {
 	var err error
 
 	ip := iphdr{
@@ -128,7 +132,11 @@ func BuildRawUdpIp(srcIP, dstIP string, srcPort, dstPort uint16, payload []byte)
 	udplen := 8 + len(payload)
 	totalLen := 20 + udplen
 	if totalLen > 0xffff {
-		err = fmt.Errorf("message is too large to fit into a packet: %v > %v\n", totalLen, 0xffff)
+		err = fmt.Errorf(
+			"message is too large to fit into a packet: %v > %v\n",
+			totalLen,
+			0xffff,
+		)
 		return nil, err
 	}
 

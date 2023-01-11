@@ -17,7 +17,9 @@ func BuildServiceRequest(serviceType uint8) *nas.Message {
 	m.GmmHeader.SetMessageType(nas.MsgTypeServiceRequest)
 
 	serviceRequest := nasMessage.NewServiceRequest(0)
-	serviceRequest.SetExtendedProtocolDiscriminator(nasMessage.Epd5GSMobilityManagementMessage)
+	serviceRequest.SetExtendedProtocolDiscriminator(
+		nasMessage.Epd5GSMobilityManagementMessage,
+	)
 	serviceRequest.SetSecurityHeaderType(nas.SecurityHeaderTypePlainNas)
 	serviceRequest.SetMessageType(nas.MsgTypeServiceRequest)
 	serviceRequest.SetServiceTypeValue(serviceType)
@@ -28,13 +30,19 @@ func BuildServiceRequest(serviceType uint8) *nas.Message {
 	serviceRequest.TMSI5GS.SetLen(7)
 	switch serviceType {
 	case nasMessage.ServiceTypeMobileTerminatedServices:
-		serviceRequest.AllowedPDUSessionStatus = new(nasType.AllowedPDUSessionStatus)
-		serviceRequest.AllowedPDUSessionStatus.SetIei(nasMessage.ServiceRequestAllowedPDUSessionStatusType)
+		serviceRequest.AllowedPDUSessionStatus = new(
+			nasType.AllowedPDUSessionStatus,
+		)
+		serviceRequest.AllowedPDUSessionStatus.SetIei(
+			nasMessage.ServiceRequestAllowedPDUSessionStatusType,
+		)
 		serviceRequest.AllowedPDUSessionStatus.SetLen(2)
 		serviceRequest.AllowedPDUSessionStatus.Buffer = []uint8{0x00, 0x08}
 	case nasMessage.ServiceTypeData:
 		serviceRequest.UplinkDataStatus = new(nasType.UplinkDataStatus)
-		serviceRequest.UplinkDataStatus.SetIei(nasMessage.ServiceRequestUplinkDataStatusType)
+		serviceRequest.UplinkDataStatus.SetIei(
+			nasMessage.ServiceRequestUplinkDataStatusType,
+		)
 		serviceRequest.UplinkDataStatus.SetLen(2)
 		serviceRequest.UplinkDataStatus.Buffer = []uint8{0x00, 0x04}
 	case nasMessage.ServiceTypeSignalling:
