@@ -34,7 +34,7 @@ func HandleConnectRequest(gnbue *gnbctx.GnbCpUe,
 
 	msg := intfcMsg.(*common.UuMessage)
 	gnbue.Supi = msg.Supi
-	gnbue.WriteUeChan = msg.CommChan
+	gnbue.WriteSimUeChan = msg.CommChan
 	gnbue.Log.Traceln("Connected to SimUe")
 }
 
@@ -607,6 +607,8 @@ func ProcessPduSessResourceSetupList(
 func HandleQuitEvent(gnbue *gnbctx.GnbCpUe, intfcMsg common.InterfaceMessage) {
 	terminateUpUeContexts(gnbue)
 	gnbue.Gnb.RanUeNGAPIDGenerator.FreeID(gnbue.GnbUeNgapId)
+	gnbue.Log.Infoln("GnbCpUe waiting for WaitGrp")
+
 	gnbue.WaitGrp.Wait()
 	gnbue.Log.Infoln("gNB Control-Plane UE context terminated")
 }
@@ -621,6 +623,7 @@ func terminateUpUeContexts(gnbue *gnbctx.GnbCpUe) {
 }
 
 func terminateUpUeContext(upCtx *gnbctx.GnbUpUe) {
+	upCtx.Log.Traceln("terminateUpUeContext")
 	msg := &common.DefaultMessage{}
 	msg.Event = common.QUIT_EVENT
 	upCtx.ReadCmdChan <- msg

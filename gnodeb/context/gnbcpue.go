@@ -27,7 +27,7 @@ type GnbCpUe struct {
 	WaitGrp sync.WaitGroup
 
 	// GnbCpUe writes messages to UE on this channel
-	WriteUeChan chan common.InterfaceMessage
+	WriteSimUeChan chan common.InterfaceMessage
 
 	// GnbCpUe reads messages from all other workers and UE on this channel
 	ReadChan chan common.InterfaceMessage
