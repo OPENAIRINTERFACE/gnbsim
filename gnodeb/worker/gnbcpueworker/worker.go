@@ -69,5 +69,5 @@ func SendToSimUe(
 	uemsg.NgapPdu = ngapPdu
 	uemsg.NgapProcedureCode = ngapProcedureCode
 	uemsg.NasPdu = nasPdu
-	gnbue.WriteUeChan <- &uemsg
+	gnbue.WriteSimUeChan <- &uemsg
 }

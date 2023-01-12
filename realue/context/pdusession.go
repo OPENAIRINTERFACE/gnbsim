@@ -38,7 +38,7 @@ type PduSession struct {
 	WriteGnbChan chan common.InterfaceMessage
 
 	/* command replies are written to RealUE over this channel */
-	WriteUeChan chan common.InterfaceMessage
+	WriteRealUeChan chan common.InterfaceMessage
 
 	/* Downlink packets from gNB UE user plane context are read over this channel */
 	ReadDlChan chan common.InterfaceMessage

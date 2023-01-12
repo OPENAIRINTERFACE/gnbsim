@@ -34,7 +34,7 @@ type GnbAmf struct {
 	Conn net.Conn
 
 	// GnbAmf writes messages to test scenario on this channel
-	WriteScenarioChan chan common.InterfaceMessage
+	WriteSimGnbChan chan common.InterfaceMessage
 
 	/* logger */
 	Log *logrus.Entry
@@ -43,12 +43,12 @@ type GnbAmf struct {
 func NewGnbAmf(
 	ip string,
 	port int,
-	writeScenarioChan chan common.InterfaceMessage,
+	writeSimGnbChan chan common.InterfaceMessage,
 ) *GnbAmf {
 	gnbAmf := &GnbAmf{}
 	gnbAmf.AmfIp = ip
 	gnbAmf.AmfPort = port
-	gnbAmf.WriteScenarioChan = writeScenarioChan
+	gnbAmf.WriteSimGnbChan = writeSimGnbChan
 	gnbAmf.Log = logger.GNodeBLog.WithFields(
 		logrus.Fields{"subcategory": "GnbAmf",
 			logger.FieldIp: gnbAmf.AmfIp},
@@ -91,7 +91,7 @@ func (amf *GnbAmf) GetNgSetupStatus() bool {
 
 func (amf *GnbAmf) SendToScenario(msg common.InterfaceMessage) {
 	amf.Log.Traceln("Sending", msg.GetEventType(), "to Scenario")
-	amf.WriteScenarioChan <- msg
+	amf.WriteSimGnbChan <- msg
 }
 
 func NewServedGUAMIList() []models.Guami {

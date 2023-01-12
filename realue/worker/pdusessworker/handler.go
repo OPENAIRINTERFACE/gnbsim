@@ -58,7 +58,7 @@ func SendIcmpEchoRequest(pduSess *realuectx.PduSession) (err error) {
 		Src:      pduSess.PduAddress, // ue IP address
 		// upstream router interface connected to Gi
 		Dst: net.ParseIP(pduSess.DefaultAs).To4(),
-		ID: 1,
+		ID:  1,
 	}
 	checksum := test.CalculateIpv4HeaderChecksum(&ipv4hdr)
 	ipv4hdr.Checksum = int(checksum)
@@ -118,7 +118,7 @@ func HandleIcmpMessage(pduSess *realuectx.PduSession,
 		} else {
 			msg := &common.UuMessage{}
 			msg.Event = common.DATA_PKT_GEN_SUCCESS_EVENT
-			pduSess.WriteUeChan <- msg
+			pduSess.WriteRealUeChan <- msg
 			pduSess.Log.Traceln("Sent Data Packet Generation Success Event")
 		}
 	default:
@@ -213,7 +213,7 @@ func HandleQuitEvent(pduSess *realuectx.PduSession,
 		}
 	}
 
-	pduSess.WriteUeChan = nil
+	pduSess.WriteRealUeChan = nil
 	pduSess.Log.Infoln("Pdu Session terminated")
 
 	return nil

@@ -125,7 +125,7 @@ func HandlePduSessEstAcceptEvent(ue *realuectx.RealUe,
 	pduSess.PduSessType = pduSessType
 	pduSess.SscMode = nasMsg.GetSSCMode()
 	pduSess.PduAddress = pduAddr
-	pduSess.WriteUeChan = ue.ReadChan
+	pduSess.WriteRealUeChan = ue.ReadChan
 	ue.AddPduSession(int64(pduSess.PduSessId), pduSess)
 	ue.Log.Infoln("PDU Session ID:", pduSess.PduSessId)
 	ue.Log.Infoln("PDU Session Type:", pduSess.PduSessType)

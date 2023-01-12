@@ -25,7 +25,7 @@ import (
 // Init initializes the GNodeB struct var and connects (SCTP only) to the default AMF
 func Init(
 	gnb *gnbctx.GNodeB,
-	scenarioReadChan chan common.InterfaceMessage,
+	simGnbReadChan chan common.InterfaceMessage,
 ) error {
 	gnb.Log = logger.GNodeBLog.WithField(logger.FieldGnb, gnb.GnbName)
 	gnb.Log.Traceln("Inititializing GNodeB")
@@ -67,7 +67,7 @@ func Init(
 			gnb.Amf = gnbctx.NewGnbAmf(
 				addrs[0],
 				gnbctx.NGAP_SCTP_PORT,
-				scenarioReadChan,
+				simGnbReadChan,
 			)
 		}
 	}
